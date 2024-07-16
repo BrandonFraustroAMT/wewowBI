@@ -18,6 +18,11 @@ defineProps(
     :data-slice-type="slice.slice_type"
     :data-slice-variation="slice.variation"
   >
-    Placeholder component for menu (variation: {{ slice.variation }}) Slices
+    <PrismicRichText :field="slice.primary.nombreempresa" />
+    <PrismicImage :field="slice.primary.logoempresa" />
+    <template v-for="item in slice.primary.groupmenu">
+      <PrismicLink :field="item.linklabel">{{ item.label }}</PrismicLink>
+    </template>
+    <PrismicImage :field="slice.primary.logo" />
   </section>
 </template>

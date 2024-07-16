@@ -18,7 +18,25 @@ defineProps(
     :data-slice-type="slice.slice_type"
     :data-slice-variation="slice.variation"
   >
-    Placeholder component for barra_lateral (variation: {{ slice.variation }})
-    Slices
+    <PrismicRichText :field="slice.primary.titulo" />
+    <PrismicImage :field="slice.primary.logo" />
+    {{ slice.primary.nombreempresa }}
+    {{ slice.primary.correousuario }}
+    <PrismicImage :field="slice.primary.logoempresa" />
+
+    {{ slice.primary.labelaplicaciones }}
+    <template v-for="item in slice.primary.groupaplicaciones">
+      <PrismicImage :field="item.icono" />
+      {{ item.label }}
+    </template>
+
+    {{ slice.primary.labelherramientas }}
+    <template v-for="item in slice.primary.groupherramientas">
+      <PrismicImage :field="item.icono" />
+      {{ item.label }}
+    </template>
+
+    {{ slice.primary.labelresultados }}
+    {{ slice.primary.labelreportes }}
   </section>
 </template>
