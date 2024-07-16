@@ -1,0 +1,68 @@
+{
+  "id": "menu",
+  "type": "SharedSlice",
+  "name": "Menu",
+  "description": "Menu",
+  "variations": [
+    {
+      "id": "default",
+      "name": "Default",
+      "docURL": "...",
+      "version": "initial",
+      "description": "Default",
+      "imageUrl": "",
+      "primary": {
+        "nombreempresa": {
+          "type": "StructuredText",
+          "config": {
+            "label": "NombreEmpresa",
+            "placeholder": "",
+            "allowTargetBlank": true,
+            "multi": "paragraph,preformatted,heading1,heading2,heading3,heading4,heading5,heading6,strong,em,hyperlink,image,embed,list-item,o-list-item,rtl"
+          }
+        },
+        "logoempresa": {
+          "type": "Image",
+          "config": {
+            "label": "LogoEmpresa",
+            "constraint": {},
+            "thumbnails": []
+          }
+        },
+        "groupmenu": {
+          "type": "Group",
+          "config": {
+            "label": "GroupMenu",
+            "repeat": true,
+            "fields": {
+              "linklabel": {
+                "type": "Link",
+                "config": {
+                  "label": "LinkLabel",
+                  "placeholder": "",
+                  "select": null
+                }
+              },
+              "label": {
+                "type": "Text",
+                "config": {
+                  "label": "Label",
+                  "placeholder": ""
+                }
+              }
+            }
+          }
+        },
+        "logo": {
+          "type": "Image",
+          "config": {
+            "label": "Logo",
+            "constraint": {},
+            "thumbnails": []
+          }
+        }
+      },
+      "items": {}
+    }
+  ]
+}

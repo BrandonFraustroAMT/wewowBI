@@ -1,0 +1,134 @@
+{
+  "id": "barra_lateral",
+  "type": "SharedSlice",
+  "name": "BarraLateral",
+  "description": "BarraLateral",
+  "variations": [
+    {
+      "id": "default",
+      "name": "Default",
+      "docURL": "...",
+      "version": "initial",
+      "description": "Default",
+      "imageUrl": "",
+      "primary": {
+        "titulo": {
+          "type": "StructuredText",
+          "config": {
+            "label": "Titulo",
+            "placeholder": "",
+            "allowTargetBlank": true,
+            "multi": "paragraph,preformatted,heading1,heading2,heading3,heading4,heading5,heading6,strong,em,hyperlink,image,embed,list-item,o-list-item,rtl"
+          }
+        },
+        "logo": {
+          "type": "Image",
+          "config": {
+            "label": "Logo",
+            "constraint": {},
+            "thumbnails": []
+          }
+        },
+        "nombreempresa": {
+          "type": "Text",
+          "config": {
+            "label": "NombreEmpresa",
+            "placeholder": ""
+          }
+        },
+        "correousuario": {
+          "type": "Text",
+          "config": {
+            "label": "CorreoUsuario",
+            "placeholder": ""
+          }
+        },
+        "logoempresa": {
+          "type": "Image",
+          "config": {
+            "label": "LogoEmpresa",
+            "constraint": {},
+            "thumbnails": []
+          }
+        },
+        "labelaplicaciones": {
+          "type": "Text",
+          "config": {
+            "label": "LabelAplicaciones",
+            "placeholder": ""
+          }
+        },
+        "groupaplicaciones": {
+          "type": "Group",
+          "config": {
+            "label": "GroupAplicaciones",
+            "repeat": true,
+            "fields": {
+              "label": {
+                "type": "Text",
+                "config": {
+                  "label": "Label",
+                  "placeholder": ""
+                }
+              },
+              "icono": {
+                "type": "Image",
+                "config": {
+                  "label": "Icono",
+                  "constraint": {},
+                  "thumbnails": []
+                }
+              }
+            }
+          }
+        },
+        "labelherramientas": {
+          "type": "Text",
+          "config": {
+            "label": "LabelHerramientas",
+            "placeholder": ""
+          }
+        },
+        "groupherramientas": {
+          "type": "Group",
+          "config": {
+            "label": "GroupHerramientas",
+            "repeat": true,
+            "fields": {
+              "label": {
+                "type": "Text",
+                "config": {
+                  "label": "Label",
+                  "placeholder": ""
+                }
+              },
+              "icono": {
+                "type": "Image",
+                "config": {
+                  "label": "Icono",
+                  "constraint": {},
+                  "thumbnails": []
+                }
+              }
+            }
+          }
+        },
+        "labelresultados": {
+          "type": "Text",
+          "config": {
+            "label": "LabelResultados",
+            "placeholder": ""
+          }
+        },
+        "labelreportes": {
+          "type": "Text",
+          "config": {
+            "label": "LabelReportes",
+            "placeholder": ""
+          }
+        }
+      },
+      "items": {}
+    }
+  ]
+}
