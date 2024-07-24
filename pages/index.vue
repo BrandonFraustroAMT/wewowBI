@@ -6,7 +6,7 @@
       <div class="menu-column">
         <Menu v-if="menuSlice" :slice="menuSlice" />
         <BarraPaises />
-        <div class="powerbi"></div>
+        <Tabla />
       </div>
     </div>
     
@@ -83,17 +83,10 @@ onMounted(() => {
   to { transform: rotate(360deg); }
 }
 
-
 .portal {
   width: 100%;
   display: flex;
   flex-direction: row;
 }
 
-
-.powerbi {
-  width: 100%;
-  height: 86%;
-  background-color: #DFD3C3;
-}
 </style>
