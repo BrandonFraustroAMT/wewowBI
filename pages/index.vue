@@ -9,12 +9,6 @@
         <Tabla />
       </div>
     </div>
-    
-    <!-- <SliceZone v-if="document && document.data" :slices="document.data.slices" :components="components" />
-    <div v-else class="loading-overlay">
-      <div class="spinner"></div>
-      <p>Loading...</p>
-    </div> -->
   </div>
 </template>
 
@@ -87,6 +81,10 @@ onMounted(() => {
   width: 100%;
   display: flex;
   flex-direction: row;
+}
+
+.menu-column {
+  width: 100%;
 }
 
 </style>

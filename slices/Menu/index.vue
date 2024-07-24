@@ -45,7 +45,7 @@ defineProps(
 
 <style>
   .menu {
-    width: 1200px;
+    width: 100%;
   }
   .menu-slice {
     width: 100%;
@@ -54,7 +54,7 @@ defineProps(
 
   .menu-slice__container {
     width: 70%;
-    height: 100px;
+    height: 80px;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
@@ -65,6 +65,8 @@ defineProps(
   .menu-slice__empresa {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
   .menu-slice__empresa-logo {
     width: 100px;

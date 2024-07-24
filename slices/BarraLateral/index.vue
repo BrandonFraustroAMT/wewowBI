@@ -62,7 +62,7 @@ defineProps(
 
 <style>
   .barra {
-    width: 20%;
+    width: 15%;
   }
   .barra-slice {
     width: 100%;

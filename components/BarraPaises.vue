@@ -10,7 +10,7 @@
 <style>
   .paises {
     width: 100%;
-    height: 10%;
+    height: 60px;
     background-color: #e6c293;
   }
   .paises-container {
