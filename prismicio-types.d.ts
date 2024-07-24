@@ -4,7 +4,7 @@ import type * as prismic from "@prismicio/client";
 
 type Simplify<T> = { [KeyType in keyof T]: T[KeyType] };
 
-type PortalDocumentDataSlicesSlice = BarraLateralSlice;
+type PortalDocumentDataSlicesSlice = MenuSlice | BarraLateralSlice;
 
 /**
  * Content for Portal documents
@@ -63,63 +63,9 @@ interface PortalDocumentData {
  * @typeParam Lang - Language API ID of the document.
  */
 export type PortalDocument<Lang extends string = string> =
-  prismic.PrismicDocumentWithoutUID<
-    Simplify<PortalDocumentData>,
-    "portal",
-    Lang
-  >;
+  prismic.PrismicDocumentWithUID<Simplify<PortalDocumentData>, "portal", Lang>;
 
 export type AllDocumentTypes = PortalDocument;
-
-/**
- * Item in *BarraLateral → Default → Primary → GroupAplicaciones*
- */
-export interface BarraLateralSliceDefaultPrimaryGroupaplicacionesItem {
-  /**
-   * Label field in *BarraLateral → Default → Primary → GroupAplicaciones*
-   *
-   * - **Field Type**: Text
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.groupaplicaciones[].label
-   * - **Documentation**: https://prismic.io/docs/field#key-text
-   */
-  label: prismic.KeyTextField;
-
-  /**
-   * Icono field in *BarraLateral → Default → Primary → GroupAplicaciones*
-   *
-   * - **Field Type**: Image
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.groupaplicaciones[].icono
-   * - **Documentation**: https://prismic.io/docs/field#image
-   */
-  icono: prismic.ImageField<never>;
-}
-
-/**
- * Item in *BarraLateral → Default → Primary → GroupHerramientas*
- */
-export interface BarraLateralSliceDefaultPrimaryGroupherramientasItem {
-  /**
-   * Label field in *BarraLateral → Default → Primary → GroupHerramientas*
-   *
-   * - **Field Type**: Text
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.groupherramientas[].label
-   * - **Documentation**: https://prismic.io/docs/field#key-text
-   */
-  label: prismic.KeyTextField;
-
-  /**
-   * Icono field in *BarraLateral → Default → Primary → GroupHerramientas*
-   *
-   * - **Field Type**: Image
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.groupherramientas[].icono
-   * - **Documentation**: https://prismic.io/docs/field#image
-   */
-  icono: prismic.ImageField<never>;
-}
 
 /**
  * Primary content in *BarraLateral → Default → Primary*
@@ -146,16 +92,6 @@ export interface BarraLateralSliceDefaultPrimary {
   logo: prismic.ImageField<never>;
 
   /**
-   * NombreEmpresa field in *BarraLateral → Default → Primary*
-   *
-   * - **Field Type**: Text
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.nombreempresa
-   * - **Documentation**: https://prismic.io/docs/field#key-text
-   */
-  nombreempresa: prismic.KeyTextField;
-
-  /**
    * CorreoUsuario field in *BarraLateral → Default → Primary*
    *
    * - **Field Type**: Text
@@ -176,48 +112,14 @@ export interface BarraLateralSliceDefaultPrimary {
   logoempresa: prismic.ImageField<never>;
 
   /**
-   * LabelAplicaciones field in *BarraLateral → Default → Primary*
+   * NombreEmpresa field in *BarraLateral → Default → Primary*
    *
    * - **Field Type**: Text
    * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.labelaplicaciones
+   * - **API ID Path**: barra_lateral.default.primary.nombreempresa
    * - **Documentation**: https://prismic.io/docs/field#key-text
    */
-  labelaplicaciones: prismic.KeyTextField;
-
-  /**
-   * GroupAplicaciones field in *BarraLateral → Default → Primary*
-   *
-   * - **Field Type**: Group
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.groupaplicaciones[]
-   * - **Documentation**: https://prismic.io/docs/field#group
-   */
-  groupaplicaciones: prismic.GroupField<
-    Simplify<BarraLateralSliceDefaultPrimaryGroupaplicacionesItem>
-  >;
-
-  /**
-   * LabelHerramientas field in *BarraLateral → Default → Primary*
-   *
-   * - **Field Type**: Text
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.labelherramientas
-   * - **Documentation**: https://prismic.io/docs/field#key-text
-   */
-  labelherramientas: prismic.KeyTextField;
-
-  /**
-   * GroupHerramientas field in *BarraLateral → Default → Primary*
-   *
-   * - **Field Type**: Group
-   * - **Placeholder**: *None*
-   * - **API ID Path**: barra_lateral.default.primary.groupherramientas[]
-   * - **Documentation**: https://prismic.io/docs/field#group
-   */
-  groupherramientas: prismic.GroupField<
-    Simplify<BarraLateralSliceDefaultPrimaryGroupherramientasItem>
-  >;
+  nombreempresa: prismic.KeyTextField;
 
   /**
    * LabelResultados field in *BarraLateral → Default → Primary*
@@ -382,8 +284,6 @@ declare module "@prismicio/client" {
       PortalDocumentDataSlicesSlice,
       AllDocumentTypes,
       BarraLateralSlice,
-      BarraLateralSliceDefaultPrimaryGroupaplicacionesItem,
-      BarraLateralSliceDefaultPrimaryGroupherramientasItem,
       BarraLateralSliceDefaultPrimary,
       BarraLateralSliceVariation,
       BarraLateralSliceDefault,

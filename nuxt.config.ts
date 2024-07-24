@@ -4,8 +4,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   modules: ["@nuxtjs/prismic"],
-
+  css: [
+    '@/assets/css/reset.css',
+  ],
   prismic: {
-    endpoint: apiEndpoint || repositoryName
+    endpoint: apiEndpoint || repositoryName,
+    linkResolver: '@/plugins/link-resolver.js',
+    htmlSerializer: '@/plugins/html-serializer.js',
   }
 })

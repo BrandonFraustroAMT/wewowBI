@@ -29,13 +29,6 @@
             "thumbnails": []
           }
         },
-        "nombreempresa": {
-          "type": "Text",
-          "config": {
-            "label": "NombreEmpresa",
-            "placeholder": ""
-          }
-        },
         "correousuario": {
           "type": "Text",
           "config": {
@@ -51,66 +44,11 @@
             "thumbnails": []
           }
         },
-        "labelaplicaciones": {
+        "nombreempresa": {
           "type": "Text",
           "config": {
-            "label": "LabelAplicaciones",
+            "label": "NombreEmpresa",
             "placeholder": ""
-          }
-        },
-        "groupaplicaciones": {
-          "type": "Group",
-          "config": {
-            "label": "GroupAplicaciones",
-            "repeat": true,
-            "fields": {
-              "label": {
-                "type": "Text",
-                "config": {
-                  "label": "Label",
-                  "placeholder": ""
-                }
-              },
-              "icono": {
-                "type": "Image",
-                "config": {
-                  "label": "Icono",
-                  "constraint": {},
-                  "thumbnails": []
-                }
-              }
-            }
-          }
-        },
-        "labelherramientas": {
-          "type": "Text",
-          "config": {
-            "label": "LabelHerramientas",
-            "placeholder": ""
-          }
-        },
-        "groupherramientas": {
-          "type": "Group",
-          "config": {
-            "label": "GroupHerramientas",
-            "repeat": true,
-            "fields": {
-              "label": {
-                "type": "Text",
-                "config": {
-                  "label": "Label",
-                  "placeholder": ""
-                }
-              },
-              "icono": {
-                "type": "Image",
-                "config": {
-                  "label": "Icono",
-                  "constraint": {},
-                  "thumbnails": []
-                }
-              }
-            }
           }
         },
         "labelresultados": {

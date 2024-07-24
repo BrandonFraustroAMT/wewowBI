@@ -37,11 +37,6 @@
 				"__TYPE__": "ImageContent",
 				"thumbnails": {}
 			},
-			"nombreempresa": {
-				"__TYPE__": "FieldContent",
-				"value": "women",
-				"type": "Text"
-			},
 			"correousuario": {
 				"__TYPE__": "FieldContent",
 				"value": "occasionally",
@@ -70,104 +65,6 @@
 				"__TYPE__": "ImageContent",
 				"thumbnails": {}
 			},
-			"groupaplicaciones": {
-				"__TYPE__": "GroupContentType",
-				"value": [
-					{
-						"__TYPE__": "GroupItemContent",
-						"value": [
-							[
-								"label",
-								{
-									"__TYPE__": "FieldContent",
-									"value": "stared",
-									"type": "Text"
-								}
-							],
-							[
-								"icono",
-								{
-									"origin": {
-										"id": "main",
-										"url": "https://images.unsplash.com/photo-1471897488648-5eae4ac6686b",
-										"width": 3560,
-										"height": 5340
-									},
-									"url": "https://images.unsplash.com/photo-1471897488648-5eae4ac6686b",
-									"width": 3560,
-									"height": 5340,
-									"edit": {
-										"zoom": 1,
-										"crop": {
-											"x": 0,
-											"y": 0
-										},
-										"background": "transparent"
-									},
-									"credits": null,
-									"alt": null,
-									"__TYPE__": "ImageContent",
-									"thumbnails": {}
-								}
-							]
-						]
-					}
-				]
-			},
-			"labelaplicaciones": {
-				"__TYPE__": "FieldContent",
-				"value": "mathematics",
-				"type": "Text"
-			},
-			"labelherramientas": {
-				"__TYPE__": "FieldContent",
-				"value": "cent",
-				"type": "Text"
-			},
-			"groupherramientas": {
-				"__TYPE__": "GroupContentType",
-				"value": [
-					{
-						"__TYPE__": "GroupItemContent",
-						"value": [
-							[
-								"label",
-								{
-									"__TYPE__": "FieldContent",
-									"value": "mirror",
-									"type": "Text"
-								}
-							],
-							[
-								"icono",
-								{
-									"origin": {
-										"id": "main",
-										"url": "https://images.unsplash.com/photo-1589321599763-d66926c29613",
-										"width": 3168,
-										"height": 4752
-									},
-									"url": "https://images.unsplash.com/photo-1589321599763-d66926c29613",
-									"width": 3168,
-									"height": 4752,
-									"edit": {
-										"zoom": 1,
-										"crop": {
-											"x": 0,
-											"y": 0
-										},
-										"background": "transparent"
-									},
-									"credits": null,
-									"alt": null,
-									"__TYPE__": "ImageContent",
-									"thumbnails": {}
-								}
-							]
-						]
-					}
-				]
-			},
 			"labelresultados": {
 				"__TYPE__": "FieldContent",
 				"value": "elephant",
@@ -176,6 +73,11 @@
 			"labelreportes": {
 				"__TYPE__": "FieldContent",
 				"value": "lungs",
+				"type": "Text"
+			},
+			"nombreempresa": {
+				"__TYPE__": "FieldContent",
+				"value": "island",
 				"type": "Text"
 			}
 		},
