@@ -11,7 +11,9 @@
   .paises {
     width: 100%;
     height: 60px;
-    background-color: #e6c293;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    background-color: rgba(6, 142, 240, 1.0);
   }
   .paises-container {
     height: 100%;

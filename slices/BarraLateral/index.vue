@@ -32,7 +32,7 @@ defineProps(
         </div>
         <div class="barra-slice__column2">
           <div class="barra-slice__text">
-            {{ slice.primary.nombreempresa }}
+            <p>Empresa</p>
           </div>
           <div class="barra-slice__text">
             {{ slice.primary.correousuario }}
