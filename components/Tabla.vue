@@ -1,46 +1,181 @@
 <script setup lang="ts">
-  import empresasService from '~/services/Empresas';
-  
+import { onMounted, ref } from 'vue';
+import { useRoute } from '#app';
+import empresasService from '~/services/Empresas';
 
-  const empresas = async () => {
-    try {
-      const data = await empresasService.getEmpresas();
-      console.log("Data tabla", data);
-    } catch(err) {
-      console.log("Error tabla: ", err);
-    }
+const route = useRoute();
+const empresa = ref<number>(0);
+const empresaData = ref({});
+
+const empresafounded = async (id:number) => {
+  if (id) {
+    const data = await empresasService.getEmpresaId(id);
+    empresaData.value = data;
   }
+};
 
-  empresas();
+onMounted(() => {
+  const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
+  empresa.value = isNaN(empresaId) ? null : empresaId;
+  empresafounded(empresa.value);
+});
+
+
+interface Afirmacion {
+  id?: number;
+  name?: string;
+  valor?: String;
+}
+interface Competencia {
+  id?: number;
+  name?: string;
+  afirmacion?: Afirmacion[];
+}
+
+interface Subdimension {
+  id?: number;
+  name?: string;
+  competencia?: Competencia[];
+}
+
+interface Dimension {
+  id: number;
+  dimension: string;
+  subdimension: Subdimension[];
+}
+
+const tableData = ref<Dimension[]>([
+  {
+    id: 1,
+    dimension: "Talento",
+    subdimension: [
+      {
+        id: 11,
+        name: "Querer",
+        competencia: [
+          {
+            id: 111,
+            name: "Flexible",
+            afirmacion: [
+              {
+                id: 1111,
+                name: "Los trabajadores se adaptan al cambio",
+                valor: ""
+              }
+            ]
+          },
+          {
+            id: 112,
+            name: "Compañerismo"
+          },
+          {
+            id: 113,
+            name: "Energizer"
+          },
+        ]
+      },
+      {
+        id: 12,
+        name: "Sentir"
+      },
+      {
+        id: 13,
+        name: "Saber"
+      },
+      {
+        id: 14,
+        name: "Hacer"
+      }
+    ]
+  },
+  {
+    id: 2,
+    dimension: "Liderazgo",
+    subdimension: [
+      {
+        id: 21,
+        name: "Auto-liderazgo"
+      },
+      {
+        id: 22,
+        name: "Liderazgo orientado a los demás"
+      },
+      {
+        id: 23,
+        name: "Liderazgo hacia el negocio"
+      }
+    ]
+  },
+  {
+    id: 3,
+    dimension: "Cultura",
+    subdimension: [
+      {
+        id: 31,
+        name: "Experiencia del colaborador"
+      },
+      {
+        id: 32,
+        name: "Gestión del cambio"
+      },
+      {
+        id: 33,
+        name: "Valores"
+      },
+      {
+        id: 34,
+        name: "Propósito"
+      }
+    ]
+  }
+]);
+
+const expandedRows = ref(new Set<number>());
+
+const toggleRow = (id: number) => {
+  if (expandedRows.value.has(id)) {
+    expandedRows.value.delete(id);
+  } else {
+    expandedRows.value.add(id);
+  }
+};
 
 </script>
+
 <template>
   <section class="tabla">
     <div class="tabla-container">
       <div class="tabla-container__scroll">
-        <table>
+        <table class="table">
           <caption>Empresa</caption>
-          <tr>
-            <th></th>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-            <th>6</th>
-            <th>7</th>
-            <th>8</th>
-            <th>9</th>
-            <th>10</th>
-          </tr>
-          <tr>
-
-          </tr>
-          <tr>
-            <td>Demográficos</td>
-            <td>Data</td>
-            <td>Data</td>
-          </tr>
+          <tbody>
+            <template v-for="dimension in tableData" :key="dimension.id">
+              <tr @click="toggleRow(dimension.id)">
+                <td>{{ dimension.dimension }}</td>
+              </tr>
+              <template v-if="expandedRows.has(dimension.id)">
+                <template v-for="subdimension in dimension.subdimension" :key="subdimension.id || subdimension.name">
+                  <tr @click="toggleRow(subdimension.id)">
+                    <td :style="{ paddingLeft: '20px' }">{{ subdimension.name }}</td>
+                  </tr>
+                  <template v-if="expandedRows.has(subdimension.id)">
+                    <template v-for="competencia in subdimension.competencia" :key="competencia.id || competencia.name">
+                      <tr @click="toggleRow(competencia.id)">
+                        <td :style="{ paddingLeft: '40px' }">{{ competencia.name }}</td>
+                      </tr>
+                      <template v-if="expandedRows.has(competencia.id)">
+                        <template v-for="afirmacion in competencia.afirmacion" :key="afirmacion.id || afirmacion.name">
+                          <tr>
+                            <td :style="{ paddingLeft: '60px' }">{{ afirmacion.name }}</td>
+                          </tr>
+                        </template>
+                      </template>
+                    </template>
+                  </template>
+                </template>
+              </template>
+            </template>
+          </tbody>
         </table>
       </div>
     </div>
@@ -52,9 +187,16 @@
     width: 100%;
   }
   .tabla-container__scroll {
+    width: 100%;
+    margin: 10px 10px;
     max-width: 100%;
-    max-height: 500px; 
+    max-height: 600px; 
     overflow-x: auto;
     overflow-y: auto;
+  }
+
+  .table {
+    margin: 5px 5px;
+    border: 1px solid black
   }
 </style>

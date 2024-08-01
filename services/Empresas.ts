@@ -15,9 +15,11 @@ const getEmpresas = async () => {
 const getEmpresaId = async (id:number) => {
   try {
     const response = await axios.get(`${BackendURL}/empresas/${id}`)
-    console.log("Response getempresaid: ", response.data);
+    //console.log("Response getempresaid: ", response.data);
+    return response.data
   } catch(e:any) {
-    console.log("Error getempresaid: ", e);
+    console.log("Error getempresaid: ", e.message);
+    return e.message
   }
 }
 

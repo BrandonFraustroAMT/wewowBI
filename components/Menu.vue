@@ -9,7 +9,7 @@
             <img src="" alt="">
           </div>
           <div class="menu-slice__title">
-            <h3>Empresa</h3>
+            <h3>{{ empresaData.empnombre }}</h3>
           </div>
         </div>
         
@@ -25,7 +25,69 @@
       </div>
     </div>
   </section>
+  <section class="paises">
+    <div class="paises-container">
+      <div class="paises-container__image">
+      </div>
+    </div>
+  </section>
 </template>
+
+<script setup>
+
+import { onMounted, ref } from 'vue';
+import { useRoute } from '#app';
+import empresaService from '~/services/Empresas';
+
+const route = useRoute();
+const empresa = ref(0);
+const empresaData = ref({});
+
+const empresafounded = async (id) => {
+  if (id) {
+    const data = await empresaService.getEmpresaId(id);
+    empresaData.value = data;
+    //console.log("Datos de la empresa: ", empresaData.value);
+  }
+};
+
+onMounted(() => {
+  const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
+  empresa.value = isNaN(empresaId) ? null : empresaId;
+  empresafounded(empresa.value);
+});
+
+/* const props = defineProps({
+  empresa: {
+    type: Number,
+    default: null
+  }
+})
+
+const { empresa } = toRefs(props);
+
+const empresaData = ref({});
+
+const empresafounded = async (id) => {
+  if (id) {
+    const data = await empresaService.getEmpresaId(id);
+    empresaData.value = data;
+    console.log(empresaData);
+  }
+};
+
+watch(empresa, (newId) => {
+  empresafounded(newId);
+}, { immediate: true });
+
+onMounted(() => {
+  console.log(empresa.value);
+  if (empresa.value) {
+    empresafounded(empresa.value);
+  }
+});
+ */
+</script>
 
 <style>
   .menu {
@@ -84,5 +146,27 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around
+  }
+
+  .paises {
+    width: 100%;
+    height: 60px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    background-color: rgba(6, 142, 240, 1.0);
+  }
+  .paises-container {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 10px;
+  }
+
+  .paises-container__image {
+    width: 60px;
+    height: 30px;
+    border-radius: 10px;
+    background-color: #DFD3C3;
   }
 </style>
