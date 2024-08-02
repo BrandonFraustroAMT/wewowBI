@@ -149,14 +149,28 @@ const toggleRow = (id: number) => {
         <table class="table">
           <caption>Empresa</caption>
           <tbody>
+            <!-- EJEMPLO ENCABEZADO -->
+              <tr class="encabezado">
+                <td class="dimension">Dimension</td>
+              </tr>
+              <tr class="encabezado">
+                <td :style="{ paddingLeft: '20px' }">Subdimension</td>
+              </tr>
+              <tr class="encabezado">
+                <td :style="{ paddingLeft: '40px' }">competencia</td>
+              </tr>
+              <tr class="encabezado">
+                <td :style="{ paddingLeft: '60px' }">afirmacion</td>
+              </tr>
+            <!-- DATA DB -->
             <template v-for="dimension in tableData" :key="dimension.id">
               <tr @click="toggleRow(dimension.id)">
-                <td>{{ dimension.dimension }}</td>
+                <td class="dimension">{{ dimension.dimension }}</td>
               </tr>
               <template v-if="expandedRows.has(dimension.id)">
                 <template v-for="subdimension in dimension.subdimension" :key="subdimension.id || subdimension.name">
                   <tr @click="toggleRow(subdimension.id)">
-                    <td :style="{ paddingLeft: '20px' }">{{ subdimension.name }}</td>
+                    <td :style="{ paddingLeft: '20px' }" class="subdimension">{{ subdimension.name }}</td>
                   </tr>
                   <template v-if="expandedRows.has(subdimension.id)">
                     <template v-for="competencia in subdimension.competencia" :key="competencia.id || competencia.name">
@@ -198,5 +212,9 @@ const toggleRow = (id: number) => {
   .table {
     margin: 5px 5px;
     border: 1px solid black
+  }
+
+  .encabezado {
+    background-color: rgb(186, 182, 182);
   }
 </style>
