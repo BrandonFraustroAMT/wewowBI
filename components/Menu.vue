@@ -57,36 +57,6 @@ onMounted(() => {
   empresafounded(empresa.value);
 });
 
-/* const props = defineProps({
-  empresa: {
-    type: Number,
-    default: null
-  }
-})
-
-const { empresa } = toRefs(props);
-
-const empresaData = ref({});
-
-const empresafounded = async (id) => {
-  if (id) {
-    const data = await empresaService.getEmpresaId(id);
-    empresaData.value = data;
-    console.log(empresaData);
-  }
-};
-
-watch(empresa, (newId) => {
-  empresafounded(newId);
-}, { immediate: true });
-
-onMounted(() => {
-  console.log(empresa.value);
-  if (empresa.value) {
-    empresafounded(empresa.value);
-  }
-});
- */
 </script>
 
 <style>
