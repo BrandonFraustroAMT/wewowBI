@@ -27,7 +27,26 @@
   </section>
   <section class="paises">
     <div class="paises-container">
-      <div class="paises-container__image">
+      <div class="paises-container__img">
+        <a href="#"><img src="/assets/img/filtrar.png" alt="Filto"></a>
+      </div>
+      <div class="paises-container__buttons">
+        <div>
+          
+          <!-- <a href="#">
+            <img src="/assets/img/campos.png" alt="Filto">
+          </a> -->
+            <UButton label="Campos" class="btn" @click="isOpen = true" />
+
+            <UModal v-model="isOpen">
+              <FiltroCampos/>
+            </UModal>
+        </div>
+        <div class="paises-container__img">
+          <a href="#">
+            <img src="/assets/img/xls.png" alt="Filto">
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -42,12 +61,13 @@ import empresaService from '~/services/Empresas';
 const route = useRoute();
 const empresa = ref(0);
 const empresaData = ref({});
+const isOpen = ref(false)
 
 const empresafounded = async (id) => {
   if (id) {
     const data = await empresaService.getEmpresaId(id);
     empresaData.value = data;
-    //console.log("Datos de la empresa: ", empresaData.value);
+    console.log("Datos de la empresa: ", empresaData.value);
   }
 };
 
@@ -126,11 +146,12 @@ onMounted(() => {
     background-color: rgba(6, 142, 240, 1.0);
   }
   .paises-container {
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-left: 10px;
+    padding-left: 40px;
   }
 
   .paises-container__image {
@@ -138,5 +159,25 @@ onMounted(() => {
     height: 30px;
     border-radius: 10px;
     background-color: #DFD3C3;
+  }
+  .paises-container__img {
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  .paises-container__img p{
+    font-size: 0.5rem
+  }
+  .paises-container__img img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .paises-container__buttons {
+    width: 15%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
   }
 </style>

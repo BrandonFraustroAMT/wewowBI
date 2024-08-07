@@ -1,3 +1,6 @@
+<script setup lang="ts">
+const isOpen = ref(false)
+</script>
 <template>
   <div>
     <div class="portal">
@@ -23,5 +26,9 @@
 
 .menu-column {
   width: 100%;
+}
+
+.btn {
+  background-color: wheat;
 }
 </style>

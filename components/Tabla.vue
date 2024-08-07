@@ -1,85 +1,105 @@
+<template>
+  <div>
+    <v-data-table-virtual
+      class="fixed-header-table"
+      :headers="headers"
+      height="550"
+      :items="formattedData"
+      item-value="name"
+    >
+      <template v-slot:item="{ item }">
+        <tr>
+          <td :style="{ paddingLeft: `${getPadding(item.level)}px` }">
+            <v-btn
+              v-if="item.level !== 'afirmacion'"
+              :icon="isExpanded(item.id) ? '$expand' : '$next'"
+              size="small"
+              variant="text"
+              @click="toggleRow(item.id)"
+            ></v-btn>
+            <span>
+              {{ item.name }}
+            </span>
+            <!-- Columna para Resultado -->
+          </td>
+          <td v-if="item.level === 'afirmacion'" class="result-column">
+            {{ item.result }}
+          </td>
+        </tr>
+      </template>
+    </v-data-table-virtual>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from '#app';
 import empresasService from '~/services/Empresas';
 import dimensionesService from '~/services/Dimensiones';
-
-// Interfaces para las estructuras de datos
-interface Afirmacion {
-  id?: number;
-  name?: string;
-  valor?: string;
-}
-
-interface Competencia {
-  name?: string;
-  afirmacion?: Afirmacion[];
-}
-
-interface Subdimension {
-  id?: number;
-  name?: string;
-  competencia?: Competencia[];
-}
-
-interface Dimension {
-  id: number;
-  dimension: string;
-  subdimension: Subdimension[];
-}
 
 // Variables reactivas
 const route = useRoute();
 const empresa = ref<number>(0);
 const empresaData = ref({});
-const dimensiones = ref<Dimension[]>([]);
-// Datos iniciales de ejemplo
-const tableData = ref<Dimension[]>([]);
+const tableData = ref([]);
+const formattedData = ref([]);
+const expandedRows = ref(new Set<number | string>());
+
+const headers = ref([
+  { title: 'Dimensiones', sortable: false,  key: 'dimension' },
+  { title: 'Resultado (%)', sortable: false,  key: 'result' },
+  { title: 'Valor1', sortable: false, key: 'val1' },
+  { title: 'Valor2', sortable: false,  key: 'val2' },
+  { title: 'Valor3', sortable: false, key: 'val3' },
+]);
 
 // Función para transformar datos planos a la estructura jerárquica
-const transformData = (data: any[]): Dimension[] => {
-  const dimensionsMap = new Map<number, Dimension>();
+const transformData = (data: any[]): any[] => {
+  const formatted = [];
+  const addedItems = new Set();
 
   data.forEach(item => {
     const [empId, dimId, dimDesc, subDimId, subDimDesc, competencia, afirId, afirDesc] = item;
-    if (!dimensionsMap.has(dimId)) {
-      dimensionsMap.set(dimId, {
+
+    if (!addedItems.has(dimId)) {
+      formatted.push({
+        name: dimDesc,
+        level: 'dimension',
         id: dimId,
-        dimension: dimDesc,
-        subdimension: []
       });
+      addedItems.add(dimId);
     }
 
-    const dimension = dimensionsMap.get(dimId)!;
-    let subdimension = dimension.subdimension.find(sd => sd.id === subDimId);
-
-    if (!subdimension) {
-      subdimension = {
-        id: subDimId,
+    if (!addedItems.has(`${dimId}-${subDimId}`)) {
+      formatted.push({
         name: subDimDesc.trim(),
-        competencia: []
-      };
-      dimension.subdimension.push(subdimension);
+        level: 'subdimension',
+        id: `${dimId}-${subDimId}`,
+        parent: dimId,
+      });
+      addedItems.add(`${dimId}-${subDimId}`);
     }
 
-    let competenciaObj = subdimension.competencia.find(c => c.name === competencia);
-
-    if (!competenciaObj) {
-      competenciaObj = {
+    if (!addedItems.has(`${subDimId}-${competencia}`)) {
+      formatted.push({
         name: competencia,
-        afirmacion: []
-      };
-      subdimension.competencia.push(competenciaObj);
+        level: 'competencia',
+        id: `${subDimId}-${competencia}`,
+        parent: `${dimId}-${subDimId}`,
+      });
+      addedItems.add(`${subDimId}-${competencia}`);
     }
 
-    const afirmacion: Afirmacion = {
-      id: afirId,
-      name: afirDesc.trim()
-    };
-    competenciaObj.afirmacion.push(afirmacion);
+    formatted.push({
+      name: afirDesc.trim(),
+      level: 'afirmacion',
+      id: `${subDimId}-${competencia}-${afirId}`,
+      parent: `${subDimId}-${competencia}`,
+      result: '2%',
+    });
   });
 
-  return Array.from(dimensionsMap.values());
+  return formatted;
 };
 
 // Función para obtener los datos de la empresa por ID
@@ -87,7 +107,6 @@ const empresafounded = async (id: number) => {
   if (id) {
     const data = await empresasService.getEmpresaId(id);
     empresaData.value = data;
-    //console.log(empresaData);
   }
 };
 
@@ -95,8 +114,56 @@ const empresafounded = async (id: number) => {
 const dimensionsFounded = async (id: number) => {
   if (id) {
     const data = await dimensionesService.getDimensionsByEmp(id);
-    console.log(data);
-    tableData.value = transformData(data);  // Transformar y asignar los datos
+    tableData.value = transformData(data);
+    updateFormattedData();
+  }
+};
+
+// Función para actualizar los datos formateados para la tabla
+const updateFormattedData = () => {
+  const updatedData = [];
+  const addedParents = new Set();
+
+  tableData.value.forEach(item => {
+    if (item.level === 'dimension' || expandedRows.value.has(item.parent)) {
+      updatedData.push(item);
+      if (item.level !== 'afirmacion') {
+        addedParents.add(item.id);
+      }
+    }
+  });
+
+  formattedData.value = updatedData;
+};
+
+// Función para verificar si una fila está expandida
+const isExpanded = (id: number | string): boolean => {
+  return expandedRows.value.has(id);
+};
+
+// Función para alternar la expansión de una fila
+const toggleRow = (id: number | string) => {
+  if (expandedRows.value.has(id)) {
+    expandedRows.value.delete(id);
+  } else {
+    expandedRows.value.add(id);
+  }
+  updateFormattedData();
+};
+
+// Función para obtener el espaciado según el nivel
+const getPadding = (level: string): number => {
+  switch (level) {
+    case 'dimension':
+      return 0;
+    case 'subdimension':
+      return 20;
+    case 'competencia':
+      return 40;
+    case 'afirmacion':
+      return 60;
+    default:
+      return 0;
   }
 };
 
@@ -108,91 +175,37 @@ onMounted(() => {
   dimensionsFounded(empresa.value);
 });
 
-const expandedRows = ref(new Set<number>());
+// Configuraciones de Vuetify
 
-const toggleRow = (id: number) => {
-  if (expandedRows.value.has(id)) {
-    expandedRows.value.delete(id);
-  } else {
-    expandedRows.value.add(id);
-  }
-};
 </script>
 
-<template>
-  <section class="tabla">
-    <div class="tabla-container">
-      <div class="tabla-container__scroll">
-        <table class="table">
-          <caption>{{ empresaData.empnombre }}</caption>
-          <tbody>
-            <!-- EJEMPLO ENCABEZADO -->
-              <tr class="encabezado">
-                <td class="dimension">Dimension</td>
-              </tr>
-              <tr class="encabezado">
-                <td :style="{ paddingLeft: '10px' }">Subdimension</td>
-              </tr>
-              <tr class="encabezado">
-                <td :style="{ paddingLeft: '20px' }">competencia</td>
-              </tr>
-              <tr class="encabezado">
-                <td :style="{ paddingLeft: '30px' }">Afirmacion</td>
-              </tr>
-            <!-- DATA DB -->
-            <template v-for="dimension in tableData" :key="dimension.id">
-              <tr @click="toggleRow(dimension.id)">
-                <td class="dimension">{{ dimension.dimension }}</td>
-              </tr>
-              <template v-if="expandedRows.has(dimension.id)">
-                <template v-for="subdimension in dimension.subdimension" :key="subdimension.id || subdimension.name">
-                  <tr @click="toggleRow(subdimension.id)">
-                    <td :style="{ paddingLeft: '20px' }" class="subdimension">{{ subdimension.name }}</td>
-                  </tr>
-                  <template v-if="expandedRows.has(subdimension.id)">
-                    <template v-for="competencia in subdimension.competencia" :key="competencia.id || competencia.name">
-                      <tr @click="toggleRow(competencia.id)">
-                        <td :style="{ paddingLeft: '40px' }">{{ competencia.name }}</td>
-                      </tr>
-                      <template v-if="expandedRows.has(competencia.id)">
-                        <template v-for="afirmacion in competencia.afirmacion" :key="afirmacion.id || afirmacion.name">
-                          <tr>
-                            <td :style="{ paddingLeft: '60px' }">{{ afirmacion.name }}</td>
-                          </tr>
-                        </template>
-                      </template>
-                    </template>
-                  </template>
-                </template>
-              </template>
-            </template>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-</template>
+<style scoped>
+button {
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
 
-<style>
-  .tabla {
-    width: 100%;
-  }
-  .tabla-container__scroll {
-    width: 100%;
-    margin: 10px 10px;
-    max-width: 100%;
-    max-height: 550px; 
-    overflow-x: auto;
-    overflow-y: auto;
-  }
+button:hover {
+  background-color: #45a049;
+}
 
-  .table {
-    width: 700px;
-    margin: 5px 5px;
-    border: 1px solid black
-  }
+.table-container {
+  position: relative; /* Contenedor relativo para el header fijo */
+}
 
-  .encabezado {
-    background-color: rgb(186, 182, 182);
-  }
+.fixed-header-table .v-data-table__wrapper {
+  overflow-y: auto; /* Habilitar el desplazamiento */
+  max-height: 550px; /* Ajusta la altura máxima según sea necesario */
+}
+
+.fixed-header-table .v-data-table__header {
+  position: sticky;
+  top: 0;
+  background-color: white; /* Asegúrate de que el fondo sea visible */
+  z-index: 1; /* Asegúrate de que el header esté sobre otros elementos */
+}
 </style>
