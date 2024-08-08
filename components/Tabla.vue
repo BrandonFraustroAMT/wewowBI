@@ -1,7 +1,7 @@
 <template>
   <div>
+    <caption>{{ empresaData.empnombre }}</caption>
     <v-data-table-virtual
-      class="fixed-header-table"
       :headers="headers"
       height="550"
       :items="formattedData"
@@ -22,9 +22,30 @@
             </span>
             <!-- Columna para Resultado -->
           </td>
-          <td v-if="item.level === 'afirmacion'" class="result-column">
+          <td v-if="item.level === 'afirmacion'">
             {{ item.result }}
           </td>
+          <td v-if="item.level === 'afirmacion'">
+            {{ item.val1 }}
+          </td>
+          <td v-if="item.level === 'afirmacion'">
+            {{ item.val2 }}
+          </td>
+          <td v-if="item.level === 'afirmacion'">
+            {{ item.val3 }}
+          </td>
+          <td v-if="item.level === 'dimension'"></td>
+          <td v-if="item.level === 'dimension'"></td>
+          <td v-if="item.level === 'dimension'"></td>
+          <td v-if="item.level === 'dimension'"></td>
+          <td v-if="item.level === 'subdimension'"></td>
+          <td v-if="item.level === 'subdimension'"></td>
+          <td v-if="item.level === 'subdimension'"></td>
+          <td v-if="item.level === 'subdimension'"></td>
+          <td v-if="item.level === 'competencia'"></td>
+          <td v-if="item.level === 'competencia'"></td>
+          <td v-if="item.level === 'competencia'"></td>
+          <td v-if="item.level === 'competencia'"></td>
         </tr>
       </template>
     </v-data-table-virtual>
@@ -95,7 +116,10 @@ const transformData = (data: any[]): any[] => {
       level: 'afirmacion',
       id: `${subDimId}-${competencia}-${afirId}`,
       parent: `${subDimId}-${competencia}`,
-      result: '2%',
+      result: '80%',
+      val1: '3',
+      val2: '3',
+      val3: '3',
     });
   });
 
@@ -180,32 +204,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-button {
-  padding: 10px 20px;
-  margin-bottom: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
 
-button:hover {
-  background-color: #45a049;
-}
-
-.table-container {
-  position: relative; /* Contenedor relativo para el header fijo */
-}
-
-.fixed-header-table .v-data-table__wrapper {
-  overflow-y: auto; /* Habilitar el desplazamiento */
-  max-height: 550px; /* Ajusta la altura máxima según sea necesario */
-}
-
-.fixed-header-table .v-data-table__header {
-  position: sticky;
-  top: 0;
-  background-color: white; /* Asegúrate de que el fondo sea visible */
-  z-index: 1; /* Asegúrate de que el header esté sobre otros elementos */
+button[data-v-c997bf71] {
+    background-color: transparent;
+    color: black;
 }
 </style>

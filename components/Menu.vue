@@ -33,11 +33,7 @@
       <div class="paises-container__buttons">
         <div>
           
-          <!-- <a href="#">
-            <img src="/assets/img/campos.png" alt="Filto">
-          </a> -->
             <UButton label="Campos" class="btn" @click="isOpen = true" />
-
             <UModal v-model="isOpen">
               <FiltroCampos/>
             </UModal>
