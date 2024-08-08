@@ -28,7 +28,7 @@
   <section class="paises">
     <div class="paises-container">
       <div class="paises-container__img">
-        <a href="#"><img src="/assets/img/filtrar.png" alt="Filto"></a>
+        <button>Filtro</button>
       </div>
       <div class="paises-container__buttons">
         <div>
@@ -39,9 +39,7 @@
             </UModal>
         </div>
         <div class="paises-container__img">
-          <a href="#">
-            <img src="/assets/img/xls.png" alt="Filto">
-          </a>
+          <button>Exportar</button>
         </div>
       </div>
     </div>
@@ -157,7 +155,6 @@ onMounted(() => {
     background-color: #DFD3C3;
   }
   .paises-container__img {
-    width: 40px;
     display: flex;
     flex-direction: column;
   }
@@ -171,7 +168,6 @@ onMounted(() => {
   }
 
   .paises-container__buttons {
-    width: 15%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;

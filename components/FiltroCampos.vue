@@ -37,7 +37,7 @@ const handleDeselected = (value: string) => {
                     <span>Campos</span>
                 </div>
                 <div class="filtro-campos__col-content2">
-                    <CollapsibleFilter text="Dimensiones" @selected="handleSelected" @deselected="handleDeselected"/>
+                    <CollapsibleFilter text="Modelo" @selected="handleSelected" @deselected="handleDeselected"/>
                 </div>
             </div>
             <div class="filtro-campos__column">

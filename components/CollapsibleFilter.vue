@@ -4,16 +4,20 @@
     <div class="content" :style="{ display: isContentVisible ? 'block' : 'none' }">
       <div class="listcheck">
           <label>
-            <input type="checkbox" id="cbox1" value="Filtro1" @change="updateSelection($event)"/> 
-            Filtro1
+            <input type="checkbox" id="cbox1" value="Dimensiones" @change="updateSelection($event)"/> 
+            Dimensiones
           </label>
           <label>
-            <input type="checkbox" id="cbox2" value="Filtro2" @change="updateSelection($event)"/> 
-            Filtro2
+            <input type="checkbox" id="cbox2" value="Subdimensiones" @change="updateSelection($event)"/> 
+            Subdimensiones
           </label>
           <label>
-            <input type="checkbox" id="cbox3" value="Filtro3" @change="updateSelection($event)"/> 
-            Filtro3
+            <input type="checkbox" id="cbox3" value="Competencias" @change="updateSelection($event)"/> 
+            Competencias
+          </label>
+          <label>
+            <input type="checkbox" id="cbox3" value="Afirmaciones" @change="updateSelection($event)"/> 
+            Afirmaciones
           </label>
       </div>
     </div>
