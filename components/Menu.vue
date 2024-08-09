@@ -24,25 +24,24 @@
         </div>
       </div>
     </div>
-  </section>
-  <section class="paises">
-    <div class="paises-container">
-      <div class="paises-container__img">
-        <button>Filtro</button>
-      </div>
-      <div class="paises-container__buttons">
-        <div>
-          
-            <UButton label="Campos" class="btn" @click="isOpen = true" />
-            <UModal v-model="isOpen">
-              <FiltroCampos/>
-            </UModal>
-        </div>
+    <section class="paises">
+      <div class="paises-container">
         <div class="paises-container__img">
-          <button>Exportar</button>
+          <button class="btn_menu">Filtro</button>
+        </div>
+        <div class="paises-container__buttons">
+          <div class="btn_campos">
+              <UButton label="Campos" @click="isOpen = true" />
+              <UModal v-model="isOpen">
+                <FiltroCampos @applyFilter="applyFilter"/>
+              </UModal>
+          </div>
+          <div class="paises-container__img">
+            <button class="btn_menu">Exportar</button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   </section>
 </template>
 
@@ -56,6 +55,7 @@ const route = useRoute();
 const empresa = ref(0);
 const empresaData = ref({});
 const isOpen = ref(false)
+const emit = defineEmits(['applyFilter']);
 
 const empresafounded = async (id) => {
   if (id) {
@@ -63,6 +63,13 @@ const empresafounded = async (id) => {
     empresaData.value = data;
     console.log("Datos de la empresa: ", empresaData.value);
   }
+};
+
+// Define el método `applyFilter` que manejará el filtro
+const applyFilter = (filterData) => {
+  console.log('Filtro aplicado desde Menu:', filterData);
+  // Emitir el evento hacia el componente padre si es necesario
+  emit('applyFilter', filterData);
 };
 
 onMounted(() => {
@@ -76,10 +83,11 @@ onMounted(() => {
 <style>
   .menu {
     width: 100%;
+    background: rgb(17,74,133);
+    background: linear-gradient(180deg, rgba(17,74,133,1) 0%, rgba(47,164,207,1) 100%);
   }
   .menu-slice {
     width: 100%;
-    background-color: rgba(6, 142, 240, 1.0)
   }
 
   .menu-slice__container {
@@ -113,6 +121,10 @@ onMounted(() => {
     background-color: #DFD3C3;
   }
 
+  .menu-slice__title{
+    color: #A2BDD0;
+  }
+
   
   .menu-slice__text {
       width: 50%;
@@ -129,15 +141,23 @@ onMounted(() => {
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-around
+    justify-content: space-around;
+    color: #A2BDD0;
+  }
+  .menu-slice__link a{
+    color: #A2BDD0;
+    transition: scale 1s ease-in;
+  }
+  .menu-slice__link a:hover{
+    color: #a5afb6;
+    transform: scale(0.8);
   }
 
   .paises {
     width: 100%;
     height: 60px;
-    border-top: 1px solid black;
+    border-top: 1px solid rgb(144, 144, 144);
     border-bottom: 1px solid black;
-    background-color: rgba(6, 142, 240, 1.0);
   }
   .paises-container {
     width: 100%;
@@ -145,6 +165,7 @@ onMounted(() => {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     padding-left: 40px;
   }
 
@@ -171,5 +192,39 @@ onMounted(() => {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+  }
+
+  .sm\:max-w-lg {
+      max-width: 45rem;
+  }
+
+  .btn_menu {
+    background-color: #D2DFE8;
+    color: #3D495B;
+    padding: 5px 10px;
+    margin-right: 20px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+  }
+  .btn_menu:hover{
+    background-color: #bcbfc1;
+  }
+  .dark\:bg-primary-400:is(.dark *) {
+    background-color: #D2DFE8;
+    color: #3D495B;
+    padding: 5px 10px;
+    margin-right: 20px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+  } 
+  .dark\:bg-primary-400:is(.dark *):hover {
+    background-color: #bcbfc1;
+  } 
+  .text-white {
+    color: #3D495B !important;
+  }
+
+  .btn_campos {
+    margin-right: 20px;
   }
 </style>

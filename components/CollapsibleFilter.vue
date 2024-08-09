@@ -3,22 +3,10 @@
     <button type="button" class="collapsible" @click="toggleContent">{{ text }}</button>
     <div class="content" :style="{ display: isContentVisible ? 'block' : 'none' }">
       <div class="listcheck">
-          <label>
-            <input type="checkbox" id="cbox1" value="Dimensiones" @change="updateSelection($event)"/> 
-            Dimensiones
-          </label>
-          <label>
-            <input type="checkbox" id="cbox2" value="Subdimensiones" @change="updateSelection($event)"/> 
-            Subdimensiones
-          </label>
-          <label>
-            <input type="checkbox" id="cbox3" value="Competencias" @change="updateSelection($event)"/> 
-            Competencias
-          </label>
-          <label>
-            <input type="checkbox" id="cbox3" value="Afirmaciones" @change="updateSelection($event)"/> 
-            Afirmaciones
-          </label>
+        <label v-for="(item, index) in items" :key="index">
+          <input type="checkbox" :id="'cbox' + index" :value="item" @change="updateSelection($event)" /> 
+          {{ item }}
+        </label>
       </div>
     </div>
   </div>
@@ -32,9 +20,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  items: {
+    type: Array,
+    required: true,
+  },
 });
 
-const emit = defineEmits(['selected', 'deselected']); // Aquí defines la función emit
+const emit = defineEmits(['selected', 'deselected']);
 
 const isContentVisible = ref(false);
 const toggleContent = () => {

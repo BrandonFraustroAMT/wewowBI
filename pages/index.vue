@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="portal">
-      <BarraLateral/>
+      <!-- <BarraLateral/> -->
       <div class="menu-column">
         <Menu :empresa="empresa" />
         <h2>Portada</h2>

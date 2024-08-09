@@ -3,7 +3,7 @@
 <template>
   <div>
     <div class="portal">
-      <BarraLateral/>
+      <!-- <BarraLateral/> -->
       <div class="menu-column">
         <Menu/>
         <div>

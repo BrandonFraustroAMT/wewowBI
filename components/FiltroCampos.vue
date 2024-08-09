@@ -1,21 +1,60 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import CollapsibleFilter from './CollapsibleFilter.vue';
+
 const selectedRows = ref<string[]>([]);
 const selectedColumns = ref<string[]>([]);
+const emit = defineEmits(['applyFilter']);
 
-const handleSelected = (value: string) => {
+const handleSelectedRow = (value: string) => {
   if (!selectedRows.value.includes(value)) {
     selectedRows.value.push(value);
   }
 };
 
-const handleDeselected = (value: string) => {
+const handleDeselectedRow = (value: string) => {
   const index = selectedRows.value.indexOf(value);
   if (index > -1) {
     selectedRows.value.splice(index, 1);
   }
 };
+const handleSelectedCol = (value: string) => {
+  if (!selectedColumns.value.includes(value)) {
+    selectedColumns.value.push(value);
+  }
+};
+
+const handleDeselectedCol = (value: string) => {
+  const index = selectedColumns.value.indexOf(value);
+  if (index > -1) {
+    selectedColumns.value.splice(index, 1);
+  }
+};
+
+// Emitir filas y columnas seleccionadas cuando se haga clic en "Aplicar"
+const applyFilter = () => {
+  emit('applyFilter', {
+    rows: selectedRows.value,
+    columns: selectedColumns.value,
+  });
+  //console.log("Emitiendo filtro:", selectedRows);
+};
+
+const demographicsValue = [
+    'Genero', 'Medio de transporte', 'Tiempo de llegada', 'Reuniones con tu jefe', 'Oportunidades',
+    'Seguir desarrollandome', 'Buscar oportunidades de empleo', 'Cantidad de empleos', 'Padecimiento de salud crónico', 'Dependientes económicos',
+    'Tiempo de gente a cargo', 'Modalidad de trabajo', 'Describir tu organización', 'Años de trabajo', 'Area',
+    'Cargo', 'Cargo mologado', 'Educación', 'Generación', 'Localidad 1', 
+    'Localidad 2', 'Nivel estructural 1', 'Nivel estructural 2', 'Nivel estructural 3', 'Nivel estructural 4',
+    'Nivel estructural 5', 'Nivel estructural 6', 'Nivel estructural 7', 'Nivel estructural 8', 'Nivel estructural 9',
+    'Nivel estructural 10', 'Pais', 'Tipo de trabajo',
+]
+const modeloValue = [
+    'Dimensiones', 'Subdimensiones', 'Competencias', 'Afirmaciones'
+]
+const benchmarkValue = [
+    'Benchmark1'
+]
 </script>
 
 <template>
@@ -24,7 +63,7 @@ const handleDeselected = (value: string) => {
         <div class="filtro-campos__row">
             <div class="filtro-campos__title"><h3>Campos</h3></div>
             <div class="filtro-campos__buttons">
-                <button class="btn-apply">Aplicar</button>
+                <button class="btn-apply" @click="applyFilter">Aplicar</button>
                 <button class="btn-cancel">Cancelar</button>
             </div>
         </div>
@@ -37,7 +76,12 @@ const handleDeselected = (value: string) => {
                     <span>Campos</span>
                 </div>
                 <div class="filtro-campos__col-content2">
-                    <CollapsibleFilter text="Modelo" @selected="handleSelected" @deselected="handleDeselected"/>
+                    <CollapsibleFilter text="Modelo" :items="modeloValue"
+                        @selected="handleSelectedRow" @deselected="handleDeselectedRow"/>
+                    <CollapsibleFilter text="Demográficos" :items="demographicsValue"
+                        @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
+                    <CollapsibleFilter text="Benchmark" :items="benchmarkValue"
+                        @selected="handleSelectedCol" @deselected="handleSelectedCol"/>
                 </div>
             </div>
             <div class="filtro-campos__column">

@@ -1,16 +1,32 @@
 <template>
     <div class="portal">
-      <BarraLateral/>
+      <!-- <BarraLateral/> -->
       <div class="menu-column">
-        <Menu/>
+        <Menu @applyFilter="handleFilter"/>
         <div>
           <div>
-              <Tabla />
+              <Tabla :filterData="filterData"/>
           </div>
         </div>
       </div>
     </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      filterData: {},
+    };
+  },
+  methods: {
+    handleFilter(filterData) {
+      console.log('Filtro aplicado:', filterData);
+      this.filterData = filterData;
+    }
+  }
+};
+</script>
 
 <style>
 .portal {
