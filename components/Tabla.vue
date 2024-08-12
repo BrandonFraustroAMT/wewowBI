@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="tabla_container">
     <caption>{{ empresaData.empnombre }}</caption>
+    <v-btn @click="exportToExcel" color="primary" class="mb-4">Exportar a Excel</v-btn>
     <v-data-table-virtual
       :headers="headers"
       height="550"
@@ -22,30 +23,54 @@
             </span>
             <!-- Columna para Resultado -->
           </td>
-          <td v-if="item.level === 'afirmacion'">
+          <td v-if="item.level === 'afirmacion' && selectedLevels.includes('afirmacion')">
             {{ item.result }}
           </td>
-          <td v-if="item.level === 'afirmacion'">
+          <td v-if="item.level === 'afirmacion' && selectedLevels.includes('afirmacion')">
             {{ item.val1 }}
           </td>
-          <td v-if="item.level === 'afirmacion'">
+          <td v-if="item.level === 'afirmacion' && selectedLevels.includes('afirmacion')">
             {{ item.val2 }}
           </td>
-          <td v-if="item.level === 'afirmacion'">
+          <td v-if="item.level === 'afirmacion' && selectedLevels.includes('afirmacion')">
             {{ item.val3 }}
           </td>
-          <td v-if="item.level === 'dimension'">{{ item.result }}</td>
-          <td v-if="item.level === 'dimension'">{{ item.val1 }}</td>
-          <td v-if="item.level === 'dimension'">{{ item.val2 }}</td>
-          <td v-if="item.level === 'dimension'">{{ item.val3 }}</td>
-          <td v-if="item.level === 'subdimension'">{{ item.result }}</td>
-          <td v-if="item.level === 'subdimension'">{{ item.val1 }}</td>
-          <td v-if="item.level === 'subdimension'">{{ item.val2 }}</td>
-          <td v-if="item.level === 'subdimension'">{{ item.val3 }}</td>
-          <td v-if="item.level === 'competencia'">{{ item.result }}</td>
-          <td v-if="item.level === 'competencia'">{{ item.val1 }}</td>
-          <td v-if="item.level === 'competencia'">{{ item.val2 }}</td>
-          <td v-if="item.level === 'competencia'">{{ item.val3 }}</td>
+          <td v-if="item.level === 'dimension' && selectedLevels.includes('dimension')">
+            {{ item.result }}
+          </td>
+          <td v-if="item.level === 'dimension' && selectedLevels.includes('dimension')">
+            {{ item.val1 }}
+          </td>
+          <td v-if="item.level === 'dimension' && selectedLevels.includes('dimension')">
+            {{ item.val2 }}
+          </td>
+          <td v-if="item.level === 'dimension' && selectedLevels.includes('dimension')">
+            {{ item.val3 }}
+          </td>
+          <td v-if="item.level === 'subdimension' && selectedLevels.includes('subdimension')">
+            {{ item.result }}
+          </td>
+          <td v-if="item.level === 'subdimension' && selectedLevels.includes('subdimension')">
+            {{ item.val1 }}
+          </td>
+          <td v-if="item.level === 'subdimension' && selectedLevels.includes('subdimension')">
+            {{ item.val2 }}
+          </td>
+          <td v-if="item.level === 'subdimension' && selectedLevels.includes('subdimension')">
+            {{ item.val3 }}
+          </td>
+          <td v-if="item.level === 'competencia' && selectedLevels.includes('competencia')">
+            {{ item.result }}
+          </td>
+          <td v-if="item.level === 'competencia' && selectedLevels.includes('competencia')">
+            {{ item.val1 }}
+          </td>
+          <td v-if="item.level === 'competencia' && selectedLevels.includes('competencia')">
+            {{ item.val2 }}
+          </td>
+          <td v-if="item.level === 'competencia' && selectedLevels.includes('competencia')">
+            {{ item.val3 }}
+          </td>
         </tr>
       </template>
     </v-data-table-virtual>
@@ -54,6 +79,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import * as XLSX from 'xlsx';
+
 import { useRoute } from '#app';
 import empresasService from '~/services/Empresas';
 import dimensionesService from '~/services/Dimensiones';
@@ -74,23 +101,41 @@ const empresaData:any = ref({});
 const tableData:any = ref([]);
 const formattedData:any = ref([]);
 const expandedRows = ref(new Set<number | string>());
+const selectedLevels = ref<string[]>([]);
 
 const headers = ref([
-  { title: 'Modelo', sortable: false,  key: 'dimension' },
-  { title: 'Resultado (%)', sortable: false,  key: 'result' },
+  { title: 'Modelo', sortable: false, key: 'dimension' },
+  { title: 'Resultado (%)', sortable: false, key: 'result' },
   { title: 'Valor1', sortable: false, key: 'val1' },
-  { title: 'Valor2', sortable: false,  key: 'val2' },
+  { title: 'Valor2', sortable: false, key: 'val2' },
   { title: 'Valor3', sortable: false, key: 'val3' },
 ]);
+
+watch(() => props.filterData.columns, (newColumns) => {
+  if (newColumns && newColumns.length >= 3) {
+    headers.value = [
+      { title: 'Modelo', sortable: false, key: 'dimension' },
+      { title: 'Resultado (%)', sortable: false, key: 'result' },
+      { title: newColumns[0] || 'Valor1', sortable: false, key: 'val1' },
+      { title: newColumns[1] || 'Valor2', sortable: false, key: 'val2' },
+      { title: newColumns[2] || 'Valor3', sortable: false, key: 'val3' },
+    ];
+  }
+}, { immediate: true });
+
 // Filtrar los datos según la selección
 const applyFilter = () => {
   console.log("Aplicando filtro con datos:", props.filterData);
   formattedData.value = [];
 
+  // Limpiar los niveles seleccionados
+  selectedLevels.value = [];
+
   if (props.filterData.rows.includes('Dimensiones')) {
     formattedData.value = tableData.value
       .filter(item => item.level === 'dimension')
       .map(item => ({ ...item, expandable: false }));
+    selectedLevels.value.push('dimension');
   }
 
   if (props.filterData.rows.includes('Subdimensiones')) {
@@ -100,6 +145,7 @@ const applyFilter = () => {
         ...item, 
         expandable: item.level === 'dimension' 
       }));
+    selectedLevels.value.push('subdimension');
   }
 
   if (props.filterData.rows.includes('Competencias')) {
@@ -109,6 +155,7 @@ const applyFilter = () => {
         ...item, 
         expandable: item.level === 'dimension' || item.level === 'subdimension' 
       }));
+    selectedLevels.value.push('competencia');
   }
 
   if (props.filterData.rows.includes('Afirmaciones')) {
@@ -118,8 +165,10 @@ const applyFilter = () => {
         ...item, 
         expandable: item.level === 'dimension' || item.level === 'subdimension' || item.level === 'competencia' 
       }));
+    selectedLevels.value.push('afirmacion');
   }
 };
+
 
 // Observa los cambios en filterData para aplicar el filtro automáticamente
 watch(() => props.filterData, applyFilter, { deep: true });
@@ -144,6 +193,9 @@ const transformData = (data: any[]): any[] => {
         id: dimId,
         expandable: true,
         result: 0, // Placeholder
+        val1: '0',
+        val2: '0',
+        val3: '0',
         count: 0
       });
       addedItems.add(dimId);
@@ -159,6 +211,9 @@ const transformData = (data: any[]): any[] => {
         parent: dimId,
         expandable: true,
         result: 0, // Placeholder
+        val1: '0',
+        val2: '0',
+        val3: '0',
         count: 0
       });
       addedItems.add(`${dimId}-${subDimId}`);
@@ -174,6 +229,9 @@ const transformData = (data: any[]): any[] => {
         parent: `${dimId}-${subDimId}`,
         expandable: true,
         result: 0, // Placeholder
+        val1: '0',
+        val2: '0',
+        val3: '0',
         count: 0
       });
       addedItems.add(`${subDimId}-${competencia}`);
@@ -338,6 +396,21 @@ const getPadding = (level: string): number => {
   }
 };
 
+// Función para exportar datos a Excel
+const exportToExcel = () => {
+  // Crear una nueva hoja de trabajo
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(formattedData.value, {
+    header: headers.value.map(header => header.title)
+  });
+
+  // Crear un libro de trabajo y agregar la hoja de trabajo
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+
+  // Generar el archivo Excel y descargarlo
+  XLSX.writeFile(wb, 'tablapivote.xlsx');
+};
+
 // Lifecycle hook para cargar datos al montar el componente
 onMounted(() => {
   const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
@@ -349,5 +422,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
+.tabla_container {
+  padding: 0 30px
+}
 </style>

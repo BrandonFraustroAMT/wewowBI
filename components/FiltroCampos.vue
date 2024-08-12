@@ -81,7 +81,7 @@ const benchmarkValue = [
                     <CollapsibleFilter text="Demográficos" :items="demographicsValue"
                         @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
                     <CollapsibleFilter text="Benchmark" :items="benchmarkValue"
-                        @selected="handleSelectedCol" @deselected="handleSelectedCol"/>
+                        @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
                 </div>
             </div>
             <div class="filtro-campos__column">

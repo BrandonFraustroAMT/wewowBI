@@ -18,7 +18,7 @@
             <ul class="menu-slice__link">
               <li><NuxtLink to="/portada">Portada</NuxtLink></li>
               <li><NuxtLink to="/reporteejecutivo">Reporte Ejecutivo</NuxtLink></li>
-              <li><NuxtLink to="/tablapivote">Tabla Pivote</NuxtLink></li>
+              <li><NuxtLink to="/tablapivote/dimensiones">Tabla Pivote</NuxtLink></li>
             </ul>
           </nav>
         </div>
@@ -28,6 +28,17 @@
       <div class="paises-container">
         <div class="paises-container__img">
           <button class="btn_menu">Filtro</button>
+        </div>
+        <div class="tablas-pivote">
+          <nav class="menu-nav">
+            <ul class="menu-slice__link">
+              <li><NuxtLink to="/tablapivote/dimensiones">Dimensiones</NuxtLink></li>
+              <li><NuxtLink to="/tablapivote/demograficos">Demográficos</NuxtLink></li>
+              <li><NuxtLink to="/tablapivote/lideres">Lideres</NuxtLink></li>
+              <li><NuxtLink to="/tablapivote/preguntas">Preguntas abiertas</NuxtLink></li>
+              <li><NuxtLink to="/tablapivote/vacio">Vacio</NuxtLink></li>
+            </ul>
+          </nav>
         </div>
         <div class="paises-container__buttons">
           <div class="btn_campos">
@@ -151,6 +162,9 @@ onMounted(() => {
   .menu-slice__link a:hover{
     color: #a5afb6;
     transform: scale(0.8);
+  }
+  .tablas-pivote {
+    width: 50%;
   }
 
   .paises {

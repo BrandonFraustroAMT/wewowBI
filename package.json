@@ -17,7 +17,8 @@
     "@prismicio/vue": "^4.2.2",
     "axios": "^1.7.2",
     "nuxt": "^3.12.3",
-    "vue": "latest"
+    "vue": "latest",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@nuxtjs/prismic": "^3.3.2",
