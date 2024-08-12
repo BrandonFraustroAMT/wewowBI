@@ -84,7 +84,6 @@ import * as XLSX from 'xlsx';
 import { useRoute } from '#app';
 import empresasService from '~/services/Empresas';
 import dimensionesService from '~/services/Dimensiones';
-import respuestasBdinfService from '~/services/RespuestasBdinf';
 
 // Recibir la prop filterData
 const props = defineProps({
@@ -329,15 +328,6 @@ const dimensionsFounded = async (id: number) => {
   }
 };
 
-// Función para obtener las respuestas por ID de empresa
-const answersFounded = async (id: number) => {
-  if (id) {
-    const data = await respuestasBdinfService.getRespuestas(id);
-    console.log("Respuestas empresa: ", data);
-    /* tableData.value = transformData(data);
-    updateFormattedData(); */
-  }
-};
 
 // Función para actualizar los datos formateados para la tabla
 const updateFormattedData = () => {
