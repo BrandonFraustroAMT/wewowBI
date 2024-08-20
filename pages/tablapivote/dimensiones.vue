@@ -5,7 +5,7 @@
         <Menu @applyFilter="handleFilter"/>
         <div>
           <div>
-              <Tabla :filterData="filterData"/>
+              <TablaDimensiones :filterData="filterData"/>
           </div>
         </div>
       </div>
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import TablaDimensiones from '~/components/TablaDimensiones.vue';
+
 export default {
   data() {
     return {
@@ -21,7 +23,7 @@ export default {
   },
   methods: {
     handleFilter(filterData) {
-      console.log('Filtro aplicado:', filterData);
+      //console.log('Filtro aplicado:', filterData);
       this.filterData = filterData;
     }
   }

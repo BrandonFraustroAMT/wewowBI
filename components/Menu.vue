@@ -72,13 +72,13 @@ const empresafounded = async (id) => {
   if (id) {
     const data = await empresaService.getEmpresaId(id);
     empresaData.value = data;
-    console.log("Datos de la empresa: ", empresaData.value);
+    //console.log("Datos de la empresa: ", empresaData.value);
   }
 };
 
 // Define el método `applyFilter` que manejará el filtro
 const applyFilter = (filterData) => {
-  console.log('Filtro aplicado desde Menu:', filterData);
+  //console.log('Filtro aplicado desde Menu:', filterData);
   // Emitir el evento hacia el componente padre si es necesario
   emit('applyFilter', filterData);
 };

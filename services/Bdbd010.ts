@@ -2,9 +2,9 @@ import axios from "axios";
 
 const BackendURL = 'http://localhost:8080/api'
 
-const getDimensionsByEmp = async (id: number) => {
+const getBdbd010ByEmp = async (id: number) => {
   try {
-    const response = await axios.get(`${BackendURL}/tindl010/dimensions/${id}`);
+    const response = await axios.get(`${BackendURL}/bdbd010/${id}`);
     //console.log("Dimensions Data", response.data);
     return response.data;
   } catch(err: any) {
@@ -13,4 +13,4 @@ const getDimensionsByEmp = async (id: number) => {
   }
 }
 
-export default {getDimensionsByEmp};
+export default {getBdbd010ByEmp};

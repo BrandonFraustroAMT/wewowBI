@@ -4,9 +4,9 @@
       <div class="menu-column">
         <Menu/>
         <div>
-          <div>
+          <div class="reporte-container">
               <h2>Reporte Ejecutivo</h2>
-              <iframe title="DEMO 240724" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=700034e8-ed81-40ab-aac5-79a71de98685&autoAuth=true&ctid=87d828aa-c1e2-4c03-9aa3-1691cab514f5" frameborder="0" allowFullScreen="true"></iframe>
+              <iframe title="DEMO 240816" class="reporte" src="https://app.powerbi.com/view?r=eyJrIjoiY2U1MjA0OWEtNTRmMS00MDdhLWFlMDUtMGMwNzhiYjM2NDg0IiwidCI6IjgxMzdjMTE5LWI0NmMtNDE4YS04OTE0LTY4MzM0NjNlZWViMCJ9" frameborder="0" allowFullScreen="true"></iframe>
           </div>
         </div>
       </div>
@@ -22,5 +22,14 @@
 
 .menu-column {
   width: 100%;
+}
+
+.reporte-container {
+  margin: 20px;
+}
+
+.reporte {
+  width: 100%;
+  height: 70vh;
 }
 </style>

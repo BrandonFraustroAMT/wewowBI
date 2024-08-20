@@ -80,10 +80,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import * as XLSX from 'xlsx';
-
 import { useRoute } from '#app';
+
 import empresasService from '~/services/Empresas';
 import dimensionesService from '~/services/Dimensiones';
+import respuestasService from '~/services/Respuestas';
+import condensadoDimensionesService from '~/services/CondensadoDimensiones';
+import bdbd010Service from '~/services/Bdbd010';
+
 
 // Recibir la prop filterData
 const props = defineProps({
@@ -101,6 +105,75 @@ const tableData:any = ref([]);
 const formattedData:any = ref([]);
 const expandedRows = ref(new Set<number | string>());
 const selectedLevels = ref<string[]>([]);
+const respuestasData:any = ref([]);
+const bdbd010Data:any = ref([]);
+const desviacionEstandar =  ref<number>(0);
+const benchmark1 =  ref<number>(0);
+const benchmark2 =  ref<number>(0);
+const benchmark3 =  ref<number>(0);
+const benchmark4 =  ref<number>(0);
+const benchmark5 =  ref<number>(0);
+const benchmark6 =  ref<number>(0);
+const benchmark7 =  ref<number>(0);
+const benchmark8 =  ref<number>(0);
+const benchmark9 =  ref<number>(0);
+const benchmark10 =  ref<number>(0);
+
+const cantidadRespuestas = ref<number>(0);
+/* VARIABLRES PARA LOS DEMOGRÁFICOS */
+const generos:any = ref({});
+const medioTransporte:any = ref({});
+const tiempoLlegada:any = ref({});
+const cantidadReuniones:any = ref({});
+const oportunidadesMejora:any = ref({});
+const seguirDesarrollandome:any = ref({});
+const oportunidadesEmpleo:any = ref({});
+const cantidadEmpleos:any = ref({});
+const padecimientoSalud:any = ref({});
+const dependientesEconomicos:any = ref({});
+const tiempoGenteACargo:any = ref({});
+const modalidadTrabajo:any = ref({});
+const describirOrganizacion:any = ref({});
+const añosTrabajo:any = ref({});
+const area:any = ref({});
+const cargo:any = ref({});
+const cargoMologado:any = ref({});
+const educacion:any = ref({});
+const generacion:any = ref({});
+const localidad1:any = ref({});
+const localidad2:any = ref({});
+const nivelEstructural1:any = ref({});
+const nivelEstructural2:any = ref({});
+const nivelEstructural3:any = ref({});
+const nivelEstructural4:any = ref({});
+const nivelEstructural5:any = ref({});
+const nivelEstructural6:any = ref({});
+const nivelEstructural7:any = ref({});
+const nivelEstructural8:any = ref({});
+const nivelEstructural9:any = ref({});
+const nivelEstructural10:any = ref({});
+const tipoTrabajo:any = ref({});
+
+
+let generosUnicos = [];
+let medioTransporteUnico = [];
+let tiempoLlegadaUnico = [];
+let cantidadReunionesUnico = [];
+let oportunidadesMejoraUnico = [];
+let seguirDesarrollandomeUnico = [];
+let oportunidadesEmpleoUnico = [];
+let cantidadEmpleosUnico = [];
+let padecimientoSaludUnico = [];
+let dependientesEconomicosUnico = [];
+let tiempoGenteACargoUnico = [];
+let modalidadTrabajoUnico = [];
+let describirOrganizacionUnico = [];
+let añosTrabajoUnico = [];
+let areaUnico = [];
+let cargoUnico = [];
+let cargoMologadoUnico = [];
+let educacionUnico = [];
+let generacionUnico = [];
 
 const headers = ref([
   { title: 'Modelo', sortable: false, key: 'dimension' },
@@ -124,7 +197,7 @@ watch(() => props.filterData.columns, (newColumns) => {
 
 // Filtrar los datos según la selección
 const applyFilter = () => {
-  console.log("Aplicando filtro con datos:", props.filterData);
+  //console.log("Aplicando filtro con datos:", props.filterData);
   formattedData.value = [];
 
   // Limpiar los niveles seleccionados
@@ -323,11 +396,113 @@ const empresafounded = async (id: number) => {
 const dimensionsFounded = async (id: number) => {
   if (id) {
     const data = await dimensionesService.getDimensionsByEmp(id);
+    //console.log(data);
     tableData.value = transformData(data);
     updateFormattedData();
   }
 };
+// Función para obtener las respuestas por ID de empresa y los demográficos
+const answersFounded = async (id: number) => {
+  if (id) {
+    const data = await respuestasService.getAnswersID(id);
+    const bdbd010Demo = await bdbd010Service.getBdbd010ByEmp(id);
+    const desvEstData = await condensadoDimensionesService.getCondensadoDimensionsByEmp(id);
 
+    bdbd010Data.value = bdbd010Demo;
+    //console.log(data);
+    respuestasData.value = data
+
+    //cantidad de respuestas
+    cantidadRespuestas.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 1).length;
+
+    /* DEMOGRÁFICOS */
+    generos.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 1);
+    medioTransporte.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 2);
+    tiempoLlegada.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 3);
+    cantidadReuniones.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 4);
+    oportunidadesMejora.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 5);
+    seguirDesarrollandome.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 6);
+    oportunidadesEmpleo.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 7);
+    cantidadEmpleos.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 8);
+    padecimientoSalud.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 9);
+    dependientesEconomicos.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 10);
+    tiempoGenteACargo.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 11);
+    modalidadTrabajo.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 12);
+    describirOrganizacion.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 13);
+    // VARIABLE PARA LOS AÑOS DE TRABAJO
+    const dataRespuestas = respuestasData.value.filter((rd:any) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 1)
+    añosTrabajo.value = dataRespuestas.map((dr: any) => calculateYears(dr.bdinfantiguedad));
+
+    area.value = dataRespuestas.map((dr:any) => dr.bdinfarea);
+    cargo.value = bdbd010Data.value.map((bdbd:any) => bdbd.bdcargo);
+    cargoMologado.value = bdbd010Data.value.map((bdbd:any) => bdbd.bdcargoho);
+    educacion.value = dataRespuestas.map((dr:any) => dr.bdinfgradac);
+    generacion.value = dataRespuestas.map((dr:any) => dr.bdinfgenracion);
+    nivelEstructural1.value = dataRespuestas.map((dr:any) => dr.bdinfjer1);
+    nivelEstructural2.value = dataRespuestas.map((dr:any) => dr.bdinfjer2);
+    nivelEstructural3.value = dataRespuestas.map((dr:any) => dr.bdinfjer3);
+    nivelEstructural4.value = dataRespuestas.map((dr:any) => dr.bdinfjer4);
+    nivelEstructural5.value = dataRespuestas.map((dr:any) => dr.bdinfjer5);
+    nivelEstructural6.value = dataRespuestas.map((dr:any) => dr.bdinfjer6);
+    nivelEstructural7.value = dataRespuestas.map((dr:any) => dr.bdinfjer7);
+    nivelEstructural8.value = dataRespuestas.map((dr:any) => dr.bdinfjer8);
+    nivelEstructural9.value = dataRespuestas.map((dr:any) => dr.bdinfjer9);
+    nivelEstructural10.value = dataRespuestas.map((dr:any) => dr.bdinfjer10);
+    tipoTrabajo.value = dataRespuestas.map((dr:any) => dr.bdinfcondcion);
+
+    //DESVIACION ESTANDAR
+    desviacionEstandar.value = desvEstData[0].statement_standarddeviation;
+    benchmark1.value = desvEstData[0].benchmark1;
+    benchmark2.value = desvEstData[0].benchmark2;
+    benchmark3.value = desvEstData[0].benchmark3;
+    benchmark4.value = desvEstData[0].benchmark4;
+    benchmark5.value = desvEstData[0].benchmark5;
+    benchmark6.value = desvEstData[0].benchmark6;
+    benchmark7.value = desvEstData[0].benchmark7;
+    benchmark8.value = desvEstData[0].benchmark8;
+    benchmark9.value = desvEstData[0].benchmark9;
+    benchmark10.value = desvEstData[0].benchmark10;
+
+    /* 
+    localidad1.value = 
+    localidad2.value = 
+    */
+
+    generosUnicos = [...new Set(generos.value.map((gen:any) => gen.bdinfindxvc))];
+    medioTransporteUnico = [...new Set(medioTransporte.value.map((mt:any) => mt.bdinfindxvc))];
+    tiempoLlegadaUnico = [...new Set(tiempoLlegada.value.map((tl:any) => tl.bdinfindxvc))];
+    cantidadReunionesUnico = [...new Set(cantidadReuniones.value.map((cr:any) => cr.bdinfindxvc))];
+    oportunidadesMejoraUnico = [...new Set(oportunidadesMejora.value.map((om:any) => om.bdinfindxvc))];
+    seguirDesarrollandomeUnico = [];
+    oportunidadesEmpleoUnico = [];
+    cantidadEmpleosUnico = [];
+    padecimientoSaludUnico = [];
+    dependientesEconomicosUnico = [];
+    tiempoGenteACargoUnico = [];
+    modalidadTrabajoUnico = [];
+    describirOrganizacionUnico = [];
+    añosTrabajoUnico = [];
+    areaUnico = [];
+    cargoUnico = [];
+    cargoMologadoUnico = [];
+    educacionUnico = [];
+    generacionUnico = [];
+    console.log("GENEROS: ", generosUnicos );
+    //console.log("BDBD010: ", bdbd010Data.value.map((bdbd:any) => bdbd.bdcargoho));
+    /* tableData.value = transformData(data);
+    updateFormattedData(); */
+  }
+};
+
+const calculateYears = (date:Date) => {
+  // First Date
+  const firstDate: Date = new Date(date);
+ 
+  // Current Date
+  const secondDate: Date = new Date();
+  const years:number = secondDate.getFullYear() - firstDate.getFullYear();
+  return years;
+}
 
 // Función para actualizar los datos formateados para la tabla
 const updateFormattedData = () => {
