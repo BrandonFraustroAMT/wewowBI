@@ -229,6 +229,8 @@ let nivelE8Unico: string[] = [];
 let nivelE9Unico: string[] = [];
 let nivelE10Unico: string[] = [];
 let paisUnico: string[] = [];
+let lideresUnico: string[] = [];
+let lideresNombre: string[] = [];
 
 let generoMap: { [key: string]: any[] } = {};
 let medioTransporteMap: { [key: string]: any[] } = {};
@@ -262,6 +264,7 @@ let nivelE8Map: { [key: string]: any[] } = {};
 let nivelE9Map: { [key: string]: any[] } = {};
 let nivelE10Map: { [key: string]: any[] } = {};
 let paisMap: { [key: string]: any[] } = {};
+let lideresMap: { [key: string]: any[] } = {};
 
 // Función para obtener los datos de la empresa por ID
 const empresafounded = async (id: number) => {
@@ -527,6 +530,14 @@ const answersFounded = async (id: number) => {
       localidad2Map[psu] = dataRespuestas.filter((ps: any) => ps.bdinflocalb === psu);
     });
 
+    lideresUnico = [...new Set(lideres.value.filter((mt: any) => mt).map((mt:any) => mt.bdname))]
+    lideresUnico.forEach(psu => {
+      lideresMap[psu] = bdbd010Data.value.filter((ps: any) => ps.bdnamejd === psu);
+    });
+    console.log('bdbd010Data',bdbd010Data);
+    console.log('lideresUnico',lideresUnico);
+    console.log('lideresMap',lideresMap);
+
     tableData.value = transformData(
       (dataDimensions.filter((d: any) => d.dimid >= 2 && d.dimid <= 4)), 
       contentTable, 
@@ -562,6 +573,7 @@ const answersFounded = async (id: number) => {
       paisMap, paisUnico,
       localidad1Map, localidad1Unico,
       localidad2Map, localidad2Unico,
+      lideresMap, lideresUnico,
     );
     updateFormattedData();
   }
@@ -1112,6 +1124,23 @@ watch(() => props.filterData.columns, (newColumns) => {
           });
       });
     }
+    // columns
+    if (newColumns.includes('Lideres')) {
+      dynamicHeaders.push({
+          title: 'Lideres',
+          align: 'center',
+          key: 'lideres-header',
+          colspan: lideresUnico.length,
+      });
+      
+      lideresUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `lideres_${cru}`,
+          });
+      });
+    }
 
     let valoresHeaders = [];
     if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
@@ -1219,6 +1248,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       paisMap: { [key: string]: any[] }, paisUnico: string[],
       localidad1Map: { [key: string]: any[] }, localidad1Unico: string[],
       localidad2Map: { [key: string]: any[] }, localidad2Unico: string[],
+      lideresMap: { [key: string]: any[] }, lideresUnico: string[],
   ): any[] => {
   const formatted: any[] = [];
   const addedItems = new Set();
@@ -1227,130 +1257,134 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   const subDimensionMap = new Map();
   const competenciaMap = new Map();
 
-  // Crear acumuladores para cada género
+  // Crear acumuladores para cada demografico
   const dimensionGeneroMap = new Map();
   const subDimensionGeneroMap = new Map();
   const competenciaGeneroMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionmedioTransporteMap = new Map();
   const subDimensionmedioTransporteMap = new Map();
   const competenciamedioTransporteMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensiontiempoLlegadaMap = new Map();
   const subDimensiontiempoLlegadaMap = new Map();
   const competenciatiempoLlegadaMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensioncantidadReunionesMap = new Map();
   const subDimensioncantidadReunionesMap = new Map();
   const competenciacantidadReunionesMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionoportunidadesMejoraMap = new Map();
   const subDimensionoportunidadesMejoraMap = new Map();
   const competenciaoportunidadesMejoraMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionseguirDesarrollandomeMap = new Map();
   const subDimensionseguirDesarrollandomeMap = new Map();
   const competenciaseguirDesarrollandomeMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionoportunidadesEmpleoMap = new Map();
   const subDimensionoportunidadesEmpleoMap = new Map();
   const competenciaoportunidadesEmpleoMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensioncantidadEmpleosMap = new Map();
   const subDimensioncantidadEmpleosMap = new Map();
   const competenciacantidadEmpleosMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionpadecimientoSaludMap = new Map();
   const subDimensionpadecimientoSaludMap = new Map();
   const competenciapadecimientoSaludMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensiondependientesEconomicosMap = new Map();
   const subDimensiondependientesEconomicosMap = new Map();
   const competenciadependientesEconomicosMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensiontiempoGenteACargoMap = new Map();
   const subDimensiontiempoGenteACargoMap = new Map();
   const competenciatiempoGenteACargoMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionmodalidadTrabajoMap = new Map();
   const subDimensionmodalidadTrabajoMap = new Map();
   const competenciamodalidadTrabajoMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensiondescribirOrganizacionMap = new Map();
   const subDimensiondescribirOrganizacionMap = new Map();
   const competenciadescribirOrganizacionMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionareaMap = new Map();
   const subDimensionareaMap = new Map();
   const competenciaareaMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensioncargoMap = new Map();
   const subDimensioncargoMap = new Map();
   const competenciacargoMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensioncargoMologadoMap = new Map();
   const subDimensioncargoMologadoMap = new Map();
   const competenciacargoMologadoMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensioneducacionMap = new Map();
   const subDimensioneducacionMap = new Map();
   const competenciaeducacionMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensiongeneracionMap = new Map();
   const subDimensiongeneracionMap = new Map();
   const competenciageneracionMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE1Map = new Map();
   const subDimensionnivelE1Map = new Map();
   const competencianivelE1Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE2Map = new Map();
   const subDimensionnivelE2Map = new Map();
   const competencianivelE2Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE3Map = new Map();
   const subDimensionnivelE3Map = new Map();
   const competencianivelE3Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE4Map = new Map();
   const subDimensionnivelE4Map = new Map();
   const competencianivelE4Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE5Map = new Map();
   const subDimensionnivelE5Map = new Map();
   const competencianivelE5Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE6Map = new Map();
   const subDimensionnivelE6Map = new Map();
   const competencianivelE6Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE7Map = new Map();
   const subDimensionnivelE7Map = new Map();
   const competencianivelE7Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE8Map = new Map();
   const subDimensionnivelE8Map = new Map();
   const competencianivelE8Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE9Map = new Map();
   const subDimensionnivelE9Map = new Map();
   const competencianivelE9Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionnivelE10Map = new Map();
   const subDimensionnivelE10Map = new Map();
   const competencianivelE10Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionpaisMap = new Map();
   const subDimensionpaisMap = new Map();
   const competenciapaisMap = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionlocalidad1Map = new Map();
   const subDimensionlocalidad1Map = new Map();
   const competencialocalidad1Map = new Map();
-  // Crear acumuladores para cada género
+  // 
   const dimensionlocalidad2Map = new Map();
   const subDimensionlocalidad2Map = new Map();
   const competencialocalidad2Map = new Map();
+  // 
+  const dimensionlideresMap = new Map();
+  const subDimensionlideresMap = new Map();
+  const competencialideresMap = new Map();
 
   //const tableFilterData = contentTable;
   dataDimensions.forEach(item => {
@@ -1435,6 +1469,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
         ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
         ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
         ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        ...lideresUnico.reduce((acc, dat) => ({ ...acc, [`lideres_${dat}`]: '0%' }), {}),
         count: 0,
       });
       addedItems.add(dimid);
@@ -1471,6 +1506,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       dimensionpaisMap.set(dimid, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
       dimensionlocalidad1Map.set(dimid, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
       dimensionlocalidad2Map.set(dimid, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionlideresMap.set(dimid, lideresUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
     }
 
     // Handle Subdimensions
@@ -1513,6 +1549,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
         ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
         ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
         ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        ...lideresUnico.reduce((acc, dat) => ({ ...acc, [`lideres_${dat}`]: '0%' }), {}),
         count: 0,
       });
       addedItems.add(`${dimid}-${lindidlin}`);
@@ -1550,6 +1587,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       subDimensionpaisMap.set(`${dimid}-${lindidlin}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
       subDimensionlocalidad1Map.set(`${dimid}-${lindidlin}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
       subDimensionlocalidad2Map.set(`${dimid}-${lindidlin}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionlideresMap.set(`${dimid}-${lindidlin}`, lideresUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
     }
 
     // Handle Competencias
@@ -1603,6 +1641,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       competenciapaisMap.set(`${lindidlin}-${indclasifi}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
       competencialocalidad1Map.set(`${lindidlin}-${indclasifi}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
       competencialocalidad2Map.set(`${lindidlin}-${indclasifi}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencialideresMap.set(`${lindidlin}-${indclasifi}`, lideresUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
     }
 
     // Handle Afirmaciones    
@@ -1648,11 +1687,75 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
       ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
       ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+      ...lideresUnico.reduce((acc, dat) => ({ ...acc, [`lideres_${dat}`]: '0%' }), {}),
       expandable: false,
     };
 
-    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por género
-    // Añadir columnas dinámicas de género
+    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por lider
+    lideresUnico.forEach(dat => {
+      const lidData = lideresMap[dat] || [];
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorLid = lidData.map(item => item.bdbdo10id.bdid);
+
+
+      // Filtramos los valores en `generosCount` por `bdinfid` según el género
+      const generoFilteredCount = generosCount.value.filter(gen => 
+        idsPorLid.includes(gen.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+        idsPorLid.includes(gen.bid.bdinfid)
+      );
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const generoCount = generoFilteredCount.filter(gen => 
+        gen.bdinfindxvcn >= 4
+      ).length;
+      const generoVal1 = generoFilteredCount.filter(gen =>
+        gen.bdinfindxvcn === 1
+      ).length;
+      const generoVal2 = generoFilteredCount.filter(gen =>
+        gen.bdinfindxvcn === 2
+      ).length;
+      const generoVal3 = generoFilteredCount.filter(gen =>
+        gen.bdinfindxvcn === 3
+      ).length;
+      const generoVal4 = generoFilteredCount.filter(gen =>
+        gen.bdinfindxvcn === 4
+      ).length;
+      const generoVal5 = generoFilteredCount.filter(gen =>
+        gen.bdinfindxvcn === 5
+      ).length;
+
+      if (generoCountValue.length != 0) {
+        afirmacion[`lideres_${dat}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0) || 0}%`;
+      } else {
+        afirmacion[`lideres_${dat}`] = `0%`;
+      }
+
+       // Acumular valores en el mapa de géneros
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let generoData = competencialideresMap.get(`${lindidlin}-${indclasifi}`)[dat];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensionlideresMap.get(`${dimid}-${lindidlin}`)[dat];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensionlideresMap.get(dimid)[dat];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionlideresMap.get(dimid)[dat] = generoData; // Asignamos el objeto al map
+        }
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
     generosUnicos.forEach(genero => {
       const genData = generoMap[genero] || [];
       // Extraemos los `bdinfid` de las personas que respondieron el género actual
@@ -3671,6 +3774,16 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
         item.resultado = `${(((competenciaData.totalResult * 100 )/ competenciaData.count)/cantidadRespuestas.value).toFixed(0)}%`;
       }
       // Cálculo por demograficos en competencias
+      lideresUnico.forEach(data => {
+        const lidData = competencialideresMap.get(item.id)[data];
+        if (lidData.count > 0) {
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+            (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
+          ):(
+            0
+          )}%`;
+        }
+      });
       generosUnicos.forEach(genero => {
         const generoData = competenciaGeneroMap.get(item.id)[genero];
         if (generoData.count > 0) {
@@ -3868,6 +3981,16 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       }
 
       // Cálculo por demografico submension
+      lideresUnico.forEach(data => {
+        const lidData = subDimensionlideresMap.get(item.id)[data];
+        if (lidData.count > 0) {
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+            (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
+          ):(
+            0
+          )}%`;
+        }
+      });
       generosUnicos.forEach(genero => {
         const generoData = subDimensionGeneroMap.get(item.id)[genero];
         if (generoData.count > 0) {
@@ -4066,6 +4189,16 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       }
 
       // Cálculo por dimension demograficos
+      lideresUnico.forEach(data => {
+        const lidData = dimensionlideresMap.get(item.id)[data];
+        if (lidData.count > 0) {
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+            (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
+          ):(
+            0
+          )}%`;
+        }
+      });
       generosUnicos.forEach(genero => {
         const generoData = dimensionGeneroMap.get(item.id)[genero];
         if (generoData.count > 0) {
@@ -4502,7 +4635,11 @@ const exportToExcel = () => {
         row[index] = item[`val${index + 1}`] || '';
       });
     }
-
+    if (props.filterData.columns.includes('Lideres')) {
+      lideresUnico.forEach(mt => {
+        row[mt] = item[`lideres_${mt}`] || '';
+      });
+    }
 
     return row;
   });
@@ -4529,6 +4666,7 @@ onMounted(async () => {
   await answersFounded(empresa.value);
 
   props.filterData.rows = ['Dimensiones', 'Subdimensiones', 'Competencias', 'Afirmaciones'];
+  props.filterData.columns = ['Lideres',];
 });
 
 </script>

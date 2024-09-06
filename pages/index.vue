@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="portal">
-      <!-- <BarraLateral/> -->
       <div class="menu-column">
         <Menu :empresa="empresa" />
         <h2>Portada</h2>
@@ -17,10 +16,12 @@ import { useRoute } from '#app';
 
 const route = useRoute();
 const empresa = ref(0);
+const mod = ref(0);
 
 onMounted(() => {
   const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
   empresa.value = isNaN(empresaId) ? null : empresaId;
+
   //console.log("Empresa ", empresa.value);
 });
 </script>

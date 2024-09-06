@@ -4,6 +4,7 @@ import CollapsibleFilter from './CollapsibleFilter.vue';
 
 const selectedRows = ref<string[]>([]);
 const selectedColumns = ref<string[]>([]);
+const selectedValores = ref<string[]>([]);
 const emit = defineEmits(['applyFilter']);
 
 const handleSelectedRow = (value: string) => {
@@ -18,6 +19,7 @@ const handleDeselectedRow = (value: string) => {
     selectedRows.value.splice(index, 1);
   }
 };
+
 const handleSelectedCol = (value: string) => {
   if (!selectedColumns.value.includes(value)) {
     selectedColumns.value.push(value);
@@ -30,30 +32,49 @@ const handleDeselectedCol = (value: string) => {
     selectedColumns.value.splice(index, 1);
   }
 };
+const handleSelectedVal = (value: string) => {
+  if (!selectedValores.value.includes(value)) {
+    selectedValores.value.push(value);
+  }
+};
+
+const handleDeselectedVal = (value: string) => {
+  const index = selectedValores.value.indexOf(value);
+  if (index > -1) {
+    selectedValores.value.splice(index, 1);
+  }
+};
 
 // Emitir filas y columnas seleccionadas cuando se haga clic en "Aplicar"
 const applyFilter = () => {
   emit('applyFilter', {
     rows: selectedRows.value,
     columns: selectedColumns.value,
+    valores: selectedValores.value,
   });
-  //console.log("Emitiendo filtro:", selectedRows);
 };
 
 const demographicsValue = [
     'Genero', 'Medio de transporte', 'Tiempo de llegada', 'Reuniones con tu jefe', 'Oportunidades',
     'Seguir desarrollandome', 'Buscar oportunidades de empleo', 'Cantidad de empleos', 'Padecimiento de salud crónico', 'Dependientes económicos',
-    'Tiempo de gente a cargo', 'Modalidad de trabajo', 'Describir tu organización', 'Años de trabajo', 'Area',
+    'Tiempo de gente a cargo', 'Modalidad de trabajo', 'Describir tu organización', 'Area',
     'Cargo', 'Cargo mologado', 'Educación', 'Generación', 'Localidad 1', 
     'Localidad 2', 'Nivel estructural 1', 'Nivel estructural 2', 'Nivel estructural 3', 'Nivel estructural 4',
     'Nivel estructural 5', 'Nivel estructural 6', 'Nivel estructural 7', 'Nivel estructural 8', 'Nivel estructural 9',
-    'Nivel estructural 10', 'Pais', 'Tipo de trabajo',
+    'Nivel estructural 10', 'Pais',
 ]
 const modeloValue = [
-    'Dimensiones', 'Subdimensiones', 'Competencias', 'Afirmaciones'
+    'Dimensiones', 'Subdimensiones', 'Competencias', 'Afirmaciones',
 ]
 const benchmarkValue = [
-    'Benchmark1'
+    'Benchmark 1', 'Benchmark 2', 'Benchmark 3', 'Benchmark 4', 'Benchmark 5',
+    'Benchmark 6', 'Benchmark 7', 'Benchmark 8', 'Benchmark 8', 'Benchmark 10',
+]
+const valoresCalculadosValue = [
+    'Valor 1', 'Valor 2', 'Valor 3', 'Valor 4', 'Valor 5',
+]
+const lidPregValue = [
+    'Lideres', 'Preguntas abiertas'
 ]
 </script>
 
@@ -67,9 +88,6 @@ const benchmarkValue = [
                 <button class="btn-cancel">Cancelar</button>
             </div>
         </div>
-        <div class="filtro-campos__text">
-            <div>Lorem, ipsum dolor sit amet consectetur adipisicing elit</div>
-        </div>
         <div class="filtro-campos__columnas">
             <div class="filtro-campos__column">
                 <div class="filtro-campos__col-content1">
@@ -80,27 +98,47 @@ const benchmarkValue = [
                         @selected="handleSelectedRow" @deselected="handleDeselectedRow"/>
                     <CollapsibleFilter text="Demográficos" :items="demographicsValue"
                         @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
-                    <CollapsibleFilter text="Benchmark" :items="benchmarkValue"
+                    <!-- <CollapsibleFilter text="Benchmark" :items="benchmarkValue"
+                        @selected="handleSelectedCol" @deselected="handleDeselectedCol"/> -->
+                    <CollapsibleFilter text="Lideres/Preguntas" :items="lidPregValue"
                         @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
+                    <CollapsibleFilter text="Valores" :items="valoresCalculadosValue"
+                        @selected="handleSelectedVal" @deselected="handleDeselectedVal"/>
                 </div>
             </div>
-            <div class="filtro-campos__column">
-                <div class="filtro-campos__col-content1">
-                    <span>Filas</span>
-                </div>
-                <div class="filtro-campos__col-content2">
-                    <div v-for="item in selectedRows" :key="item">
-                      {{ item }}
+            <div class="campos-container">
+                <div class="campos-container__list">
+                    <div class="filtro-campos__column1">
+                        <div class="filtro-campos__col-content1">
+                            <span>Filas</span>
+                        </div>
+                        <div class="filtro-campos__col1-content2">
+                            <div v-for="item in selectedRows" :key="item">
+                              {{ item }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filtro-campos__column2">
+                            <div class="filtro-campos__col-content1">
+                                <span>Columnas</span>
+                            </div>
+                            <div class="filtro-campos__col1-content2">
+                                <div v-for="item in selectedColumns" :key="item">
+                                  {{ item }}
+                                </div>
+                            </div>
                     </div>
                 </div>
-            </div>
-            <div class="filtro-campos__column">
-                <div class="filtro-campos__col-content1">
-                    <span>Columnas</span>
-                </div>
-                <div class="filtro-campos__col-content2">
-                    <div v-for="item in selectedColumns" :key="item">
-                      {{ item }}
+                <div class="campos-container__list">
+                    <div class="filtro-campos__column-list">
+                            <div class="filtro-campos__col-content1">
+                                <span>Valores Calculados</span>
+                            </div>
+                            <div class="filtro-campos__col1-content2">
+                                <div v-for="item in selectedValores" :key="item">
+                                  {{ item }}
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -185,6 +223,28 @@ const benchmarkValue = [
         flex-direction: column;
     }
 
+    .campos-container {
+        width: 50%;
+        display: flex;
+        flex-direction: column
+    }
+    .campos-container__list {
+        width: 100%;
+        height: 50%;
+        display: flex;
+        flex-direction: row
+    }
+    .filtro-campos__column1 {
+        width: 50%;
+        padding-right: 10px;
+    }
+    .filtro-campos__column2 {
+        width: 50%;
+    }
+    .filtro-campos__column-list {
+        width: 100%;
+    }
+
     .filtro-campos__col-content1 {
         width: 100%;
         height: 30px;
@@ -200,6 +260,12 @@ const benchmarkValue = [
         display: flex;
         flex-direction: column;
         overflow-y: scroll;
+    }
+    .filtro-campos__col1-content2 {
+        display: flex;
+        flex-direction: column;
+        overflow-y: scroll;
+        height: 65%;
     }
 
     /* Style the button that is used to open and close the collapsible content */

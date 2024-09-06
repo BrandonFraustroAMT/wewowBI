@@ -2,30 +2,30 @@
     <div class="portal">
       <!-- <BarraLateral/> -->
       <div class="menu-column">
-        <Menu @applyFilter="handleFilter"/>
+        <Menu @applyFilter="handleFilter" @exportExcel="handleExport"/>
         <div>
           <div>
-              <TablaDimensiones :filterData="filterData"/>
+              <TablaDimensiones :filterData="filterData" ref="tablaDimensiones"/>
           </div>
         </div>
       </div>
     </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
 import TablaDimensiones from '~/components/TablaDimensiones.vue';
 
-export default {
-  data() {
-    return {
-      filterData: {},
-    };
-  },
-  methods: {
-    handleFilter(filterData) {
-      //console.log('Filtro aplicado:', filterData);
-      this.filterData = filterData;
-    }
+const filterData = ref({});
+const tablaDimensiones = ref(null);
+
+const handleFilter = (filterDataFromMenu) => {
+  filterData.value = filterDataFromMenu;
+};
+
+const handleExport = () => {
+  if (tablaDimensiones.value) {
+    tablaDimensiones.value.exportToExcel();
   }
 };
 </script>

@@ -48,7 +48,7 @@
               </UModal>
           </div>
           <div class="paises-container__img">
-            <button class="btn_menu">Exportar</button>
+            <button class="btn_menu" @click="emitExport">Exportar</button>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@ const route = useRoute();
 const empresa = ref(0);
 const empresaData = ref({});
 const isOpen = ref(false)
-const emit = defineEmits(['applyFilter']);
+const emit = defineEmits(['applyFilter', 'exportExcel']);
 
 const empresafounded = async (id) => {
   if (id) {
@@ -81,6 +81,10 @@ const applyFilter = (filterData) => {
   //console.log('Filtro aplicado desde Menu:', filterData);
   // Emitir el evento hacia el componente padre si es necesario
   emit('applyFilter', filterData);
+};
+
+const emitExport = () => {
+  emit('exportExcel');
 };
 
 onMounted(() => {

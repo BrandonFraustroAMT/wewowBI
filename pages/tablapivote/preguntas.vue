@@ -2,28 +2,30 @@
     <div class="portal">
       <!-- <BarraLateral/> -->
       <div class="menu-column">
-        <Menu @applyFilter="handleFilter"/>
+        <Menu @applyFilter="handleFilter" @exportExcel="handleExport"/>
         <div>
           <div>
-              <Tabla :filterData="filterData"/>
+            <TablaPreguntas :filterData="filterData" ref="tablaPreguntas"/>
           </div>
         </div>
       </div>
     </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      filterData: {},
-    };
-  },
-  methods: {
-    handleFilter(filterData) {
-      console.log('Filtro aplicado:', filterData);
-      this.filterData = filterData;
-    }
+<script setup>
+import { ref } from 'vue';
+import TablaPreguntas from '~/components/TablaPreguntas.vue';
+
+const filterData = ref({});
+const tablaPreguntas = ref(null);
+
+const handleFilter = (filterDataFromMenu) => {
+  filterData.value = filterDataFromMenu;
+};
+
+const handleExport = () => {
+  if (tablaPreguntas.value) {
+    tablaPreguntas.value.exportToExcel();
   }
 };
 </script>
