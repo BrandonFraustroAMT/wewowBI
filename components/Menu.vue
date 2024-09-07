@@ -16,9 +16,9 @@
         <div class="menu-slice__text">
           <nav class="menu-nav">
             <ul class="menu-slice__link">
-              <li><NuxtLink to="/portada">Portada</NuxtLink></li>
-              <li><NuxtLink to="/reporteejecutivo">Reporte Ejecutivo</NuxtLink></li>
-              <li><NuxtLink to="/tablapivote/dimensiones">Tabla Pivote</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/portada')">Portada</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/reporteejecutivo')">Reporte Ejecutivo</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/dimensiones')">Tabla Pivote</NuxtLink></li>
             </ul>
           </nav>
         </div>
@@ -32,11 +32,11 @@
         <div class="tablas-pivote">
           <nav class="menu-nav">
             <ul class="menu-slice__link">
-              <li><NuxtLink to="/tablapivote/dimensiones">Dimensiones</NuxtLink></li>
-              <li><NuxtLink to="/tablapivote/demograficos">Demográficos</NuxtLink></li>
-              <li><NuxtLink to="/tablapivote/lideres">Lideres</NuxtLink></li>
-              <li><NuxtLink to="/tablapivote/preguntas">Preguntas abiertas</NuxtLink></li>
-              <li><NuxtLink to="/tablapivote/vacio">Vacio</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/dimensiones')">Dimensiones</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/demograficos')">Demográficos</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/lideres')">Lideres</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/preguntas')">Preguntas abiertas</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/vacio')">Vacio</NuxtLink></li>
             </ul>
           </nav>
         </div>
@@ -74,6 +74,12 @@ const empresafounded = async (id) => {
     empresaData.value = data;
     //console.log("Datos de la empresa: ", empresaData.value);
   }
+};
+
+
+const buildLink = (path) => {
+  const query = { ...route.query }; // Clona los parámetros de consulta actuales
+  return { path, query }; // Devuelve la ruta con los parámetros de consulta
 };
 
 // Define el método `applyFilter` que manejará el filtro
