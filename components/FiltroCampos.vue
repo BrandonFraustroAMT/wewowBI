@@ -2,80 +2,167 @@
 import { ref } from 'vue';
 import CollapsibleFilter from './CollapsibleFilter.vue';
 
-const selectedRows = ref<string[]>([]);
-const selectedColumns = ref<string[]>([]);
-const selectedValores = ref<string[]>([]);
+const rows = ref<any[]>([]);
+const columns = ref<any[]>([]);
+const valores = ref<any[]>([]);
+const validDrop = ref(null); // Estado para validar el contenedor activo
 const emit = defineEmits(['applyFilter']);
 
-const handleSelectedRow = (value: string) => {
-  if (!selectedRows.value.includes(value)) {
-    selectedRows.value.push(value);
+// Lista de ítems inicial, agrupando por categoría
+const items = ref([
+  { id: 1, name: 'Genero', category: 'demographics' },
+  { id: 2, name: 'Medio de transporte', category: 'demographics' },
+  { id: 3, name: 'Tiempo de llegada', category: 'demographics' },
+  { id: 4, name: 'Reuniones con tu jefe', category: 'demographics' },
+  { id: 5, name: 'Oportunidades', category: 'demographics' },
+  { id: 6, name: 'Seguir desarrollandome', category: 'demographics' },
+  { id: 7, name: 'Buscar oportunidades de empleo', category: 'demographics' },
+  { id: 8, name: 'Cantidad de empleos', category: 'demographics' },
+  { id: 9, name: 'Padecimiento de salud crónico', category: 'demographics' },
+  { id: 10, name: 'Dependientes económicos', category: 'demographics' },
+  { id: 11, name: 'Tiempo de gente a cargo', category: 'demographics' },
+  { id: 12, name: 'Modalidad de trabajo', category: 'demographics' },
+  { id: 13, name: 'Describir tu organización', category: 'demographics' },
+  { id: 14, name: 'Area', category: 'demographics' },
+  { id: 15, name: 'Cargo', category: 'demographics' },
+  { id: 16, name: 'Cargo mologado', category: 'demographics' },
+  { id: 17, name: 'Educación', category: 'demographics' },
+  { id: 18, name: 'Generación', category: 'demographics' },
+  { id: 19, name: 'Localidad 1', category: 'demographics' },
+  { id: 20, name: 'Localidad 2', category: 'demographics' },
+  { id: 21, name: 'Nivel estructural 1', category: 'demographics' },
+  { id: 22, name: 'Nivel estructural 2', category: 'demographics' },
+  { id: 23, name: 'Nivel estructural 3', category: 'demographics' },
+  { id: 24, name: 'Nivel estructural 4', category: 'demographics' },
+  { id: 25, name: 'Nivel estructural 5', category: 'demographics' },
+  { id: 26, name: 'Nivel estructural 6', category: 'demographics' },
+  { id: 27, name: 'Nivel estructural 7', category: 'demographics' },
+  { id: 28, name: 'Nivel estructural 8', category: 'demographics' },
+  { id: 29, name: 'Nivel estructural 9', category: 'demographics' },
+  { id: 30, name: 'Nivel estructural 10', category: 'demographics' },
+  { id: 31, name: 'Pais', category: 'demographics' },
+  { id: 32, name: 'Dimensiones', category: 'modelo' },
+  { id: 33, name: 'Subdimensiones', category: 'modelo' },
+  { id: 34, name: 'Competencias', category: 'modelo' },
+  { id: 35, name: 'Afirmaciones', category: 'modelo' },
+  /* { id: 3, name: 'Benchmark 1', category: 'benchmark' }, */
+  { id: 36, name: 'Valor 1', category: 'valoresCalculados' },
+  { id: 37, name: 'Valor 2', category: 'valoresCalculados' },
+  { id: 38, name: 'Valor 3', category: 'valoresCalculados' },
+  { id: 39, name: 'Valor 4', category: 'valoresCalculados' },
+  { id: 40, name: 'Valor 5', category: 'valoresCalculados' },
+  { id: 41, name: 'Lideres', category: 'lidPreg' },
+  { id: 42, name: 'Preguntas Abiertas', category: 'lidPreg' },
+  // Agregar más elementos
+]);
+
+// Ítem arrastrado
+let draggedItem = null;
+
+// Control de categorías expandidas
+const expandedCategories = ref({});
+
+// Función para agrupar ítems por categoría
+const groupedItems = computed(() => {
+  return items.value.reduce((groups, item) => {
+    (groups[item.category] = groups[item.category] || []).push(item);
+    return groups;
+  }, {});
+});
+
+// Función para obtener el título de la categoría
+const categoryTitle = (category) => {
+  const titles = {
+    demographics: 'Demográficos',
+    modelo: 'Modelo',
+    valoresCalculados: 'Valores Calculados',
+    lidPreg: 'Líderes',
+    // Agrega más títulos según las categorías
+  };
+  return titles[category];
+};
+
+// Función para manejar el inicio del arrastre
+const onDragStart = (item) => {
+  draggedItem = item; // Almacena el ítem arrastrado
+};
+
+const onDragEnter = (target) => {
+  validDrop.value = isValidDrop(target);
+};
+
+const onDragLeave = () => {
+  validDrop.value = null;
+};
+
+// Función para manejar el "drop"
+const onDrop = (target) => {
+  if (isValidDrop(target)) {
+    // Añadir el ítem al contenedor de destino sin eliminarlo del contenedor principal
+    if (target === 'rows') {
+      if (!rows.value.some(i => i.id === draggedItem.id)) {
+        rows.value.push(draggedItem);
+      }
+    } else if (target === 'columns') {
+      if (!columns.value.some(i => i.id === draggedItem.id)) {
+        columns.value.push(draggedItem);
+      }
+    } else if (target === 'valores') {
+      if (!valores.value.some(i => i.id === draggedItem.id)) {
+        valores.value.push(draggedItem);
+      }
+    }
+  }
+  draggedItem = null;
+  validDrop.value = null;
+};
+
+
+// Valida si un ítem es válido para ser soltado en un contenedor
+const isValidDrop = (target) => {
+  if (!draggedItem) return false;
+
+  if ((target === 'rows' || target === 'columns') &&
+      (draggedItem.category === 'demographics' || draggedItem.category === 'modelo' || draggedItem.category === 'lidPreg')) {
+    return true;
+  } else if (target === 'valores' && draggedItem.category === 'valoresCalculados') {
+    return true;
+  }
+
+  return false;
+};
+
+// Función para eliminar un ítem del contenedor y regresarlo a su categoría original
+const removeItem = (item, container) => {
+  // Elimina el ítem del contenedor correspondiente
+  if (container === 'rows') {
+    rows.value = rows.value.filter(i => i.id !== item.id);
+  } else if (container === 'columns') {
+    columns.value = columns.value.filter(i => i.id !== item.id);
+  } else if (container === 'valores') {
+    valores.value = valores.value.filter(i => i.id !== item.id);
+  }
+
+  // Devuelve el ítem a la lista de 'items' en su categoría original
+  if (!items.value.some(i => i.id === item.id)) {
+    items.value.push(item);
   }
 };
 
-const handleDeselectedRow = (value: string) => {
-  const index = selectedRows.value.indexOf(value);
-  if (index > -1) {
-    selectedRows.value.splice(index, 1);
-  }
-};
 
-const handleSelectedCol = (value: string) => {
-  if (!selectedColumns.value.includes(value)) {
-    selectedColumns.value.push(value);
-  }
-};
-
-const handleDeselectedCol = (value: string) => {
-  const index = selectedColumns.value.indexOf(value);
-  if (index > -1) {
-    selectedColumns.value.splice(index, 1);
-  }
-};
-const handleSelectedVal = (value: string) => {
-  if (!selectedValores.value.includes(value)) {
-    selectedValores.value.push(value);
-  }
-};
-
-const handleDeselectedVal = (value: string) => {
-  const index = selectedValores.value.indexOf(value);
-  if (index > -1) {
-    selectedValores.value.splice(index, 1);
-  }
+// Función para expandir o colapsar categorías
+const toggleCategory = (category) => {
+  expandedCategories.value[category] = !expandedCategories.value[category];
 };
 
 // Emitir filas y columnas seleccionadas cuando se haga clic en "Aplicar"
 const applyFilter = () => {
   emit('applyFilter', {
-    rows: selectedRows.value,
-    columns: selectedColumns.value,
-    valores: selectedValores.value,
+    rows: rows.value,
+    columns: columns.value,
+    valores: valores.value,
   });
 };
-
-const demographicsValue = [
-    'Genero', 'Medio de transporte', 'Tiempo de llegada', 'Reuniones con tu jefe', 'Oportunidades',
-    'Seguir desarrollandome', 'Buscar oportunidades de empleo', 'Cantidad de empleos', 'Padecimiento de salud crónico', 'Dependientes económicos',
-    'Tiempo de gente a cargo', 'Modalidad de trabajo', 'Describir tu organización', 'Area',
-    'Cargo', 'Cargo mologado', 'Educación', 'Generación', 'Localidad 1', 
-    'Localidad 2', 'Nivel estructural 1', 'Nivel estructural 2', 'Nivel estructural 3', 'Nivel estructural 4',
-    'Nivel estructural 5', 'Nivel estructural 6', 'Nivel estructural 7', 'Nivel estructural 8', 'Nivel estructural 9',
-    'Nivel estructural 10', 'Pais',
-]
-const modeloValue = [
-    'Dimensiones', 'Subdimensiones', 'Competencias', 'Afirmaciones',
-]
-const benchmarkValue = [
-    'Benchmark 1', 'Benchmark 2', 'Benchmark 3', 'Benchmark 4', 'Benchmark 5',
-    'Benchmark 6', 'Benchmark 7', 'Benchmark 8', 'Benchmark 8', 'Benchmark 10',
-]
-const valoresCalculadosValue = [
-    'Valor 1', 'Valor 2', 'Valor 3', 'Valor 4', 'Valor 5',
-]
-const lidPregValue = [
-    'Lideres', 'Preguntas abiertas'
-]
 </script>
 
 <template>
@@ -88,60 +175,102 @@ const lidPregValue = [
                 <button class="btn-cancel">Cancelar</button>
             </div>
         </div>
-        <div class="filtro-campos__columnas">
-            <div class="filtro-campos__column">
-                <div class="filtro-campos__col-content1">
-                    <span>Campos</span>
-                </div>
-                <div class="filtro-campos__col-content2">
-                    <CollapsibleFilter text="Modelo" :items="modeloValue"
-                        @selected="handleSelectedRow" @deselected="handleDeselectedRow"/>
-                    <CollapsibleFilter text="Demográficos" :items="demographicsValue"
-                        @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
-                    <!-- <CollapsibleFilter text="Benchmark" :items="benchmarkValue"
-                        @selected="handleSelectedCol" @deselected="handleDeselectedCol"/> -->
-                    <CollapsibleFilter text="Lideres/Preguntas" :items="lidPregValue"
-                        @selected="handleSelectedCol" @deselected="handleDeselectedCol"/>
-                    <CollapsibleFilter text="Valores" :items="valoresCalculadosValue"
-                        @selected="handleSelectedVal" @deselected="handleDeselectedVal"/>
-                </div>
-            </div>
-            <div class="campos-container">
-                <div class="campos-container__list">
-                    <div class="filtro-campos__column1">
-                        <div class="filtro-campos__col-content1">
-                            <span>Filas</span>
-                        </div>
-                        <div class="filtro-campos__col1-content2">
-                            <div v-for="item in selectedRows" :key="item">
-                              {{ item }}
-                            </div>
-                        </div>
+        <div class="drag-container">
+          <div class="drag-column">
+              <!-- Contenedor 1: Lista de Items -->
+               <div class="container">
+                  <h3>Elementos</h3>
+                  <div v-for="(group, category) in groupedItems" :key="category">
+                    <h4>
+                      {{ categoryTitle(category) }}
+                      <!-- Botón para expandir/colapsar la categoría -->
+                      <button @click="toggleCategory(category)">
+                        {{ expandedCategories[category] ? '-' : '+' }}
+                      </button>
+                    </h4>
+                    <!-- Mostrar elementos solo si la categoría está expandida -->
+                    <div v-if="expandedCategories[category]">
+                      <div
+                        v-for="item in group"
+                        :key="item.id"
+                        @dragstart="onDragStart(item)"
+                        draggable="true"
+                        class="draggable-item"
+                      >
+                        {{ item.name }}
+                      </div>
                     </div>
-                    <div class="filtro-campos__column2">
-                            <div class="filtro-campos__col-content1">
-                                <span>Columnas</span>
-                            </div>
-                            <div class="filtro-campos__col1-content2">
-                                <div v-for="item in selectedColumns" :key="item">
-                                  {{ item }}
-                                </div>
-                            </div>
+                  </div>
+               </div>
+          </div>
+      
+          <div class="drag-column">
+              <div class="drag-col1">
+                  <!-- Contenedor 2: Filas -->
+                  <div 
+                    class="container" 
+                    :class="{ 'valid-drop': isValidDrop('rows'), 'invalid-drop': !isValidDrop('rows') }"
+                    @dragover.prevent
+                    @dragenter="onDragEnter('rows')"
+                    @dragleave="onDragLeave"
+                    @drop="onDrop('rows')"
+                    style="margin-right: 10px;"
+                  >
+                    <h3>Filas</h3>
+                    <div 
+                      v-for="item in rows" 
+                      :key="item.id" 
+                      class="draggable-item"
+                    >
+                      {{ item.name }}
+                      <button class="dd-button" @click="removeItem(item, 'rows')">x</button>
                     </div>
-                </div>
-                <div class="campos-container__list">
-                    <div class="filtro-campos__column-list">
-                            <div class="filtro-campos__col-content1">
-                                <span>Valores Calculados</span>
-                            </div>
-                            <div class="filtro-campos__col1-content2">
-                                <div v-for="item in selectedValores" :key="item">
-                                  {{ item }}
-                                </div>
-                            </div>
+                  </div>
+              
+                  <!-- Contenedor 3: Columnas -->
+                  <div 
+                    class="container" 
+                    :class="{ 'valid-drop': isValidDrop('columns'), 'invalid-drop': !isValidDrop('columns') }"
+                    @dragover.prevent
+                    @dragenter="onDragEnter('columns')"
+                    @dragleave="onDragLeave"
+                    @drop="onDrop('columns')"
+                  >
+                    <h3>Columnas</h3>
+                    <div 
+                      v-for="item in columns" 
+                      :key="item.id" 
+                      class="draggable-item"
+                    >
+                      {{ item.name }}
+                      <!-- Botón para eliminar el ítem de columnas y regresarlo a 'Elementos' -->
+                      <button class="dd-button" @click="removeItem(item, 'columns')">x</button>
                     </div>
-                </div>
-            </div>
+                  </div>
+              </div>
+              <div class="drag-col2">
+                  <!-- Contenedor 4: Columnas -->
+                  <div 
+                    class="container" 
+                    :class="{ 'valid-drop': isValidDrop('valores'), 'invalid-drop': !isValidDrop('valores') }"
+                    @dragover.prevent
+                    @dragenter="onDragEnter('valores')"
+                    @dragleave="onDragLeave"
+                    @drop="onDrop('valores')"
+                  >
+                    <h3>Valores</h3>
+                    <div 
+                      v-for="item in valores" 
+                      :key="item.id" 
+                      class="draggable-item"
+                    >
+                      {{ item.name }}
+                      <!-- Botón para eliminar el ítem de valores y regresarlo a 'Elementos' -->
+                      <button class="dd-button" @click="removeItem(item, 'valores')">x</button>
+                    </div>
+                  </div>
+              </div>
+          </div>
         </div>
     </div>
   </section>
@@ -201,96 +330,64 @@ const lidPregValue = [
         background-color: #969695;
     }
 
-    .filtro-campos__text {
-        width: 100%;
-        padding: 0 20px;
-    }
 
-    .filtro-campos__columnas {
-        width: 100%;
-        padding: 30px 20px;
-        display: flex;
-        flex-direction: row;
-    }
+    .drag-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.container {
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  min-height: 100px;
+  height: 300px;
+  overflow-y: scroll;
+}
 
-    .filtro-campos__column {
-        width: 33%;
-        height: 300px;
-        background-color: #f8f8f8;
-        border-radius: 3px;
-        margin: 0 10px;
-        display: flex;
-        flex-direction: column;
-    }
+.draggable-item {
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 5px;
+  cursor: move;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .campos-container {
-        width: 50%;
-        display: flex;
-        flex-direction: column
-    }
-    .campos-container__list {
-        width: 100%;
-        height: 50%;
-        display: flex;
-        flex-direction: row
-    }
-    .filtro-campos__column1 {
-        width: 50%;
-        padding-right: 10px;
-    }
-    .filtro-campos__column2 {
-        width: 50%;
-    }
-    .filtro-campos__column-list {
-        width: 100%;
-    }
+.drag-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 10px;
+}
 
-    .filtro-campos__col-content1 {
-        width: 100%;
-        height: 30px;
-        background-color: #d3d1d1;
-    }
+.drag-col1{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.drag-col2{
+    width: 100%;
+}
 
-    .filtro-campos__col-content1 span{
-        padding-left: 10px;
-        font-size: 0.8rem;
-    }
+.dd-button {
+  margin-left: 10px;
+  background-color: #EE4E4E;
+  color: white;
+  border: none;
+  padding: 0px 10px;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.dd-button:hover {
+  background-color: #f26f6f;
+}
 
-    .filtro-campos__col-content2 {
-        display: flex;
-        flex-direction: column;
-        overflow-y: scroll;
-    }
-    .filtro-campos__col1-content2 {
-        display: flex;
-        flex-direction: column;
-        overflow-y: scroll;
-        height: 65%;
-    }
-
-    /* Style the button that is used to open and close the collapsible content */
-    .collapsible {
-      background-color: #eee;
-      color: #444;
-      cursor: pointer;
-      padding: 18px;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 15px;
-    }
-
-    /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-    .active, .collapsible:hover {
-      background-color: #ccc;
-    }
-
-    /* Style the collapsible content. Note: hidden by default */
-    .content {
-      padding: 0 18px;
-      display: none;
-      overflow: hidden;
-      background-color: #f1f1f1;
-    }
+.sm\:max-w-lg {
+    max-width: 60rem;
+}
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 </script>
 <template>
   <div>
@@ -7,9 +8,6 @@
       <div class="menu-column">
         <Menu/>
         <div>
-          <h2>
-            Portada
-          </h2>
         </div>
       </div>
     </div>

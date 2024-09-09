@@ -574,566 +574,566 @@
   ]);
   
   watch(() => props.filterData.columns, (newColumns) => {
-    if (newColumns) {
-      let dynamicHeaders = [];
-      // Verifica si 'generos' está en los nuevos columns
-      if (newColumns.includes('Genero')) {
-        dynamicHeaders.push({
-            title: 'Género',
-            align: 'center',
-            key: 'generos-header',
-            colspan: generosUnicos.length,
-        });
-  
-        generosUnicos.forEach((genero, index) => {
-            dynamicHeaders.push({
-                title: genero,
-                sortable: false,
-                key: `genero_${genero}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Medio de transporte' está en los nuevos columns
-      if (newColumns.includes('Medio de transporte')) {
-        dynamicHeaders.push({
-            title: 'Medio de transporte',
-            align: 'center',
-            key: 'mediotransporte-header',
-            colspan: medioTransporteUnico.length,
-        });
-        
-        medioTransporteUnico.forEach((mt, index) => {
-            dynamicHeaders.push({
-                title: mt,
-                sortable: false,
-                key: `mediotransporte_${mt}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Tiempo de llegada' está en los nuevos columns
-      if (newColumns.includes('Tiempo de llegada')) {
-        dynamicHeaders.push({
-            title: 'Tiempo de llegada',
-            align: 'center',
-            key: 'tiempollegada-header',
-            colspan: tiempoLlegadaUnico.length,
-        });
-        
-        tiempoLlegadaUnico.forEach((tll, index) => {
-            dynamicHeaders.push({
-                title: tll,
-                sortable: false,
-                key: `tiempollegada_${tll}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Reuniones con tu jefe' está en los nuevos columns
-      if (newColumns.includes('Reuniones con tu jefe')) {
-        dynamicHeaders.push({
-            title: 'Reuniones con tu jefe',
-            align: 'center',
-            key: 'reunionesjefe-header',
-            colspan: cantidadReunionesUnico.length,
-        });
-        
-        cantidadReunionesUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `reunionesjefe_${cru}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Oportunidades' está en los nuevos columns
-      if (newColumns.includes('Oportunidades')) {
-        dynamicHeaders.push({
-            title: 'Oportunidades de Mejora',
-            align: 'center',
-            key: 'oportunidadesmejora-header',
-            colspan: oportunidadesMejoraUnico.length,
-        });
-        
-        oportunidadesMejoraUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `oportunidadesmejora_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Seguir desarrollandome' está en los nuevos columns
-      if (newColumns.includes('Seguir desarrollandome')) {
-        dynamicHeaders.push({
-            title: 'Seguir desarrollandome',
-            align: 'center',
-            key: 'seguirdesarrollandome-header',
-            colspan: seguirDesarrollandomeUnico.length,
-        });
-        
-        seguirDesarrollandomeUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `seguirdesarrollandome_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Buscar oportunidades de empleo' está en los nuevos columns
-      if (newColumns.includes('Buscar oportunidades de empleo')) {
-        dynamicHeaders.push({
-            title: 'Oportunidades de Empleo',
-            align: 'center',
-            key: 'oportunidadesempleo-header',
-            colspan: oportunidadesEmpleoUnico.length,
-        });
-        
-        oportunidadesEmpleoUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `oportunidadesempleo_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Cantidad de empleos' está en los nuevos columns
-      if (newColumns.includes('Cantidad de empleos')) {
-        dynamicHeaders.push({
-            title: 'Cantidad de empleos',
-            align: 'center',
-            key: 'cantidadempleos-header',
-            colspan: cantidadEmpleosUnico.length,
-        });
-        
-        cantidadEmpleosUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `cantidadempleos_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Cantidad de empleos' está en los nuevos columns
-      if (newColumns.includes('Padecimiento de salud crónico')) {
-        dynamicHeaders.push({
-            title: 'Padecimiento de salud crónico',
-            align: 'center',
-            key: 'padecimientosalud-header',
-            colspan: padecimientoSaludUnico.length,
-        });
-        
-        padecimientoSaludUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `padecimientosalud_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Dependientes económicos')) {
-        dynamicHeaders.push({
-            title: 'Dependientes económicos',
-            align: 'center',
-            key: 'dependienteseconomicos-header',
-            colspan: dependientesEconomicosUnico.length,
-        });
-        
-        dependientesEconomicosUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `dependienteseconomicos_${cru}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Tiempo de gente a cargo')) {
-        dynamicHeaders.push({
-            title: 'Tiempo de gente a cargo',
-            align: 'center',
-            key: 'tiempogente-header',
-            colspan: tiempoGenteACargoUnico.length,
-        });
-        
-        tiempoGenteACargoUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `tiempogente_${cru}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Modalidad de trabajo')) {
-        dynamicHeaders.push({
-            title: 'Modalidad de trabajo',
-            align: 'center',
-            key: 'modalidatrabajo-header',
-            colspan: modalidadTrabajoUnico.length,
-        });
-        
-        modalidadTrabajoUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `modalidatrabajo_${cru}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Describir tu organización')) {
-        dynamicHeaders.push({
-            title: 'Describir tu organización',
-            align: 'center',
-            key: 'describirorganizacion-header',
-            colspan: describirOrganizacionUnico.length,
-        });
-        
-        describirOrganizacionUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `describirorganizacion_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Area')) {
-        dynamicHeaders.push({
-            title: 'Area',
-            align: 'center',
-            key: 'areaT-header',
-            colspan: areaUnico.length,
-        });
-        
-        areaUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `areaT_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Cargo')) {
-        dynamicHeaders.push({
-            title: 'Cargo',
-            align: 'center',
-            key: 'cargoT-header',
-            colspan: cargoUnico.length,
-        });
-        
-        cargoUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `cargoT_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Cargo mologado')) {
-        dynamicHeaders.push({
-            title: 'Cargo mologado',
-            align: 'center',
-            key: 'cargomologado-header',
-            colspan: cargoMologadoUnico.length,
-        });
-        
-        cargoMologadoUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `cargomologado_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Educación')) {
-        dynamicHeaders.push({
-            title: 'Educación',
-            align: 'center',
-            key: 'educacion-header',
-            colspan: educacionUnico.length,
-        });
-        
-        educacionUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `educacion_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Generación')) {
-        dynamicHeaders.push({
-            title: 'Generación',
-            align: 'center',
-            key: 'generacion-header',
-            colspan: generacionUnico.length,
-        });
-        
-        generacionUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `generacion_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 1')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 1',
-            align: 'center',
-            key: 'nivele1-header',
-            colspan: nivelE1Unico.length,
-        });
-        
-        nivelE1Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele1_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 2')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 2',
-            align: 'center',
-            key: 'nivele2-header',
-            colspan: nivelE2Unico.length,
-        });
-        
-        nivelE2Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele2_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 3')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 3',
-            align: 'center',
-            key: 'nivele3-header',
-            colspan: nivelE3Unico.length,
-        });
-        
-        nivelE3Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele3_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 4')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 4',
-            align: 'center',
-            key: 'nivele4-header',
-            colspan: nivelE4Unico.length,
-        });
-        
-        nivelE4Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele4_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 5')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 5',
-            align: 'center',
-            key: 'nivele5-header',
-            colspan: nivelE5Unico.length,
-        });
-        
-        nivelE5Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele5_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 6')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 6',
-            align: 'center',
-            key: 'nivele6-header',
-            colspan: nivelE6Unico.length,
-        });
-        
-        nivelE6Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele6_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 7')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 7',
-            align: 'center',
-            key: 'nivele7-header',
-            colspan: nivelE7Unico.length,
-        });
-        
-        nivelE7Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele7_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 8')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 8',
-            align: 'center',
-            key: 'nivele8-header',
-            colspan: nivelE8Unico.length,
-        });
-        
-        nivelE8Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele8_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 9')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 9',
-            align: 'center',
-            key: 'nivele9-header',
-            colspan: nivelE9Unico.length,
-        });
-        
-        nivelE9Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele9_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Nivel estructural 10')) {
-        dynamicHeaders.push({
-            title: 'Nivel estructural 10',
-            align: 'center',
-            key: 'nivele10-header',
-            colspan: nivelE10Unico.length,
-        });
-        
-        nivelE10Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `nivele10_${cru}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Pais')) {
-        dynamicHeaders.push({
-            title: 'Pais',
-            align: 'center',
-            key: 'pais-header',
-            colspan: paisUnico.length,
-        });
-        
-        paisUnico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `pais_${cru}`,
-            });
-        });
-      }
-  
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Localidad 1')) {
-        dynamicHeaders.push({
-            title: 'Localidad 1',
-            align: 'center',
-            key: 'local1-header',
-            colspan: localidad1Unico.length,
-        });
-        
-        localidad1Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `local1_${cru}`,
-            });
-        });
-      }
-      // Verifica si 'Dependientes económicos' está en los nuevos columns
-      if (newColumns.includes('Localidad 2')) {
-        dynamicHeaders.push({
-            title: 'Localidad 2',
-            align: 'center',
-            key: 'local2-header',
-            colspan: localidad2Unico.length,
-        });
-        
-        localidad2Unico.forEach((cru, index) => {
-            dynamicHeaders.push({
-                title: cru,
-                sortable: false,
-                key: `local2_${cru}`,
-            });
-        });
-      }
-  
-      let valoresHeaders = [];
-      if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
-        valoresHeaders = props.filterData.valores.map((val, index) => {
-          return {
-            title: `Valor ${index + 1}`,
-            sortable: false,
-            key: `val${index + 1}`,
-          };
-        });
-      }
-  
-      headers.value = [
-        { title: 'Modelo', sortable: false, key: 'dimension' },
-        { title: `Overall ${(overallResult.value/3).toFixed(0)}%`, sortable: false, key: 'overall' },
-        { title: 'Resultado', sortable: false, key: 'resultado' },
-        ...valoresHeaders,
-        ...dynamicHeaders,
-      ];
+    console.log(newColumns);
+  if (newColumns) {
+    let dynamicHeaders = [];
+    // Verifica si 'generos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Genero')) {
+      dynamicHeaders.push({
+          title: 'Género',
+          align: 'center',
+          key: 'generos-header',
+          colspan: generosUnicos.length,
+      });
+
+      generosUnicos.forEach((genero, index) => {
+          dynamicHeaders.push({
+              title: genero,
+              sortable: false,
+              key: `genero_${genero}`,
+          });
+      });
     }
-  }, { immediate: true });
-  
+
+    // Verifica si 'Medio de transporte' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Medio de transporte')) {
+      dynamicHeaders.push({
+          title: 'Medio de transporte',
+          align: 'center',
+          key: 'mediotransporte-header',
+          colspan: medioTransporteUnico.length,
+      });
+      
+      medioTransporteUnico.forEach((mt, index) => {
+          dynamicHeaders.push({
+              title: mt,
+              sortable: false,
+              key: `mediotransporte_${mt}`,
+          });
+      });
+    }
+
+    // Verifica si 'Tiempo de llegada' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Tiempo de llegada')) {
+      dynamicHeaders.push({
+          title: 'Tiempo de llegada',
+          align: 'center',
+          key: 'tiempollegada-header',
+          colspan: tiempoLlegadaUnico.length,
+      });
+      
+      tiempoLlegadaUnico.forEach((tll, index) => {
+          dynamicHeaders.push({
+              title: tll,
+              sortable: false,
+              key: `tiempollegada_${tll}`,
+          });
+      });
+    }
+
+    // Verifica si 'Reuniones con tu jefe' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Reuniones con tu jefe')) {
+      dynamicHeaders.push({
+          title: 'Reuniones con tu jefe',
+          align: 'center',
+          key: 'reunionesjefe-header',
+          colspan: cantidadReunionesUnico.length,
+      });
+      
+      cantidadReunionesUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `reunionesjefe_${cru}`,
+          });
+      });
+    }
+
+    // Verifica si 'Oportunidades' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Oportunidades')) {
+      dynamicHeaders.push({
+          title: 'Oportunidades de Mejora',
+          align: 'center',
+          key: 'oportunidadesmejora-header',
+          colspan: oportunidadesMejoraUnico.length,
+      });
+      
+      oportunidadesMejoraUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `oportunidadesmejora_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Seguir desarrollandome' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Seguir desarrollandome')) {
+      dynamicHeaders.push({
+          title: 'Seguir desarrollandome',
+          align: 'center',
+          key: 'seguirdesarrollandome-header',
+          colspan: seguirDesarrollandomeUnico.length,
+      });
+      
+      seguirDesarrollandomeUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `seguirdesarrollandome_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Buscar oportunidades de empleo' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Buscar oportunidades de empleo')) {
+      dynamicHeaders.push({
+          title: 'Oportunidades de Empleo',
+          align: 'center',
+          key: 'oportunidadesempleo-header',
+          colspan: oportunidadesEmpleoUnico.length,
+      });
+      
+      oportunidadesEmpleoUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `oportunidadesempleo_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Cantidad de empleos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Cantidad de empleos')) {
+      dynamicHeaders.push({
+          title: 'Cantidad de empleos',
+          align: 'center',
+          key: 'cantidadempleos-header',
+          colspan: cantidadEmpleosUnico.length,
+      });
+      
+      cantidadEmpleosUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `cantidadempleos_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Cantidad de empleos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Padecimiento de salud crónico')) {
+      dynamicHeaders.push({
+          title: 'Padecimiento de salud crónico',
+          align: 'center',
+          key: 'padecimientosalud-header',
+          colspan: padecimientoSaludUnico.length,
+      });
+      
+      padecimientoSaludUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `padecimientosalud_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Dependientes económicos')) {
+      dynamicHeaders.push({
+          title: 'Dependientes económicos',
+          align: 'center',
+          key: 'dependienteseconomicos-header',
+          colspan: dependientesEconomicosUnico.length,
+      });
+      
+      dependientesEconomicosUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `dependienteseconomicos_${cru}`,
+          });
+      });
+    }
+
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Tiempo de gente a cargo')) {
+      dynamicHeaders.push({
+          title: 'Tiempo de gente a cargo',
+          align: 'center',
+          key: 'tiempogente-header',
+          colspan: tiempoGenteACargoUnico.length,
+      });
+      
+      tiempoGenteACargoUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `tiempogente_${cru}`,
+          });
+      });
+    }
+
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Modalidad de trabajo')) {
+      dynamicHeaders.push({
+          title: 'Modalidad de trabajo',
+          align: 'center',
+          key: 'modalidatrabajo-header',
+          colspan: modalidadTrabajoUnico.length,
+      });
+      
+      modalidadTrabajoUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `modalidatrabajo_${cru}`,
+          });
+      });
+    }
+
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Describir tu organización')) {
+      dynamicHeaders.push({
+          title: 'Describir tu organización',
+          align: 'center',
+          key: 'describirorganizacion-header',
+          colspan: describirOrganizacionUnico.length,
+      });
+      
+      describirOrganizacionUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `describirorganizacion_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Area')) {
+      dynamicHeaders.push({
+          title: 'Area',
+          align: 'center',
+          key: 'areaT-header',
+          colspan: areaUnico.length,
+      });
+      
+      areaUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `areaT_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Cargo')) {
+      dynamicHeaders.push({
+          title: 'Cargo',
+          align: 'center',
+          key: 'cargoT-header',
+          colspan: cargoUnico.length,
+      });
+      
+      cargoUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `cargoT_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Cargo mologado')) {
+      dynamicHeaders.push({
+          title: 'Cargo mologado',
+          align: 'center',
+          key: 'cargomologado-header',
+          colspan: cargoMologadoUnico.length,
+      });
+      
+      cargoMologadoUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `cargomologado_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Educación')) {
+      dynamicHeaders.push({
+          title: 'Educación',
+          align: 'center',
+          key: 'educacion-header',
+          colspan: educacionUnico.length,
+      });
+      
+      educacionUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `educacion_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Generación')) {
+      dynamicHeaders.push({
+          title: 'Generación',
+          align: 'center',
+          key: 'generacion-header',
+          colspan: generacionUnico.length,
+      });
+      
+      generacionUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `generacion_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 1')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 1',
+          align: 'center',
+          key: 'nivele1-header',
+          colspan: nivelE1Unico.length,
+      });
+      
+      nivelE1Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele1_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 2')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 2',
+          align: 'center',
+          key: 'nivele2-header',
+          colspan: nivelE2Unico.length,
+      });
+      
+      nivelE2Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele2_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 3')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 3',
+          align: 'center',
+          key: 'nivele3-header',
+          colspan: nivelE3Unico.length,
+      });
+      
+      nivelE3Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele3_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 4')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 4',
+          align: 'center',
+          key: 'nivele4-header',
+          colspan: nivelE4Unico.length,
+      });
+      
+      nivelE4Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele4_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 5')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 5',
+          align: 'center',
+          key: 'nivele5-header',
+          colspan: nivelE5Unico.length,
+      });
+      
+      nivelE5Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele5_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 6')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 6',
+          align: 'center',
+          key: 'nivele6-header',
+          colspan: nivelE6Unico.length,
+      });
+      
+      nivelE6Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele6_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 7')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 7',
+          align: 'center',
+          key: 'nivele7-header',
+          colspan: nivelE7Unico.length,
+      });
+      
+      nivelE7Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele7_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 8')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 8',
+          align: 'center',
+          key: 'nivele8-header',
+          colspan: nivelE8Unico.length,
+      });
+      
+      nivelE8Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele8_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 9')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 9',
+          align: 'center',
+          key: 'nivele9-header',
+          colspan: nivelE9Unico.length,
+      });
+      
+      nivelE9Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele9_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Nivel estructural 10')) {
+      dynamicHeaders.push({
+          title: 'Nivel estructural 10',
+          align: 'center',
+          key: 'nivele10-header',
+          colspan: nivelE10Unico.length,
+      });
+      
+      nivelE10Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `nivele10_${cru}`,
+          });
+      });
+    }
+
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Pais')) {
+      dynamicHeaders.push({
+          title: 'Pais',
+          align: 'center',
+          key: 'pais-header',
+          colspan: paisUnico.length,
+      });
+      
+      paisUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `pais_${cru}`,
+          });
+      });
+    }
+
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Localidad 1')) {
+      dynamicHeaders.push({
+          title: 'Localidad 1',
+          align: 'center',
+          key: 'local1-header',
+          colspan: localidad1Unico.length,
+      });
+      
+      localidad1Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `local1_${cru}`,
+          });
+      });
+    }
+    // Verifica si 'Dependientes económicos' está en los nuevos columns
+    if (newColumns.map(nc => nc.name).includes('Localidad 2')) {
+      dynamicHeaders.push({
+          title: 'Localidad 2',
+          align: 'center',
+          key: 'local2-header',
+          colspan: localidad2Unico.length,
+      });
+      
+      localidad2Unico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `local2_${cru}`,
+          });
+      });
+    }
+
+    let valoresHeaders = [];
+    if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+      valoresHeaders = props.filterData.valores.map((val, index) => {
+        return {
+          title: `Valor ${index + 1}`,
+          sortable: false,
+          key: `val${index + 1}`,
+        };
+      });
+    }
+
+    headers.value = [
+      { title: 'Modelo', sortable: false, key: 'dimension' },
+      { title: `Overall ${(overallResult.value/3).toFixed(0)}%`, sortable: false, key: 'overall' },
+      { title: 'Resultado', sortable: false, key: 'resultado' },
+      ...valoresHeaders,
+      ...dynamicHeaders,
+    ];
+  }
+}, { immediate: true });
   
   // Filtrar los datos según la selección
   const applyFilter = () => {
@@ -1141,14 +1141,14 @@
     selectedLevels.value = [];
     
     if (props.filterData && Array.isArray(props.filterData.rows)) {
-      if (props.filterData.rows.includes('Dimensiones')) {
+      if (props.filterData.rows.map(nc => nc.name).includes('Dimensiones')) {
         formattedData.value = tableData.value
           .filter(item => item.level === 'dimension')
           .map(item => ({ ...item, expandable: false }));
         selectedLevels.value.push('dimension');
       }
   
-      if (props.filterData.rows.includes('Subdimensiones')) {
+      if (props.filterData.rows.map(nc => nc.name).includes('Subdimensiones')) {
         formattedData.value = tableData.value
           .filter(item => item.level === 'dimension' || item.level === 'subdimension')
           .map(item => ({ 
@@ -1158,7 +1158,7 @@
         selectedLevels.value.push('subdimension');
       }
   
-      if (props.filterData.rows.includes('Competencias')) {
+      if (props.filterData.rows.map(nc => nc.name).includes('Competencias')) {
         formattedData.value = tableData.value
           .filter(item => item.level === 'dimension' || item.level === 'subdimension' || item.level === 'competencia')
           .map(item => ({ 
@@ -1168,7 +1168,7 @@
         selectedLevels.value.push('competencia');
       }
   
-      if (props.filterData.rows.includes('Afirmaciones')) {
+      if (props.filterData.rows.map(nc => nc.name).includes('Afirmaciones')) {
         formattedData.value = tableData.value
           .filter(item => item.level === 'dimension' || item.level === 'subdimension' || item.level === 'competencia' || item.level === 'afirmacion')
           .map(item => ({ 
@@ -4324,197 +4324,198 @@
     }
   };
   
-  // Función para exportar datos a Excel
-  const exportToExcel = () => {
-    // Verificar si hay datos formateados
-    if (!formattedData.value || formattedData.value.length === 0) {
-      console.error('No hay datos disponibles para exportar');
-      return;
+// Función para exportar datos a Excel
+const exportToExcel = () => {
+  // Verificar si hay datos formateados
+  if (!formattedData.value || formattedData.value.length === 0) {
+    console.error('No hay datos disponibles para exportar');
+    return;
+  }
+
+  // Formatea los datos para exportarlos
+  const dataToExport = formattedData.value.map(item => {
+    // Crea un objeto para cada fila de la tabla
+    const row = {
+      Name: item.name,
+      Resultado: item.resultado,
+    };
+
+    // Verificar si "Género" está en los headers de la tabla
+    if (props.filterData.columns.map(nc => nc.name).includes('Genero')) {
+      generosUnicos.forEach(genero => {
+        row[genero] = item[`genero_${genero}`] || '';
+      });
     }
-  
-    // Formatea los datos para exportarlos
-    const dataToExport = formattedData.value.map(item => {
-      // Crea un objeto para cada fila de la tabla
-      const row = {
-        Name: item.name,
-        Resultado: item.resultado,
-      };
-  
-      // Verificar si "Género" está en los headers de la tabla
-      if (props.filterData.columns.includes('Genero')) {
-        generosUnicos.forEach(genero => {
-          row[genero] = item[`genero_${genero}`] || '';
-        });
-      }
-  
-      // Verificar si "Medio de transporte" está en los headers de la tabla
-      if (props.filterData.columns.includes('Medio de transporte')) {
-        medioTransporteUnico.forEach(mt => {
-          row[mt] = item[`mediotransporte_${mt}`] || '';
-        });
-      }
-  
-      // Verificar si "Tiempo de llegada" está en los headers de la tabla
-      if (props.filterData.columns.includes('Tiempo de llegada')) {
-        tiempoLlegadaUnico.forEach(mt => {
-          row[mt] = item[`tiempollegada_${mt}`] || '';
-        });
-      }
-      // Verificar si "Tiempo de llegada" está en los headers de la tabla
-      if (props.filterData.columns.includes('Reuniones con tu jefe')) {
-        cantidadReunionesUnico.forEach(mt => {
-          row[mt] = item[`reunionesjefe_${mt}`] || '';
-        });
-      }
-  
-      if (props.filterData.columns.includes('Oportunidades')) {
-        oportunidadesMejoraUnico.forEach(mt => {
-          row[mt] = item[`oportunidadesmejora_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Seguir desarrollandome')) {
-        seguirDesarrollandomeUnico.forEach(mt => {
-          row[mt] = item[`seguirdesarrollandome_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Buscar oportunidades de empleo')) {
-        oportunidadesEmpleoUnico.forEach(mt => {
-          row[mt] = item[`oportunidadesempleo_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Cantidad de empleos')) {
-        cantidadEmpleosUnico.forEach(mt => {
-          row[mt] = item[`cantidadempleos_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Padecimiento de salud crónico')) {
-        padecimientoSaludUnico.forEach(mt => {
-          row[mt] = item[`padecimientosalud_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Dependientes económicos')) {
-        dependientesEconomicosUnico.forEach(mt => {
-          row[mt] = item[`dependienteseconomicos_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Tiempo de gente a cargo')) {
-        tiempoGenteACargoUnico.forEach(mt => {
-          row[mt] = item[`tiempogente_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Modalidad de trabajo')) {
-        modalidadTrabajoUnico.forEach(mt => {
-          row[mt] = item[`modalidatrabajo_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Area')) {
-        areaUnico.forEach(mt => {
-          row[mt] = item[`areaT_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Cargo')) {
-        cargoUnico.forEach(mt => {
-          row[mt] = item[`cargoT_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Cargo mologado')) {
-        cargoMologadoUnico.forEach(mt => {
-          row[mt] = item[`cargomologado_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Educación')) {
-        educacionUnico.forEach(mt => {
-          row[mt] = item[`educacion_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Generación')) {
-        generacionUnico.forEach(mt => {
-          row[mt] = item[`generacion_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 1')) {
-        nivelE1Unico.forEach(mt => {
-          row[mt] = item[`nivele1_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 2')) {
-        nivelE2Unico.forEach(mt => {
-          row[mt] = item[`nivele2_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 3')) {
-        nivelE3Unico.forEach(mt => {
-          row[mt] = item[`nivele3_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 4')) {
-        nivelE4Unico.forEach(mt => {
-          row[mt] = item[`nivele4_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 5')) {
-        nivelE5Unico.forEach(mt => {
-          row[mt] = item[`nivele5_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 6')) {
-        nivelE6Unico.forEach(mt => {
-          row[mt] = item[`nivele6_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 7')) {
-        nivelE7Unico.forEach(mt => {
-          row[mt] = item[`nivele7_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 8')) {
-        nivelE8Unico.forEach(mt => {
-          row[mt] = item[`nivele8_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 9')) {
-        nivelE9Unico.forEach(mt => {
-          row[mt] = item[`nivele9_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Nivel estructural 10')) {
-        nivelE10Unico.forEach(mt => {
-          row[mt] = item[`nivele10_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Pais')) {
-        paisUnico.forEach(mt => {
-          row[mt] = item[`pais_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Localidad 1')) {
-        localidad1Unico.forEach(mt => {
-          row[mt] = item[`local1_${mt}`] || '';
-        });
-      }
-      if (props.filterData.columns.includes('Localidad 2')) {
-        localidad2Unico.forEach(mt => {
-          row[mt] = item[`local2_${mt}`] || '';
-        });
-      }
-      if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
-        props.filterData.valores.map((val, index) => {
-          row[index] = item[`val${index + 1}`] || '';
-        });
-      }
-  
-      return row;
-    });
-    // Crear la hoja de trabajo (worksheet)
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-  
-    // Crear el libro de trabajo (workbook)
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
-  
-    // Generar el archivo Excel
-    XLSX.writeFile(workbook, 'tablapivote.xlsx');
-  };
+
+    // Verificar si "Medio de transporte" está en los headers de la tabla
+    if (props.filterData.columns.map(nc => nc.name).includes('Medio de transporte')) {
+      medioTransporteUnico.forEach(mt => {
+        row[mt] = item[`mediotransporte_${mt}`] || '';
+      });
+    }
+
+    // Verificar si "Tiempo de llegada" está en los headers de la tabla
+    if (props.filterData.columns.map(nc => nc.name).includes('Tiempo de llegada')) {
+      tiempoLlegadaUnico.forEach(mt => {
+        row[mt] = item[`tiempollegada_${mt}`] || '';
+      });
+    }
+    // Verificar si "Tiempo de llegada" está en los headers de la tabla
+    if (props.filterData.columns.map(nc => nc.name).includes('Reuniones con tu jefe')) {
+      cantidadReunionesUnico.forEach(mt => {
+        row[mt] = item[`reunionesjefe_${mt}`] || '';
+      });
+    }
+
+    if (props.filterData.columns.map(nc => nc.name).includes('Oportunidades')) {
+      oportunidadesMejoraUnico.forEach(mt => {
+        row[mt] = item[`oportunidadesmejora_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Seguir desarrollandome')) {
+      seguirDesarrollandomeUnico.forEach(mt => {
+        row[mt] = item[`seguirdesarrollandome_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Buscar oportunidades de empleo')) {
+      oportunidadesEmpleoUnico.forEach(mt => {
+        row[mt] = item[`oportunidadesempleo_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Cantidad de empleos')) {
+      cantidadEmpleosUnico.forEach(mt => {
+        row[mt] = item[`cantidadempleos_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Padecimiento de salud crónico')) {
+      padecimientoSaludUnico.forEach(mt => {
+        row[mt] = item[`padecimientosalud_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Dependientes económicos')) {
+      dependientesEconomicosUnico.forEach(mt => {
+        row[mt] = item[`dependienteseconomicos_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Tiempo de gente a cargo')) {
+      tiempoGenteACargoUnico.forEach(mt => {
+        row[mt] = item[`tiempogente_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Modalidad de trabajo')) {
+      modalidadTrabajoUnico.forEach(mt => {
+        row[mt] = item[`modalidatrabajo_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Area')) {
+      areaUnico.forEach(mt => {
+        row[mt] = item[`areaT_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Cargo')) {
+      cargoUnico.forEach(mt => {
+        row[mt] = item[`cargoT_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Cargo mologado')) {
+      cargoMologadoUnico.forEach(mt => {
+        row[mt] = item[`cargomologado_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Educación')) {
+      educacionUnico.forEach(mt => {
+        row[mt] = item[`educacion_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Generación')) {
+      generacionUnico.forEach(mt => {
+        row[mt] = item[`generacion_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 1')) {
+      nivelE1Unico.forEach(mt => {
+        row[mt] = item[`nivele1_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 2')) {
+      nivelE2Unico.forEach(mt => {
+        row[mt] = item[`nivele2_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 3')) {
+      nivelE3Unico.forEach(mt => {
+        row[mt] = item[`nivele3_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 4')) {
+      nivelE4Unico.forEach(mt => {
+        row[mt] = item[`nivele4_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 5')) {
+      nivelE5Unico.forEach(mt => {
+        row[mt] = item[`nivele5_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 6')) {
+      nivelE6Unico.forEach(mt => {
+        row[mt] = item[`nivele6_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 7')) {
+      nivelE7Unico.forEach(mt => {
+        row[mt] = item[`nivele7_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 8')) {
+      nivelE8Unico.forEach(mt => {
+        row[mt] = item[`nivele8_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 9')) {
+      nivelE9Unico.forEach(mt => {
+        row[mt] = item[`nivele9_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Nivel estructural 10')) {
+      nivelE10Unico.forEach(mt => {
+        row[mt] = item[`nivele10_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Pais')) {
+      paisUnico.forEach(mt => {
+        row[mt] = item[`pais_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Localidad 1')) {
+      localidad1Unico.forEach(mt => {
+        row[mt] = item[`local1_${mt}`] || '';
+      });
+    }
+    if (props.filterData.columns.map(nc => nc.name).includes('Localidad 2')) {
+      localidad2Unico.forEach(mt => {
+        row[mt] = item[`local2_${mt}`] || '';
+      });
+    }
+    if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+      props.filterData.valores.map((val, index) => {
+        row[index] = item[`val${index + 1}`] || '';
+      });
+    }
+
+
+    return row;
+  });
+  // Crear la hoja de trabajo (worksheet)
+  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+  // Crear el libro de trabajo (workbook)
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
+
+  // Generar el archivo Excel
+  XLSX.writeFile(workbook, 'tablapivote.xlsx');
+};
   
   
   defineExpose({ exportToExcel });
@@ -4527,15 +4528,40 @@
     await empresafounded(empresa.value);
     await answersFounded(empresa.value);
   
-    props.filterData.rows = ['Dimensiones', 'Subdimensiones', 'Competencias', 'Afirmaciones'];
+    
+    props.filterData.rows = [{ id: 35, name: 'Afirmaciones', category: 'modelo' }];
     props.filterData.columns = [
-        'Genero', 'Medio de transporte', 'Tiempo de llegada', 'Reuniones con tu jefe', 'Oportunidades',
-        'Seguir desarrollandome', 'Buscar oportunidades de empleo', 'Cantidad de empleos', 'Padecimiento de salud crónico', 'Dependientes económicos',
-        'Tiempo de gente a cargo', 'Modalidad de trabajo', 'Describir tu organización', 'Area',
-        'Cargo', 'Cargo mologado', 'Educación', 'Generación', 'Localidad 1', 
-        'Localidad 2', 'Nivel estructural 1', 'Nivel estructural 2', 'Nivel estructural 3', 'Nivel estructural 4',
-        'Nivel estructural 5', 'Nivel estructural 6', 'Nivel estructural 7', 'Nivel estructural 8', 'Nivel estructural 9',
-        'Nivel estructural 10', 'Pais',
+      { id: 1, name: 'Genero', category: 'demographics' },
+      { id: 2, name: 'Medio de transporte', category: 'demographics' },
+      { id: 3, name: 'Tiempo de llegada', category: 'demographics' },
+      { id: 4, name: 'Reuniones con tu jefe', category: 'demographics' },
+      { id: 5, name: 'Oportunidades', category: 'demographics' },
+      { id: 6, name: 'Seguir desarrollandome', category: 'demographics' },
+      { id: 7, name: 'Buscar oportunidades de empleo', category: 'demographics' },
+      { id: 8, name: 'Cantidad de empleos', category: 'demographics' },
+      { id: 9, name: 'Padecimiento de salud crónico', category: 'demographics' },
+      { id: 10, name: 'Dependientes económicos', category: 'demographics' },
+      { id: 11, name: 'Tiempo de gente a cargo', category: 'demographics' },
+      { id: 12, name: 'Modalidad de trabajo', category: 'demographics' },
+      { id: 13, name: 'Describir tu organización', category: 'demographics' },
+      { id: 14, name: 'Area', category: 'demographics' },
+      { id: 15, name: 'Cargo', category: 'demographics' },
+      { id: 16, name: 'Cargo mologado', category: 'demographics' },
+      { id: 17, name: 'Educación', category: 'demographics' },
+      { id: 18, name: 'Generación', category: 'demographics' },
+      { id: 19, name: 'Localidad 1', category: 'demographics' },
+      { id: 20, name: 'Localidad 2', category: 'demographics' },
+      { id: 21, name: 'Nivel estructural 1', category: 'demographics' },
+      { id: 22, name: 'Nivel estructural 2', category: 'demographics' },
+      { id: 23, name: 'Nivel estructural 3', category: 'demographics' },
+      { id: 24, name: 'Nivel estructural 4', category: 'demographics' },
+      { id: 25, name: 'Nivel estructural 5', category: 'demographics' },
+      { id: 26, name: 'Nivel estructural 6', category: 'demographics' },
+      { id: 27, name: 'Nivel estructural 7', category: 'demographics' },
+      { id: 28, name: 'Nivel estructural 8', category: 'demographics' },
+      { id: 29, name: 'Nivel estructural 9', category: 'demographics' },
+      { id: 30, name: 'Nivel estructural 10', category: 'demographics' },
+      { id: 31, name: 'Pais', category: 'demographics' },
     ];
   });
   
