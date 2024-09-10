@@ -1187,436 +1187,312 @@
   watch(() => props.filterData, applyFilter, { deep: true });
   
   // Función para transformar datos planos a la estructura jerárquica
-  const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespuestas:number, 
-        generoMap: { [key: string]: any[] }, generosUnicos: string[], generosCount: any[], 
-        medioTransporteMap: { [key: string]: any[] }, medioTransporteUnico: string[], medioTransporteCount: any[],
-        tiempoLlegadaMap: { [key: string]: any[] }, tiempoLlegadaUnico: string[], tiempoLlegadaCount: any[],
-        cantidadReunionesMap: { [key: string]: any[] }, cantidadReunionesUnico: string[], cantidadReunionesCount: any[], 
-        oportunidadesMejoraMap: { [key: string]: any[] }, oportunidadesMejoraUnico: string[], oportunidadesMejoraCount: any[],
-        seguirDesarrollandomeMap: { [key: string]: any[] }, seguirDesarrollandomeUnico: string[], seguirDesarrollandomeCount: any[],
-        oportunidadesEmpleoMap: { [key: string]: any[] }, oportunidadesEmpleoUnico: string[], oportunidadesEmpleoCount: any[],
-        cantidadEmpleosMap: { [key: string]: any[] }, cantidadEmpleosUnico: string[], cantidadEmpleosCount: any[],
-        padecimientoSaludMap: { [key: string]: any[] }, padecimientoSaludUnico: string[], padecimientoSaludCount: any[],
-        dependientesEconomicosMap: { [key: string]: any[] }, dependientesEconomicosUnico: string[], dependientesEconomicosCount: any[],
-        tiempoGenteACargoMap: { [key: string]: any[] }, tiempoGenteACargoUnico: string[], tiempoGenteACargoCount: any[],
-        modalidadTrabajoMap: { [key: string]: any[] }, modalidadTrabajoUnico: string[], modalidadTrabajoCount: any[],
-        describirOrganizacionMap: { [key: string]: any[] }, describirOrganizacionUnico: string[], describirOrganizacionCount: any[],
-        areaMap: { [key: string]: any[] }, areaUnico: string[],
-        cargoMap: { [key: string]: any[] }, cargoUnico: string[],
-        cargoMologadoMap: { [key: string]: any[] }, cargoMologadoUnico: string[],
-        educacionMap: { [key: string]: any[] }, educacionUnico: string[],
-        generacionMap: { [key: string]: any[] }, generacionUnico: string[],
-        nivelE1Map: { [key: string]: any[] }, nivelE1Unico: string[],
-        nivelE2Map: { [key: string]: any[] }, nivelE2Unico: string[],
-        nivelE3Map: { [key: string]: any[] }, nivelE3Unico: string[],
-        nivelE4Map: { [key: string]: any[] }, nivelE4Unico: string[],
-        nivelE5Map: { [key: string]: any[] }, nivelE5Unico: string[],
-        nivelE6Map: { [key: string]: any[] }, nivelE6Unico: string[],
-        nivelE7Map: { [key: string]: any[] }, nivelE7Unico: string[],
-        nivelE8Map: { [key: string]: any[] }, nivelE8Unico: string[],
-        nivelE9Map: { [key: string]: any[] }, nivelE9Unico: string[],
-        nivelE10Map: { [key: string]: any[] }, nivelE10Unico: string[],
-        paisMap: { [key: string]: any[] }, paisUnico: string[],
-        localidad1Map: { [key: string]: any[] }, localidad1Unico: string[],
-        localidad2Map: { [key: string]: any[] }, localidad2Unico: string[],
-    ): any[] => {
-    const formatted: any[] = [];
-    const addedItems = new Set();
-  
-    const dimensionMap = new Map();
-    const subDimensionMap = new Map();
-    const competenciaMap = new Map();
-  
-    // Crear acumuladores para cada género
-    const dimensionGeneroMap = new Map();
-    const subDimensionGeneroMap = new Map();
-    const competenciaGeneroMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionmedioTransporteMap = new Map();
-    const subDimensionmedioTransporteMap = new Map();
-    const competenciamedioTransporteMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensiontiempoLlegadaMap = new Map();
-    const subDimensiontiempoLlegadaMap = new Map();
-    const competenciatiempoLlegadaMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensioncantidadReunionesMap = new Map();
-    const subDimensioncantidadReunionesMap = new Map();
-    const competenciacantidadReunionesMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionoportunidadesMejoraMap = new Map();
-    const subDimensionoportunidadesMejoraMap = new Map();
-    const competenciaoportunidadesMejoraMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionseguirDesarrollandomeMap = new Map();
-    const subDimensionseguirDesarrollandomeMap = new Map();
-    const competenciaseguirDesarrollandomeMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionoportunidadesEmpleoMap = new Map();
-    const subDimensionoportunidadesEmpleoMap = new Map();
-    const competenciaoportunidadesEmpleoMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensioncantidadEmpleosMap = new Map();
-    const subDimensioncantidadEmpleosMap = new Map();
-    const competenciacantidadEmpleosMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionpadecimientoSaludMap = new Map();
-    const subDimensionpadecimientoSaludMap = new Map();
-    const competenciapadecimientoSaludMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensiondependientesEconomicosMap = new Map();
-    const subDimensiondependientesEconomicosMap = new Map();
-    const competenciadependientesEconomicosMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensiontiempoGenteACargoMap = new Map();
-    const subDimensiontiempoGenteACargoMap = new Map();
-    const competenciatiempoGenteACargoMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionmodalidadTrabajoMap = new Map();
-    const subDimensionmodalidadTrabajoMap = new Map();
-    const competenciamodalidadTrabajoMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensiondescribirOrganizacionMap = new Map();
-    const subDimensiondescribirOrganizacionMap = new Map();
-    const competenciadescribirOrganizacionMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionareaMap = new Map();
-    const subDimensionareaMap = new Map();
-    const competenciaareaMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensioncargoMap = new Map();
-    const subDimensioncargoMap = new Map();
-    const competenciacargoMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensioncargoMologadoMap = new Map();
-    const subDimensioncargoMologadoMap = new Map();
-    const competenciacargoMologadoMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensioneducacionMap = new Map();
-    const subDimensioneducacionMap = new Map();
-    const competenciaeducacionMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensiongeneracionMap = new Map();
-    const subDimensiongeneracionMap = new Map();
-    const competenciageneracionMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE1Map = new Map();
-    const subDimensionnivelE1Map = new Map();
-    const competencianivelE1Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE2Map = new Map();
-    const subDimensionnivelE2Map = new Map();
-    const competencianivelE2Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE3Map = new Map();
-    const subDimensionnivelE3Map = new Map();
-    const competencianivelE3Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE4Map = new Map();
-    const subDimensionnivelE4Map = new Map();
-    const competencianivelE4Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE5Map = new Map();
-    const subDimensionnivelE5Map = new Map();
-    const competencianivelE5Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE6Map = new Map();
-    const subDimensionnivelE6Map = new Map();
-    const competencianivelE6Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE7Map = new Map();
-    const subDimensionnivelE7Map = new Map();
-    const competencianivelE7Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE8Map = new Map();
-    const subDimensionnivelE8Map = new Map();
-    const competencianivelE8Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE9Map = new Map();
-    const subDimensionnivelE9Map = new Map();
-    const competencianivelE9Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionnivelE10Map = new Map();
-    const subDimensionnivelE10Map = new Map();
-    const competencianivelE10Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionpaisMap = new Map();
-    const subDimensionpaisMap = new Map();
-    const competenciapaisMap = new Map();
-    // Crear acumuladores para cada género
-    const dimensionlocalidad1Map = new Map();
-    const subDimensionlocalidad1Map = new Map();
-    const competencialocalidad1Map = new Map();
-    // Crear acumuladores para cada género
-    const dimensionlocalidad2Map = new Map();
-    const subDimensionlocalidad2Map = new Map();
-    const competencialocalidad2Map = new Map();
-  
-    //const tableFilterData = contentTable;
-    dataDimensions.forEach(item => {
-      const {
-        empid, dimid, dimdesc, lindidlin, linddescc, indclasifi, indxlidln, indxldesc
-      } = item;
-  
-      const afirmaciones = contentTable.filter(ct => 
-        ct.bid.bdinfdimid === dimid && 
-        ct.bid.bdinfidlinn === lindidlin && 
-        ct.bid.bdinfidindn === indxlidln && 
-        ct.bdinfindxvcn >= 4
-      );
-      const afirmVal1 = contentTable.filter(ct => 
-        ct.bid.bdinfdimid === dimid && 
-        ct.bid.bdinfidlinn === lindidlin && 
-        ct.bid.bdinfidindn === indxlidln && 
-        ct.bdinfindxvcn === 1
-      );
-      const afirmVal2 = contentTable.filter(ct => 
-        ct.bid.bdinfdimid === dimid && 
-        ct.bid.bdinfidlinn === lindidlin && 
-        ct.bid.bdinfidindn === indxlidln && 
-        ct.bdinfindxvcn === 2
-      );
-      const afirmVal3 = contentTable.filter(ct => 
-        ct.bid.bdinfdimid === dimid && 
-        ct.bid.bdinfidlinn === lindidlin && 
-        ct.bid.bdinfidindn === indxlidln && 
-        ct.bdinfindxvcn === 3
-      );
-      const afirmVal4 = contentTable.filter(ct => 
-        ct.bid.bdinfdimid === dimid && 
-        ct.bid.bdinfidlinn === lindidlin && 
-        ct.bid.bdinfidindn === indxlidln && 
-        ct.bdinfindxvcn === 4
-      );
-      const afirmVal5 = contentTable.filter(ct => 
-        ct.bid.bdinfdimid === dimid && 
-        ct.bid.bdinfidlinn === lindidlin && 
-        ct.bid.bdinfidindn === indxlidln && 
-        ct.bdinfindxvcn === 5
-      );
-  
-      // Handle Dimensions
-      if (!addedItems.has(dimid)) {
-        formatted.push({
-          name: dimdesc,
-          level: 'dimension',
-          id: dimid,
-          expandable: true,
-          resultado: `0`,
-          // Inicializar géneros con '0%'
-          ...generosUnicos.reduce((acc, dat) => ({ ...acc, [`genero_${dat}`]: '0%' }), {}),
-          ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
-          ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
-          ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
-          ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
-          ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
-          ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
-          ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
-          ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
-          ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
-          ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
-          ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
-          ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
-          ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
-          ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
-          ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
-          ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
-          ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
-          ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
-          ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
-          ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
-          ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
-          ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
-          ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
-          ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
-          ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
-          ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
-          ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
-          ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
-          ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
-          ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
-          count: 0,
-        });
-        addedItems.add(dimid);
-        dimensionMap.set(dimid, { totalResult: 0,count: 0 });
-        // Inicializar mapa de demograficos en dimensiones
-        dimensionGeneroMap.set(dimid, generosUnicos.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionmedioTransporteMap.set(dimid, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensiontiempoLlegadaMap.set(dimid, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensioncantidadReunionesMap.set(dimid, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionoportunidadesMejoraMap.set(dimid, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionseguirDesarrollandomeMap.set(dimid, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionoportunidadesEmpleoMap.set(dimid, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensioncantidadEmpleosMap.set(dimid, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionpadecimientoSaludMap.set(dimid, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensiondependientesEconomicosMap.set(dimid, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensiontiempoGenteACargoMap.set(dimid, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionmodalidadTrabajoMap.set(dimid, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensiondescribirOrganizacionMap.set(dimid, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionareaMap.set(dimid, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensioncargoMap.set(dimid, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensioncargoMologadoMap.set(dimid, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensioneducacionMap.set(dimid, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensiongeneracionMap.set(dimid, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE1Map.set(dimid, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE2Map.set(dimid, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE3Map.set(dimid, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE4Map.set(dimid, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE5Map.set(dimid, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE6Map.set(dimid, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE7Map.set(dimid, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE8Map.set(dimid, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE9Map.set(dimid, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionnivelE10Map.set(dimid, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionpaisMap.set(dimid, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionlocalidad1Map.set(dimid, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        dimensionlocalidad2Map.set(dimid, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-      }
-  
-      // Handle Subdimensions
-      if (!addedItems.has(`${dimid}-${lindidlin}`)) {
-        formatted.push({
-          name: linddescc.trim(),
-          level: 'subdimension',
-          id: `${dimid}-${lindidlin}`,
-          parent: dimid,
-          expandable: true,
-          resultado: `0`,
-          ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
-          ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
-          ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
-          ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
-          ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
-          ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
-          ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
-          ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
-          ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
-          ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
-          ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
-          ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
-          ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
-          ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
-          ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
-          ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
-          ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
-          ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
-          ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
-          ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
-          ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
-          ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
-          ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
-          ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
-          ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
-          ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
-          ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
-          ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
-          ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
-          ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
-          ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
-          count: 0,
-        });
-        addedItems.add(`${dimid}-${lindidlin}`);
-        subDimensionMap.set(`${dimid}-${lindidlin}`, { totalResult: 0, count: 0 });
-  
-        // Inicializar mapa de demográficos en subdimensiones
-        subDimensionGeneroMap.set(`${dimid}-${lindidlin}`, generosUnicos.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionmedioTransporteMap.set(`${dimid}-${lindidlin}`, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensiontiempoLlegadaMap.set(`${dimid}-${lindidlin}`, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensioncantidadReunionesMap.set(`${dimid}-${lindidlin}`, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionoportunidadesMejoraMap.set(`${dimid}-${lindidlin}`, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionseguirDesarrollandomeMap.set(`${dimid}-${lindidlin}`, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionoportunidadesEmpleoMap.set(`${dimid}-${lindidlin}`, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensioncantidadEmpleosMap.set(`${dimid}-${lindidlin}`, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionpadecimientoSaludMap.set(`${dimid}-${lindidlin}`, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensiondependientesEconomicosMap.set(`${dimid}-${lindidlin}`, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensiontiempoGenteACargoMap.set(`${dimid}-${lindidlin}`, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionmodalidadTrabajoMap.set(`${dimid}-${lindidlin}`, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensiondescribirOrganizacionMap.set(`${dimid}-${lindidlin}`, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionareaMap.set(`${dimid}-${lindidlin}`, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensioncargoMap.set(`${dimid}-${lindidlin}`, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensioncargoMologadoMap.set(`${dimid}-${lindidlin}`, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensioneducacionMap.set(`${dimid}-${lindidlin}`, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensiongeneracionMap.set(`${dimid}-${lindidlin}`, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE1Map.set(`${dimid}-${lindidlin}`, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE2Map.set(`${dimid}-${lindidlin}`, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE3Map.set(`${dimid}-${lindidlin}`, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE4Map.set(`${dimid}-${lindidlin}`, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE5Map.set(`${dimid}-${lindidlin}`, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE6Map.set(`${dimid}-${lindidlin}`, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE7Map.set(`${dimid}-${lindidlin}`, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE8Map.set(`${dimid}-${lindidlin}`, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE9Map.set(`${dimid}-${lindidlin}`, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionnivelE10Map.set(`${dimid}-${lindidlin}`, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionpaisMap.set(`${dimid}-${lindidlin}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionlocalidad1Map.set(`${dimid}-${lindidlin}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        subDimensionlocalidad2Map.set(`${dimid}-${lindidlin}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-      }
-  
-      // Handle Competencias
-      if (!addedItems.has(`${lindidlin}-${indclasifi}`)) {
-        formatted.push({
-          name: indclasifi,
-          level: 'competencia',
-          id: `${lindidlin}-${indclasifi}`,
-          parent: `${dimid}-${lindidlin}`,
-          expandable: true,
-          resultado: `0`,
-          val1: `0`,
-          val2: `0`,
-          val3: `0`,
-          val4: `0`,
-          val5: `0`,
-          count: 0,
-        });
-        addedItems.add(`${lindidlin}-${indclasifi}`);
-        competenciaMap.set(`${lindidlin}-${indclasifi}`, { totalResult: 0, count: 0 });
-  
-        // Inicializar mapa de demograficos en competencias
-        competenciaGeneroMap.set(`${lindidlin}-${indclasifi}`, generosUnicos.reduce((acc, genero) => ({ ...acc, [genero]: { total: 0, count: 0 } }), {}));
-        competenciamedioTransporteMap.set(`${lindidlin}-${indclasifi}`, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciatiempoLlegadaMap.set(`${lindidlin}-${indclasifi}`, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciacantidadReunionesMap.set(`${lindidlin}-${indclasifi}`, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciaoportunidadesMejoraMap.set(`${lindidlin}-${indclasifi}`, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciaseguirDesarrollandomeMap.set(`${lindidlin}-${indclasifi}`, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciaoportunidadesEmpleoMap.set(`${lindidlin}-${indclasifi}`, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciacantidadEmpleosMap.set(`${lindidlin}-${indclasifi}`, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciapadecimientoSaludMap.set(`${lindidlin}-${indclasifi}`, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciadependientesEconomicosMap.set(`${lindidlin}-${indclasifi}`, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciatiempoGenteACargoMap.set(`${lindidlin}-${indclasifi}`, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciamodalidadTrabajoMap.set(`${lindidlin}-${indclasifi}`, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciadescribirOrganizacionMap.set(`${lindidlin}-${indclasifi}`, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciaareaMap.set(`${lindidlin}-${indclasifi}`, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciacargoMap.set(`${lindidlin}-${indclasifi}`, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciacargoMologadoMap.set(`${lindidlin}-${indclasifi}`, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciaeducacionMap.set(`${lindidlin}-${indclasifi}`, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciageneracionMap.set(`${lindidlin}-${indclasifi}`, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE1Map.set(`${lindidlin}-${indclasifi}`, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE2Map.set(`${lindidlin}-${indclasifi}`, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE3Map.set(`${lindidlin}-${indclasifi}`, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE4Map.set(`${lindidlin}-${indclasifi}`, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE5Map.set(`${lindidlin}-${indclasifi}`, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE6Map.set(`${lindidlin}-${indclasifi}`, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE7Map.set(`${lindidlin}-${indclasifi}`, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE8Map.set(`${lindidlin}-${indclasifi}`, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE9Map.set(`${lindidlin}-${indclasifi}`, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencianivelE10Map.set(`${lindidlin}-${indclasifi}`, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competenciapaisMap.set(`${lindidlin}-${indclasifi}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencialocalidad1Map.set(`${lindidlin}-${indclasifi}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-        competencialocalidad2Map.set(`${lindidlin}-${indclasifi}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
-      }
-  
-      // Handle Afirmaciones    
-      const afirmacion = {
-        name: indxldesc.trim(),
-        level: 'afirmacion',
-        id: `${lindidlin}-${indclasifi}-${indxlidln}`,
-        parent: `${lindidlin}-${indclasifi}`,
-        resultado: `${((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
-        val1: `${((afirmVal1.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
-        val2: `${((afirmVal2.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
-        val3: `${((afirmVal3.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
-        val4: `${((afirmVal4.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
-        val5: `${((afirmVal5.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+  // Función para transformar datos planos a la estructura jerárquica
+const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespuestas:number, 
+      generoMap: { [key: string]: any[] }, generosUnicos: string[], generosCount: any[], 
+      medioTransporteMap: { [key: string]: any[] }, medioTransporteUnico: string[], medioTransporteCount: any[],
+      tiempoLlegadaMap: { [key: string]: any[] }, tiempoLlegadaUnico: string[], tiempoLlegadaCount: any[],
+      cantidadReunionesMap: { [key: string]: any[] }, cantidadReunionesUnico: string[], cantidadReunionesCount: any[], 
+      oportunidadesMejoraMap: { [key: string]: any[] }, oportunidadesMejoraUnico: string[], oportunidadesMejoraCount: any[],
+      seguirDesarrollandomeMap: { [key: string]: any[] }, seguirDesarrollandomeUnico: string[], seguirDesarrollandomeCount: any[],
+      oportunidadesEmpleoMap: { [key: string]: any[] }, oportunidadesEmpleoUnico: string[], oportunidadesEmpleoCount: any[],
+      cantidadEmpleosMap: { [key: string]: any[] }, cantidadEmpleosUnico: string[], cantidadEmpleosCount: any[],
+      padecimientoSaludMap: { [key: string]: any[] }, padecimientoSaludUnico: string[], padecimientoSaludCount: any[],
+      dependientesEconomicosMap: { [key: string]: any[] }, dependientesEconomicosUnico: string[], dependientesEconomicosCount: any[],
+      tiempoGenteACargoMap: { [key: string]: any[] }, tiempoGenteACargoUnico: string[], tiempoGenteACargoCount: any[],
+      modalidadTrabajoMap: { [key: string]: any[] }, modalidadTrabajoUnico: string[], modalidadTrabajoCount: any[],
+      describirOrganizacionMap: { [key: string]: any[] }, describirOrganizacionUnico: string[], describirOrganizacionCount: any[],
+      areaMap: { [key: string]: any[] }, areaUnico: string[],
+      cargoMap: { [key: string]: any[] }, cargoUnico: string[],
+      cargoMologadoMap: { [key: string]: any[] }, cargoMologadoUnico: string[],
+      educacionMap: { [key: string]: any[] }, educacionUnico: string[],
+      generacionMap: { [key: string]: any[] }, generacionUnico: string[],
+      nivelE1Map: { [key: string]: any[] }, nivelE1Unico: string[],
+      nivelE2Map: { [key: string]: any[] }, nivelE2Unico: string[],
+      nivelE3Map: { [key: string]: any[] }, nivelE3Unico: string[],
+      nivelE4Map: { [key: string]: any[] }, nivelE4Unico: string[],
+      nivelE5Map: { [key: string]: any[] }, nivelE5Unico: string[],
+      nivelE6Map: { [key: string]: any[] }, nivelE6Unico: string[],
+      nivelE7Map: { [key: string]: any[] }, nivelE7Unico: string[],
+      nivelE8Map: { [key: string]: any[] }, nivelE8Unico: string[],
+      nivelE9Map: { [key: string]: any[] }, nivelE9Unico: string[],
+      nivelE10Map: { [key: string]: any[] }, nivelE10Unico: string[],
+      paisMap: { [key: string]: any[] }, paisUnico: string[],
+      localidad1Map: { [key: string]: any[] }, localidad1Unico: string[],
+      localidad2Map: { [key: string]: any[] }, localidad2Unico: string[],
+  ): any[] => {
+  const formatted: any[] = [];
+  const addedItems = new Set();
+
+  const dimensionMap = new Map();
+  const subDimensionMap = new Map();
+  const competenciaMap = new Map();
+
+  // Crear acumuladores para cada género
+  const dimensionGeneroMap = new Map();
+  const subDimensionGeneroMap = new Map();
+  const competenciaGeneroMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionmedioTransporteMap = new Map();
+  const subDimensionmedioTransporteMap = new Map();
+  const competenciamedioTransporteMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiontiempoLlegadaMap = new Map();
+  const subDimensiontiempoLlegadaMap = new Map();
+  const competenciatiempoLlegadaMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncantidadReunionesMap = new Map();
+  const subDimensioncantidadReunionesMap = new Map();
+  const competenciacantidadReunionesMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionoportunidadesMejoraMap = new Map();
+  const subDimensionoportunidadesMejoraMap = new Map();
+  const competenciaoportunidadesMejoraMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionseguirDesarrollandomeMap = new Map();
+  const subDimensionseguirDesarrollandomeMap = new Map();
+  const competenciaseguirDesarrollandomeMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionoportunidadesEmpleoMap = new Map();
+  const subDimensionoportunidadesEmpleoMap = new Map();
+  const competenciaoportunidadesEmpleoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncantidadEmpleosMap = new Map();
+  const subDimensioncantidadEmpleosMap = new Map();
+  const competenciacantidadEmpleosMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionpadecimientoSaludMap = new Map();
+  const subDimensionpadecimientoSaludMap = new Map();
+  const competenciapadecimientoSaludMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiondependientesEconomicosMap = new Map();
+  const subDimensiondependientesEconomicosMap = new Map();
+  const competenciadependientesEconomicosMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiontiempoGenteACargoMap = new Map();
+  const subDimensiontiempoGenteACargoMap = new Map();
+  const competenciatiempoGenteACargoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionmodalidadTrabajoMap = new Map();
+  const subDimensionmodalidadTrabajoMap = new Map();
+  const competenciamodalidadTrabajoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiondescribirOrganizacionMap = new Map();
+  const subDimensiondescribirOrganizacionMap = new Map();
+  const competenciadescribirOrganizacionMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionareaMap = new Map();
+  const subDimensionareaMap = new Map();
+  const competenciaareaMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncargoMap = new Map();
+  const subDimensioncargoMap = new Map();
+  const competenciacargoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncargoMologadoMap = new Map();
+  const subDimensioncargoMologadoMap = new Map();
+  const competenciacargoMologadoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioneducacionMap = new Map();
+  const subDimensioneducacionMap = new Map();
+  const competenciaeducacionMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiongeneracionMap = new Map();
+  const subDimensiongeneracionMap = new Map();
+  const competenciageneracionMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE1Map = new Map();
+  const subDimensionnivelE1Map = new Map();
+  const competencianivelE1Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE2Map = new Map();
+  const subDimensionnivelE2Map = new Map();
+  const competencianivelE2Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE3Map = new Map();
+  const subDimensionnivelE3Map = new Map();
+  const competencianivelE3Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE4Map = new Map();
+  const subDimensionnivelE4Map = new Map();
+  const competencianivelE4Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE5Map = new Map();
+  const subDimensionnivelE5Map = new Map();
+  const competencianivelE5Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE6Map = new Map();
+  const subDimensionnivelE6Map = new Map();
+  const competencianivelE6Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE7Map = new Map();
+  const subDimensionnivelE7Map = new Map();
+  const competencianivelE7Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE8Map = new Map();
+  const subDimensionnivelE8Map = new Map();
+  const competencianivelE8Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE9Map = new Map();
+  const subDimensionnivelE9Map = new Map();
+  const competencianivelE9Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE10Map = new Map();
+  const subDimensionnivelE10Map = new Map();
+  const competencianivelE10Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionpaisMap = new Map();
+  const subDimensionpaisMap = new Map();
+  const competenciapaisMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionlocalidad1Map = new Map();
+  const subDimensionlocalidad1Map = new Map();
+  const competencialocalidad1Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionlocalidad2Map = new Map();
+  const subDimensionlocalidad2Map = new Map();
+  const competencialocalidad2Map = new Map();
+
+  //const tableFilterData = contentTable;
+  dataDimensions.forEach(item => {
+    const {
+      empid, dimid, dimdesc, lindidlin, linddescc, indclasifi, indxlidln, indxldesc
+    } = item;
+
+    const afirmaciones = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn >= 4
+    );
+    const afirmVal1 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 1
+    );
+    const afirmVal2 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 2
+    );
+    const afirmVal3 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 3
+    );
+    const afirmVal4 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 4
+    );
+    const afirmVal5 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 5
+    );
+
+    // Handle Dimensions
+    if (!addedItems.has(dimid)) {
+      formatted.push({
+        name: dimdesc,
+        level: 'dimension',
+        id: dimid,
+        expandable: true,
+        resultado: `0`,
+        val1: `0`,
+        val2: `0`,
+        val3: `0`,
+        val4: `0`,
+        val5: `0`,
+        // Inicializar géneros con '0%'
+        ...generosUnicos.reduce((acc, dat) => ({ ...acc, [`genero_${dat}`]: '0%' }), {}),
+        ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+        ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+        ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+        ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+        ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+        ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+        ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+        ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+        ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+        ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+        ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+        ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+        ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+        ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+        ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+        ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+        ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+        ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+        ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+        ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+        ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+        ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+        ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+        ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+        ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+        ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+        ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+        ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+        ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+        ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        count: 0,
+      });
+      addedItems.add(dimid);
+      dimensionMap.set(dimid, { totalResult: 0,count: 0 });
+      // Inicializar mapa de demograficos en dimensiones
+      dimensionGeneroMap.set(dimid, generosUnicos.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionmedioTransporteMap.set(dimid, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiontiempoLlegadaMap.set(dimid, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncantidadReunionesMap.set(dimid, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionoportunidadesMejoraMap.set(dimid, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionseguirDesarrollandomeMap.set(dimid, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionoportunidadesEmpleoMap.set(dimid, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncantidadEmpleosMap.set(dimid, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionpadecimientoSaludMap.set(dimid, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiondependientesEconomicosMap.set(dimid, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiontiempoGenteACargoMap.set(dimid, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionmodalidadTrabajoMap.set(dimid, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiondescribirOrganizacionMap.set(dimid, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionareaMap.set(dimid, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncargoMap.set(dimid, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncargoMologadoMap.set(dimid, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioneducacionMap.set(dimid, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiongeneracionMap.set(dimid, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE1Map.set(dimid, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE2Map.set(dimid, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE3Map.set(dimid, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE4Map.set(dimid, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE5Map.set(dimid, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE6Map.set(dimid, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE7Map.set(dimid, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE8Map.set(dimid, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE9Map.set(dimid, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE10Map.set(dimid, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionpaisMap.set(dimid, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionlocalidad1Map.set(dimid, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionlocalidad2Map.set(dimid, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+    }
+
+    // Handle Subdimensions
+    if (!addedItems.has(`${dimid}-${lindidlin}`)) {
+      formatted.push({
+        name: linddescc.trim(),
+        level: 'subdimension',
+        id: `${dimid}-${lindidlin}`,
+        parent: dimid,
+        expandable: true,
+        resultado: `0`,
+        val1: `0`,
+        val2: `0`,
+        val3: `0`,
+        val4: `0`,
+        val5: `0`,
         ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
         ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
         ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
@@ -1648,13 +1524,180 @@
         ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
         ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
         ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
-        expandable: false,
-      };
-  
-      // Mapear los géneros únicos a un objeto que contenga los datos agrupados por género
-      // Añadir columnas dinámicas de género
-      generosUnicos.forEach(genero => {
-        const genData = generoMap[genero] || [];
+        count: 0,
+      });
+      addedItems.add(`${dimid}-${lindidlin}`);
+      subDimensionMap.set(`${dimid}-${lindidlin}`, { totalResult: 0, count: 0 });
+
+      // Inicializar mapa de demográficos en subdimensiones
+      subDimensionGeneroMap.set(`${dimid}-${lindidlin}`, generosUnicos.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionmedioTransporteMap.set(`${dimid}-${lindidlin}`, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiontiempoLlegadaMap.set(`${dimid}-${lindidlin}`, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncantidadReunionesMap.set(`${dimid}-${lindidlin}`, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionoportunidadesMejoraMap.set(`${dimid}-${lindidlin}`, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionseguirDesarrollandomeMap.set(`${dimid}-${lindidlin}`, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionoportunidadesEmpleoMap.set(`${dimid}-${lindidlin}`, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncantidadEmpleosMap.set(`${dimid}-${lindidlin}`, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionpadecimientoSaludMap.set(`${dimid}-${lindidlin}`, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiondependientesEconomicosMap.set(`${dimid}-${lindidlin}`, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiontiempoGenteACargoMap.set(`${dimid}-${lindidlin}`, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionmodalidadTrabajoMap.set(`${dimid}-${lindidlin}`, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiondescribirOrganizacionMap.set(`${dimid}-${lindidlin}`, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionareaMap.set(`${dimid}-${lindidlin}`, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncargoMap.set(`${dimid}-${lindidlin}`, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncargoMologadoMap.set(`${dimid}-${lindidlin}`, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioneducacionMap.set(`${dimid}-${lindidlin}`, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiongeneracionMap.set(`${dimid}-${lindidlin}`, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE1Map.set(`${dimid}-${lindidlin}`, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE2Map.set(`${dimid}-${lindidlin}`, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE3Map.set(`${dimid}-${lindidlin}`, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE4Map.set(`${dimid}-${lindidlin}`, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE5Map.set(`${dimid}-${lindidlin}`, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE6Map.set(`${dimid}-${lindidlin}`, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE7Map.set(`${dimid}-${lindidlin}`, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE8Map.set(`${dimid}-${lindidlin}`, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE9Map.set(`${dimid}-${lindidlin}`, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE10Map.set(`${dimid}-${lindidlin}`, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionpaisMap.set(`${dimid}-${lindidlin}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionlocalidad1Map.set(`${dimid}-${lindidlin}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionlocalidad2Map.set(`${dimid}-${lindidlin}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+    }
+
+    // Handle Competencias
+    if (!addedItems.has(`${lindidlin}-${indclasifi}`)) {
+      formatted.push({
+        name: indclasifi,
+        level: 'competencia',
+        id: `${lindidlin}-${indclasifi}`,
+        parent: `${dimid}-${lindidlin}`,
+        expandable: true,
+        resultado: `0`,
+        val1: `0`,
+        val2: `0`,
+        val3: `0`,
+        val4: `0`,
+        val5: `0`,
+        ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
+        ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+        ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+        ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+        ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+        ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+        ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+        ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+        ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+        ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+        ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+        ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+        ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+        ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+        ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+        ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+        ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+        ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+        ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+        ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+        ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+        ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+        ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+        ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+        ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+        ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+        ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+        ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+        ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+        ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+        ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        count: 0,
+      });
+      addedItems.add(`${lindidlin}-${indclasifi}`);
+      competenciaMap.set(`${lindidlin}-${indclasifi}`, { totalResult: 0, count: 0 });
+
+      // Inicializar mapa de demograficos en competencias
+      competenciaGeneroMap.set(`${lindidlin}-${indclasifi}`, generosUnicos.reduce((acc, genero) => ({ ...acc, [genero]: { total: 0, count: 0 } }), {}));
+      competenciamedioTransporteMap.set(`${lindidlin}-${indclasifi}`, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciatiempoLlegadaMap.set(`${lindidlin}-${indclasifi}`, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacantidadReunionesMap.set(`${lindidlin}-${indclasifi}`, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaoportunidadesMejoraMap.set(`${lindidlin}-${indclasifi}`, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaseguirDesarrollandomeMap.set(`${lindidlin}-${indclasifi}`, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaoportunidadesEmpleoMap.set(`${lindidlin}-${indclasifi}`, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacantidadEmpleosMap.set(`${lindidlin}-${indclasifi}`, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciapadecimientoSaludMap.set(`${lindidlin}-${indclasifi}`, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciadependientesEconomicosMap.set(`${lindidlin}-${indclasifi}`, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciatiempoGenteACargoMap.set(`${lindidlin}-${indclasifi}`, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciamodalidadTrabajoMap.set(`${lindidlin}-${indclasifi}`, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciadescribirOrganizacionMap.set(`${lindidlin}-${indclasifi}`, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaareaMap.set(`${lindidlin}-${indclasifi}`, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacargoMap.set(`${lindidlin}-${indclasifi}`, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacargoMologadoMap.set(`${lindidlin}-${indclasifi}`, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaeducacionMap.set(`${lindidlin}-${indclasifi}`, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciageneracionMap.set(`${lindidlin}-${indclasifi}`, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE1Map.set(`${lindidlin}-${indclasifi}`, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE2Map.set(`${lindidlin}-${indclasifi}`, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE3Map.set(`${lindidlin}-${indclasifi}`, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE4Map.set(`${lindidlin}-${indclasifi}`, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE5Map.set(`${lindidlin}-${indclasifi}`, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE6Map.set(`${lindidlin}-${indclasifi}`, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE7Map.set(`${lindidlin}-${indclasifi}`, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE8Map.set(`${lindidlin}-${indclasifi}`, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE9Map.set(`${lindidlin}-${indclasifi}`, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE10Map.set(`${lindidlin}-${indclasifi}`, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciapaisMap.set(`${lindidlin}-${indclasifi}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencialocalidad1Map.set(`${lindidlin}-${indclasifi}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencialocalidad2Map.set(`${lindidlin}-${indclasifi}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+    }
+
+    // Handle Afirmaciones    
+    const afirmacion = {
+      name: indxldesc.trim(),
+      level: 'afirmacion',
+      id: `${lindidlin}-${indclasifi}-${indxlidln}`,
+      parent: `${lindidlin}-${indclasifi}`,
+      resultado: `${((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val1: `${((afirmVal1.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val2: `${((afirmVal2.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val3: `${((afirmVal3.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val4: `${((afirmVal4.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val5: `${((afirmVal5.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
+      ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+      ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+      ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+      ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+      ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+      ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+      ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+      ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+      ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+      ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+      ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+      ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+      ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+      ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+      ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+      ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+      ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+      ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+      ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+      ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+      ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+      ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+      ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+      ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+      ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+      ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+      ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+      ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+      ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+      ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+      expandable: false,
+    };
+
+    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por género
+    // Añadir columnas dinámicas de género
+    generosUnicos.forEach(genero => {
+      const genData = generoMap[genero] || [];
+      if(genData.length >= 3) {
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorGenero = genData.map(item => item.bid.bdinfid);
   
@@ -1711,10 +1754,13 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      medioTransporteUnico.forEach(medioTransporte => {
-        const mtransData = medioTransporteMap[medioTransporte] || [];
+
+      }
+    });
+
+    medioTransporteUnico.forEach(medioTransporte => {
+      const mtransData = medioTransporteMap[medioTransporte] || [];
+      if(mtransData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorMedioTransporte = mtransData.map(item => item.bid.bdinfid);
   
@@ -1776,10 +1822,13 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      tiempoLlegadaUnico.forEach(tiempoLleg => {
-        const tLlegData = tiempoLlegadaMap[tiempoLleg] || [];
+
+      }
+    });
+
+    tiempoLlegadaUnico.forEach(tiempoLleg => {
+      const tLlegData = tiempoLlegadaMap[tiempoLleg] || [];
+      if(tLlegData.length >= 3) {
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorTiempoLlegada = tLlegData.map(item => item.bid.bdinfid);
   
@@ -1795,7 +1844,7 @@
         const tiempLlegCount = tiempoLlegadaFilteredCount.filter(tlfc => 
           tlfc.bdinfindxvcn >= 4
         ).length;
-        const tiempLlegVal1 = tiempoLlegadaFilteredCount.filter(tlfc =>
+        /* const tiempLlegVal1 = tiempoLlegadaFilteredCount.filter(tlfc =>
           tlfc.bdinfindxvcn === 1
         ).length;
         const tiempLlegVal2 = tiempoLlegadaFilteredCount.filter(tlfc =>
@@ -1809,9 +1858,10 @@
         ).length;
         const tiempLlegVal5 = tiempoLlegadaFilteredCount.filter(tlfc =>
           tlfc.bdinfindxvcn === 5
-        ).length;
-  
+        ).length; */
+
         afirmacion[`tiempollegada_${tiempoLleg}`] = `${((generoCountValue.length * 100)/ tiempoLlegadaFilteredCount.length).toFixed(0)}%`;
+  
   
         // Acumular valores en el mapa de géneros
         if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
@@ -1841,11 +1891,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      cantidadReunionesUnico.forEach(cantidadReu => {
-        const cReunData = cantidadReunionesMap[cantidadReu] || [];
-        
+      }
+    });
+
+    cantidadReunionesUnico.forEach(cantidadReu => {
+      const cReunData = cantidadReunionesMap[cantidadReu] || [];
+      if(cReunData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorCantidadReuniones = cReunData.map(item => item.bid.bdinfid);
   
@@ -1908,11 +1959,15 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      oportunidadesMejoraUnico.forEach(oportMej => {
-        const oMejoraData = oportunidadesMejoraMap[oportMej] || [];
-        
+
+      }
+      
+    });
+
+    oportunidadesMejoraUnico.forEach(oportMej => {
+      const oMejoraData = oportunidadesMejoraMap[oportMej] || [];
+      if(oMejoraData.length >= 3){
+
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorOportunidadesMejora = oMejoraData.map(item => item.bid.bdinfid);
   
@@ -1976,11 +2031,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      seguirDesarrollandomeUnico.forEach(segDes => {
-        const sDesarrollandomeData = seguirDesarrollandomeMap[segDes] || [];
-        
+      }
+    });
+
+    seguirDesarrollandomeUnico.forEach(segDes => {
+      const sDesarrollandomeData = seguirDesarrollandomeMap[segDes] || [];
+      if(sDesarrollandomeData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirDesarrollandome = sDesarrollandomeData.map(item => item.bid.bdinfid);
   
@@ -2043,11 +2099,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      oportunidadesEmpleoUnico.forEach(opEmp => {
-        const oEmpleoData = oportunidadesEmpleoMap[opEmp] || [];
-        
+      }
+    });
+
+    oportunidadesEmpleoUnico.forEach(opEmp => {
+      const oEmpleoData = oportunidadesEmpleoMap[opEmp] || [];
+      if(oEmpleoData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirOportunidadesEmpleo = oEmpleoData.map(item => item.bid.bdinfid);
   
@@ -2110,11 +2167,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      cantidadEmpleosUnico.forEach(cantEmp => {
-        const cantEmpleoData = cantidadEmpleosMap[cantEmp] || [];
-        
+      }
+    });
+
+    cantidadEmpleosUnico.forEach(cantEmp => {
+      const cantEmpleoData = cantidadEmpleosMap[cantEmp] || [];
+      if(cantEmpleoData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirCantidadEmpleo = cantEmpleoData.map(item => item.bid.bdinfid);
   
@@ -2175,11 +2233,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      padecimientoSaludUnico.forEach(padSal => {
-        const padSaludData = padecimientoSaludMap[padSal] || [];
-        
+      }
+    });
+
+    padecimientoSaludUnico.forEach(padSal => {
+      const padSaludData = padecimientoSaludMap[padSal] || [];
+      if(padSaludData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirPadecimientoSalud = padSaludData.map(item => item.bid.bdinfid);
   
@@ -2241,274 +2300,276 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      dependientesEconomicosUnico.forEach(depEcon => {
-        const depEconData = dependientesEconomicosMap[depEcon] || [];
-        
-        // Extraemos los `bdinfid` de las personas que respondieron el género actual
-        const idsPorSeguirDependientesEconomicos = depEconData.map(item => item.bid.bdinfid);
-  
-        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-        const dependientesEconomicosFilteredCount = dependientesEconomicosCount.value.filter(psc => 
-          idsPorSeguirDependientesEconomicos.includes(psc.bid.bdinfid)
-        );
-        const generoCountValue = afirmaciones.filter(gen => 
-          idsPorSeguirDependientesEconomicos.includes(gen.bid.bdinfid)
-        );
-        
-  
-        // Ahora podemos hacer los conteos según `bdinfindxvcn`
-        const depEconCount = dependientesEconomicosFilteredCount.filter(cefc => 
-          cefc.bdinfindxvcn >= 4
-        ).length;
-        const depEconVal1 = dependientesEconomicosFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const depEconVal2 = dependientesEconomicosFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const depEconVal3 = dependientesEconomicosFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const depEconVal4 = dependientesEconomicosFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const depEconVal5 = dependientesEconomicosFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
-        ).length;
-  
-        afirmacion[`dependienteseconomicos_${depEcon}`] = `${((generoCountValue.length * 100)/ dependientesEconomicosFilteredCount.length).toFixed(0)}%`;
+      }
+    });
+
+    dependientesEconomicosUnico.forEach(depEcon => {
+      const depEconData = dependientesEconomicosMap[depEcon] || [];
       
-        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-          let data = competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon];
-          // Si no existe, inicializamos medioTransporteData
-          if (!data) {
-            data = { total: 0, count: 0 };
-            competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon] = data; // Asignamos el objeto al map
-          }
-          data.total += generoCountValue.length;
-          data.count += 1;
-        }
-  
-        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-          const generoData = subDimensiondependientesEconomicosMap.get(`${dimid}-${lindidlin}`)[depEcon];
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
-        }
-  
-        if (dimensionMap.has(dimid)) {
-          // Si no existe, inicializamos generoData
-          let generoData = dimensiondependientesEconomicosMap.get(dimid)[depEcon];
-          if (!generoData) {
-            generoData = { total: 0, count: 0 };
-            dimensionGeneroMap.get(dimid)[depEcon] = generoData; // Asignamos el objeto al map
-          }
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
-        }
-      });
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirDependientesEconomicos = depEconData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const dependientesEconomicosFilteredCount = dependientesEconomicosCount.value.filter(psc => 
+        idsPorSeguirDependientesEconomicos.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+        idsPorSeguirDependientesEconomicos.includes(gen.bid.bdinfid)
+      );
       
-      tiempoGenteACargoUnico.forEach(tiemGente => {
-        const tiemGenteData = tiempoGenteACargoMap[tiemGente] || [];
-        
-        // Extraemos los `bdinfid` de las personas que respondieron el género actual
-        const idsPorSeguirTiempoGente = tiemGenteData.map(item => item.bid.bdinfid);
-  
-        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-        const tiempoGenteFilteredCount = tiempoGenteACargoCount.value.filter(psc => 
-          idsPorSeguirTiempoGente.includes(psc.bid.bdinfid)
-        );
-        const generoCountValue = afirmaciones.filter(gen => 
-          idsPorSeguirTiempoGente.includes(gen.bid.bdinfid)
-        );
-        
-  
-        // Ahora podemos hacer los conteos según `bdinfindxvcn`
-        const tiemGenteCount = tiempoGenteFilteredCount.filter(cefc => 
-          cefc.bdinfindxvcn >= 4
-        ).length;
-        const tiemGenteVal1 = tiempoGenteFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const tiemGenteVal2 = tiempoGenteFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const tiemGenteVal3 = tiempoGenteFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const tiemGenteVal4 = tiempoGenteFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const tiemGenteVal5 = tiempoGenteFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
-        ).length;
-  
-        afirmacion[`tiempogente_${tiemGente}`] = `${((generoCountValue.length * 100)/ tiempoGenteFilteredCount.length).toFixed(0)}%`;
-  
-        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-          let data = competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente];
-          // Si no existe, inicializamos medioTransporteData
-          if (!data) {
-            data = { total: 0, count: 0 };
-            competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente] = data; // Asignamos el objeto al map
-          }
-          data.total += generoCountValue.length;
-          data.count += 1;
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const depEconCount = dependientesEconomicosFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const depEconVal1 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const depEconVal2 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const depEconVal3 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const depEconVal4 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const depEconVal5 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`dependienteseconomicos_${depEcon}`] = `${((generoCountValue.length * 100)/ dependientesEconomicosFilteredCount.length).toFixed(0)}%`;
+    
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon] = data; // Asignamos el objeto al map
         }
-  
-        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-          const generoData = subDimensiontiempoGenteACargoMap.get(`${dimid}-${lindidlin}`)[tiemGente];
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensiondependientesEconomicosMap.get(`${dimid}-${lindidlin}`)[depEcon];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensiondependientesEconomicosMap.get(dimid)[depEcon];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[depEcon] = generoData; // Asignamos el objeto al map
         }
-  
-        if (dimensionMap.has(dimid)) {
-          // Si no existe, inicializamos generoData
-          let generoData = dimensiontiempoGenteACargoMap.get(dimid)[tiemGente];
-          if (!generoData) {
-            generoData = { total: 0, count: 0 };
-            dimensionGeneroMap.get(dimid)[tiemGente] = generoData; // Asignamos el objeto al map
-          }
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+    
+    tiempoGenteACargoUnico.forEach(tiemGente => {
+      const tiemGenteData = tiempoGenteACargoMap[tiemGente] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirTiempoGente = tiemGenteData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const tiempoGenteFilteredCount = tiempoGenteACargoCount.value.filter(psc => 
+        idsPorSeguirTiempoGente.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+        idsPorSeguirTiempoGente.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const tiemGenteCount = tiempoGenteFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const tiemGenteVal1 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const tiemGenteVal2 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const tiemGenteVal3 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const tiemGenteVal4 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const tiemGenteVal5 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`tiempogente_${tiemGente}`] = `${((generoCountValue.length * 100)/ tiempoGenteFilteredCount.length).toFixed(0)}%`;
+
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente] = data; // Asignamos el objeto al map
         }
-      });
-  
-      modalidadTrabajoUnico.forEach(modalidad => {
-        const modalTrabData = modalidadTrabajoMap[modalidad] || [];
-        
-        // Extraemos los `bdinfid` de las personas que respondieron el género actual
-        const idsPorSeguirModalidadTrabajo = modalTrabData.map(item => item.bid.bdinfid);
-  
-        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-        const modalidadTrabajoFilteredCount = modalidadTrabajoCount.value.filter(psc => 
-          idsPorSeguirModalidadTrabajo.includes(psc.bid.bdinfid)
-        );
-        const generoCountValue = afirmaciones.filter(gen => 
-        idsPorSeguirModalidadTrabajo.includes(gen.bid.bdinfid)
-        );
-        
-  
-        // Ahora podemos hacer los conteos según `bdinfindxvcn`
-        const modalidadTrabCount = modalidadTrabajoFilteredCount.filter(cefc => 
-          cefc.bdinfindxvcn >= 4
-        ).length;
-        const modalidadTrabajoVal1 = modalidadTrabajoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const modalidadTrabajoVal2 = modalidadTrabajoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const modalidadTrabajoVal3 = modalidadTrabajoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const modalidadTrabajoVal4 = modalidadTrabajoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const modalidadTrabajoVal5 = modalidadTrabajoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
-        ).length;
-  
-        afirmacion[`modalidatrabajo_${modalidad}`] = `${((generoCountValue.length * 100)/ modalidadTrabajoFilteredCount.length).toFixed(0)}%`;
-  
-        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-          let data = competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad];
-          // Si no existe, inicializamos medioTransporteData
-          if (!data) {
-            data = { total: 0, count: 0 };
-            competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad] = data; // Asignamos el objeto al map
-          }
-          data.total += generoCountValue.length;
-          data.count += 1;
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensiontiempoGenteACargoMap.get(`${dimid}-${lindidlin}`)[tiemGente];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensiontiempoGenteACargoMap.get(dimid)[tiemGente];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[tiemGente] = generoData; // Asignamos el objeto al map
         }
-  
-        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-          const generoData = subDimensionmodalidadTrabajoMap.get(`${dimid}-${lindidlin}`)[modalidad];
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+
+    modalidadTrabajoUnico.forEach(modalidad => {
+      const modalTrabData = modalidadTrabajoMap[modalidad] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirModalidadTrabajo = modalTrabData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const modalidadTrabajoFilteredCount = modalidadTrabajoCount.value.filter(psc => 
+        idsPorSeguirModalidadTrabajo.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+      idsPorSeguirModalidadTrabajo.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const modalidadTrabCount = modalidadTrabajoFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const modalidadTrabajoVal1 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const modalidadTrabajoVal2 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const modalidadTrabajoVal3 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const modalidadTrabajoVal4 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const modalidadTrabajoVal5 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`modalidatrabajo_${modalidad}`] = `${((generoCountValue.length * 100)/ modalidadTrabajoFilteredCount.length).toFixed(0)}%`;
+
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad] = data; // Asignamos el objeto al map
         }
-  
-        if (dimensionMap.has(dimid)) {
-          // Si no existe, inicializamos generoData
-          let generoData = dimensionmodalidadTrabajoMap.get(dimid)[modalidad];
-          if (!generoData) {
-            generoData = { total: 0, count: 0 };
-            dimensionGeneroMap.get(dimid)[modalidad] = generoData; // Asignamos el objeto al map
-          }
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensionmodalidadTrabajoMap.get(`${dimid}-${lindidlin}`)[modalidad];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensionmodalidadTrabajoMap.get(dimid)[modalidad];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[modalidad] = generoData; // Asignamos el objeto al map
         }
-      });
-  
-      describirOrganizacionUnico.forEach(descOrg => {
-        const descOrgData = describirOrganizacionMap[descOrg] || [];
-        
-        // Extraemos los `bdinfid` de las personas que respondieron el género actual
-        const idsPorSeguirDescrbOrg = descOrgData.map(item => item.bid.bdinfid);
-  
-        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-        const descOrgFilteredCount = describirOrganizacionCount.value.filter(psc => 
-          idsPorSeguirDescrbOrg.includes(psc.bid.bdinfid)
-        );
-        const generoCountValue = afirmaciones.filter(gen => 
-        idsPorSeguirDescrbOrg.includes(gen.bid.bdinfid)
-        );
-        
-  
-        // Ahora podemos hacer los conteos según `bdinfindxvcn`
-        const descOrgCount = descOrgFilteredCount.filter(cefc => 
-          cefc.bdinfindxvcn >= 4
-        ).length;
-        const descOrgVal1 = descOrgFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const descOrgVal2 = descOrgFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const descOrgVal3 = descOrgFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const descOrgVal4 = descOrgFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const descOrgVal5 = descOrgFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
-        ).length;
-  
-        afirmacion[`describirorganizacion_${descOrg}`] = `${((generoCountValue.length * 100)/ descOrgFilteredCount.length).toFixed(0)}%`;
-  
-        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-          let data = competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg];
-          // Si no existe, inicializamos medioTransporteData
-          if (!data) {
-            data = { total: 0, count: 0 };
-            competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg] = data; // Asignamos el objeto al map
-          }
-          data.total += generoCountValue.length;
-          data.count += 1;
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+
+    describirOrganizacionUnico.forEach(descOrg => {
+      const descOrgData = describirOrganizacionMap[descOrg] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirDescrbOrg = descOrgData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const descOrgFilteredCount = describirOrganizacionCount.value.filter(psc => 
+        idsPorSeguirDescrbOrg.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+      idsPorSeguirDescrbOrg.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const descOrgCount = descOrgFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const descOrgVal1 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const descOrgVal2 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const descOrgVal3 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const descOrgVal4 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const descOrgVal5 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`describirorganizacion_${descOrg}`] = `${((generoCountValue.length * 100)/ descOrgFilteredCount.length).toFixed(0)}%`;
+
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg] = data; // Asignamos el objeto al map
         }
-  
-        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-          const generoData = subDimensiondescribirOrganizacionMap.get(`${dimid}-${lindidlin}`)[descOrg];
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensiondescribirOrganizacionMap.get(`${dimid}-${lindidlin}`)[descOrg];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensiondescribirOrganizacionMap.get(dimid)[descOrg];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[descOrg] = generoData; // Asignamos el objeto al map
         }
-  
-        if (dimensionMap.has(dimid)) {
-          // Si no existe, inicializamos generoData
-          let generoData = dimensiondescribirOrganizacionMap.get(dimid)[descOrg];
-          if (!generoData) {
-            generoData = { total: 0, count: 0 };
-            dimensionGeneroMap.get(dimid)[descOrg] = generoData; // Asignamos el objeto al map
-          }
-          generoData.total += generoCountValue.length;
-          generoData.count += 1;
-        }
-      });
-  
-      areaUnico.forEach(areaT => {
-        const areaTData = areaMap[areaT] || [];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+
+    areaUnico.forEach(areaT => {
+      const areaTData = areaMap[areaT] || [];
+      if(areaTData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorAreaT = areaTData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2567,10 +2628,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      cargoUnico.forEach(cargoT => {
-        const cargoTData = cargoMap[cargoT] || [];
+      }
+    });
+
+    cargoUnico.forEach(cargoT => {
+      const cargoTData = cargoMap[cargoT] || [];
+      if(cargoTData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorCargoT = cargoTData.map(item => item.bdbdo10id.bdid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2629,10 +2692,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      cargoMologadoUnico.forEach(cargoMologado => {
-        const cargoMolData = cargoMologadoMap[cargoMologado] || [];
+      }
+    });
+
+    cargoMologadoUnico.forEach(cargoMologado => {
+      const cargoMolData = cargoMologadoMap[cargoMologado] || [];
+      if(cargoMolData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorCargoMol = cargoMolData.map(item => item.bdbdo10id.bdid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2691,10 +2756,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      educacionUnico.forEach(educacion => {
-        const educacionData = educacionMap[educacion] || [];
+      }
+    });
+
+    educacionUnico.forEach(educacion => {
+      const educacionData = educacionMap[educacion] || [];
+      if(educacionData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorEducacion = educacionData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2754,10 +2821,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      generacionUnico.forEach(generac => {
-        const generacionData = generacionMap[generac] || [];
+      }
+    });
+
+    generacionUnico.forEach(generac => {
+      const generacionData = generacionMap[generac] || [];
+      if(generacionData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorGeneracion = generacionData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2817,10 +2886,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE1Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE1Map[nivelEst] || [];
+      }
+    });
+
+    nivelE1Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE1Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2880,10 +2951,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE2Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE2Map[nivelEst] || [];
+      }
+    });
+
+    nivelE2Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE2Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -2943,10 +3016,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE3Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE3Map[nivelEst] || [];
+      }
+    });
+
+    nivelE3Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE3Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3006,10 +3081,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE4Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE4Map[nivelEst] || [];
+      }
+    });
+
+    nivelE4Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE4Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3069,10 +3146,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE5Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE5Map[nivelEst] || [];
+      }
+    });
+
+    nivelE5Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE5Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3132,10 +3211,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE6Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE6Map[nivelEst] || [];
+      }
+    });
+
+    nivelE6Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE6Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3195,10 +3276,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE7Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE7Map[nivelEst] || [];
+      }
+    });
+
+    nivelE7Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE7Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3258,10 +3341,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE8Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE8Map[nivelEst] || [];
+      }
+    });
+
+    nivelE8Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE8Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3321,10 +3406,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE9Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE9Map[nivelEst] || [];
+      }
+    });
+
+    nivelE9Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE9Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3384,10 +3471,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      nivelE10Unico.forEach(nivelEst => {
-        const nivelEsData = nivelE10Map[nivelEst] || [];
+      }
+    });
+
+    nivelE10Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE10Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3447,10 +3536,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      paisUnico.forEach(paisU => {
-        const paisUData = paisMap[paisU] || [];
+      }
+    });
+
+    paisUnico.forEach(paisU => {
+      const paisUData = paisMap[paisU] || [];
+      if(paisUData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorPais = paisUData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3510,10 +3601,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      localidad1Unico.forEach(local1 => {
-        const localData = localidad1Map[local1] || [];
+      }
+    });
+
+    localidad1Unico.forEach(local1 => {
+      const localData = localidad1Map[local1] || [];
+      if(localData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorLocal = localData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3573,10 +3666,12 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
-      });
-  
-      localidad2Unico.forEach(local1 => {
-        const localData = localidad2Map[local1] || [];
+      }
+    });
+
+    localidad2Unico.forEach(local1 => {
+      const localData = localidad2Map[local1] || [];
+      if(localData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorLocal = localData.map(item => item.bid.bdinfid);
         // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
@@ -3636,625 +3731,626 @@
           generoData.total += generoCountValue.length;
           generoData.count += 1;
         }
+      }
+    });
+
+    formatted.push(afirmacion);
+    const competenciaKey = `${lindidlin}-${indclasifi}`;
+    const subDimKey = `${dimid}-${lindidlin}`;
+    if (competenciaMap.has(competenciaKey)) {
+      const competenciaData = competenciaMap.get(competenciaKey);
+      competenciaData.totalResult += afirmaciones.length;
+      competenciaData.count += 1;
+      competenciaMap.set(competenciaKey, competenciaData);
+    }
+
+    if (subDimensionMap.has(subDimKey)) {
+      const subDimensionData = subDimensionMap.get(subDimKey);
+      subDimensionData.totalResult += afirmaciones.length;
+      subDimensionData.count += 1;
+      subDimensionMap.set(subDimKey, subDimensionData);
+    }
+
+    if (dimensionMap.has(dimid)) {
+      const dimensionData = dimensionMap.get(dimid);
+      dimensionData.totalResult += afirmaciones.length;
+      dimensionData.count += 1;
+      dimensionMap.set(dimid, dimensionData);
+    }
+  });
+
+  // Calculate and set average results for Competencias
+  formatted.forEach(item => {
+    if (item.level === 'competencia') {
+      const competenciaData = competenciaMap.get(item.id);
+      if (competenciaData && competenciaData.count > 0) {
+        item.resultado = `${(((competenciaData.totalResult * 100 )/ competenciaData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+      }
+      // Cálculo por demograficos en competencias
+      generosUnicos.forEach(genero => {
+        const generoData = competenciaGeneroMap.get(item.id)[genero];
+        if (generoData.count > 0) {
+          item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+        }
       });
-  
-      formatted.push(afirmacion);
-      const competenciaKey = `${lindidlin}-${indclasifi}`;
-      const subDimKey = `${dimid}-${lindidlin}`;
-      if (competenciaMap.has(competenciaKey)) {
-        const competenciaData = competenciaMap.get(competenciaKey);
-        competenciaData.totalResult += afirmaciones.length;
-        competenciaData.count += 1;
-        competenciaMap.set(competenciaKey, competenciaData);
-      }
-  
-      if (subDimensionMap.has(subDimKey)) {
-        const subDimensionData = subDimensionMap.get(subDimKey);
-        subDimensionData.totalResult += afirmaciones.length;
-        subDimensionData.count += 1;
-        subDimensionMap.set(subDimKey, subDimensionData);
-      }
-  
-      if (dimensionMap.has(dimid)) {
-        const dimensionData = dimensionMap.get(dimid);
-        dimensionData.totalResult += afirmaciones.length;
-        dimensionData.count += 1;
-        dimensionMap.set(dimid, dimensionData);
-      }
-    });
-  
-    // Calculate and set average results for Competencias
-    formatted.forEach(item => {
-      if (item.level === 'competencia') {
-        const competenciaData = competenciaMap.get(item.id);
-        if (competenciaData && competenciaData.count > 0) {
-          item.resultado = `${(((competenciaData.totalResult * 100 )/ competenciaData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+      medioTransporteUnico.forEach(data => {
+        const demoData = competenciamedioTransporteMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
         }
-        // Cálculo por demograficos en competencias
-        generosUnicos.forEach(genero => {
-          const generoData = competenciaGeneroMap.get(item.id)[genero];
-          if (generoData.count > 0) {
-            item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
-          }
-        });
-        medioTransporteUnico.forEach(data => {
-          const demoData = competenciamedioTransporteMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
-          }
-        });
-        tiempoLlegadaUnico.forEach(data => {
-          const demoData = competenciatiempoLlegadaMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cantidadReunionesUnico.forEach(data => {
-          const demoData = competenciacantidadReunionesMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
-          }
-        });
-        oportunidadesMejoraUnico.forEach(data => {
-          const demoData = competenciaoportunidadesMejoraMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
-          }
-        });
-        seguirDesarrollandomeUnico.forEach(data => {
-          const demoData = competenciaseguirDesarrollandomeMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
-          }
-        });
-        oportunidadesEmpleoUnico.forEach(data => {
-          const demoData = competenciaoportunidadesEmpleoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cantidadEmpleosUnico.forEach(data => {
-          const demoData = competenciacantidadEmpleosMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
-          }
-        });
-        padecimientoSaludUnico.forEach(data => {
-          const demoData = competenciapadecimientoSaludMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
-          }
-        });
-        dependientesEconomicosUnico.forEach(data => {
-          const demoData = competenciadependientesEconomicosMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
-          }
-        });
-        tiempoGenteACargoUnico.forEach(data => {
-          const demoData = competenciatiempoGenteACargoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        modalidadTrabajoUnico.forEach(data => {
-          const demoData = competenciamodalidadTrabajoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        describirOrganizacionUnico.forEach(data => {
-          const demoData = competenciadescribirOrganizacionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        areaUnico.forEach(data => {
-          const demoData = competenciaareaMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cargoUnico.forEach(data => {
-          const demoData = competenciacargoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cargoMologadoUnico.forEach(data => {
-          const demoData = competenciacargoMologadoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        educacionUnico.forEach(data => {
-          const demoData = competenciaeducacionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        generacionUnico.forEach(data => {
-          const demoData = competenciageneracionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE1Unico.forEach(data => {
-          const demoData = competencianivelE1Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE2Unico.forEach(data => {
-          const demoData = competencianivelE2Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE3Unico.forEach(data => {
-          const demoData = competencianivelE3Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE4Unico.forEach(data => {
-          const demoData = competencianivelE4Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE5Unico.forEach(data => {
-          const demoData = competencianivelE5Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE6Unico.forEach(data => {
-          const demoData = competencianivelE6Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE7Unico.forEach(data => {
-          const demoData = competencianivelE7Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE8Unico.forEach(data => {
-          const demoData = competencianivelE8Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE9Unico.forEach(data => {
-          const demoData = competencianivelE9Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE10Unico.forEach(data => {
-          const demoData = competencianivelE10Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
-          }
-        });
-        paisUnico.forEach(data => {
-          const demoData = competenciapaisMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
-          }
-        });
-        localidad1Unico.forEach(data => {
-          const demoData = competencialocalidad1Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
-          }
-        });
-        localidad2Unico.forEach(data => {
-          const demoData = competencialocalidad2Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
-          }
-        });
-      }
-    });
-  
-    formatted.forEach(item => {
-      if (item.level === 'subdimension') {
-        const subDimensionData = subDimensionMap.get(item.id);
-        if (subDimensionData && subDimensionData.count > 0) {
-          item.resultado = `${((subDimensionData.totalResult * 100 / subDimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+      });
+      tiempoLlegadaUnico.forEach(data => {
+        const demoData = competenciatiempoLlegadaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
         }
-  
-        // Cálculo por demografico submension
-        generosUnicos.forEach(genero => {
-          const generoData = subDimensionGeneroMap.get(item.id)[genero];
-          if (generoData.count > 0) {
-            item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
-          }
-        });
-        medioTransporteUnico.forEach(data => {
-          const demoData = subDimensionmedioTransporteMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
-          }
-        });
-        tiempoLlegadaUnico.forEach(data => {
-          const demoData = subDimensiontiempoLlegadaMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cantidadReunionesUnico.forEach(data => {
-          const demoData = subDimensioncantidadReunionesMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
-          }
-        });
-        oportunidadesMejoraUnico.forEach(data => {
-          const demoData = subDimensionoportunidadesMejoraMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
-          }
-        });
-        seguirDesarrollandomeUnico.forEach(data => {
-          const demoData = subDimensionseguirDesarrollandomeMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
-          }
-        });
-        oportunidadesEmpleoUnico.forEach(data => {
-          const demoData = subDimensionoportunidadesEmpleoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cantidadEmpleosUnico.forEach(data => {
-          const demoData = subDimensioncantidadEmpleosMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
-          }
-        });
-        padecimientoSaludUnico.forEach(data => {
-          const demoData = subDimensionpadecimientoSaludMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
-          }
-        });
-        dependientesEconomicosUnico.forEach(data => {
-          const demoData = subDimensiondependientesEconomicosMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
-          }
-        });
-        tiempoGenteACargoUnico.forEach(data => {
-          const demoData = subDimensiontiempoGenteACargoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        modalidadTrabajoUnico.forEach(data => {
-          const demoData = subDimensionmodalidadTrabajoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        describirOrganizacionUnico.forEach(data => {
-          const demoData = subDimensiondescribirOrganizacionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        areaUnico.forEach(data => {
-          const demoData = subDimensionareaMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cargoUnico.forEach(data => {
-          const demoData = subDimensioncargoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cargoMologadoUnico.forEach(data => {
-          const demoData = subDimensioncargoMologadoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        educacionUnico.forEach(data => {
-          const demoData = subDimensioneducacionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        generacionUnico.forEach(data => {
-          const demoData = subDimensiongeneracionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE1Unico.forEach(data => {
-          const demoData = subDimensionnivelE1Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE2Unico.forEach(data => {
-          const demoData = subDimensionnivelE2Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE3Unico.forEach(data => {
-          const demoData = subDimensionnivelE3Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE4Unico.forEach(data => {
-          const demoData = subDimensionnivelE4Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE5Unico.forEach(data => {
-          const demoData = subDimensionnivelE5Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE6Unico.forEach(data => {
-          const demoData = subDimensionnivelE6Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE7Unico.forEach(data => {
-          const demoData = subDimensionnivelE7Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE8Unico.forEach(data => {
-          const demoData = subDimensionnivelE8Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE9Unico.forEach(data => {
-          const demoData = subDimensionnivelE9Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE10Unico.forEach(data => {
-          const demoData = subDimensionnivelE10Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
-          }
-        });
-        paisUnico.forEach(data => {
-          const demoData = subDimensionpaisMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
-          }
-        });
-        localidad1Unico.forEach(data => {
-          const demoData = subDimensionlocalidad1Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
-          }
-        });
-        localidad2Unico.forEach(data => {
-          const demoData = subDimensionlocalidad2Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
-          }
-        });
-      }
-    });
-  
-    formatted.forEach(item => {
-      if (item.level === 'dimension') {
-        const dimensionData = dimensionMap.get(item.id);
-        if (dimensionData && dimensionData.count > 0) {
-          item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
-          overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
+      });
+      cantidadReunionesUnico.forEach(data => {
+        const demoData = competenciacantidadReunionesMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
         }
-  
-        // Cálculo por dimension demograficos
-        generosUnicos.forEach(genero => {
-          const generoData = dimensionGeneroMap.get(item.id)[genero];
-          if (generoData.count > 0) {
-            item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
-          }
-        });
-        medioTransporteUnico.forEach(data => {
-          const demoData = dimensionmedioTransporteMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
-          }
-        });
-        tiempoLlegadaUnico.forEach(data => {
-          const demoData = dimensiontiempoLlegadaMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cantidadReunionesUnico.forEach(data => {
-          const demoData = dimensioncantidadReunionesMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
-          }
-        });
-        oportunidadesMejoraUnico.forEach(data => {
-          const demoData = dimensionoportunidadesMejoraMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
-          }
-        });
-        seguirDesarrollandomeUnico.forEach(data => {
-          const demoData = dimensionseguirDesarrollandomeMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
-          }
-        });
-        oportunidadesEmpleoUnico.forEach(data => {
-          const demoData = dimensionoportunidadesEmpleoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cantidadEmpleosUnico.forEach(data => {
-          const demoData = dimensioncantidadEmpleosMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
-          }
-        });
-        padecimientoSaludUnico.forEach(data => {
-          const demoData = dimensionpadecimientoSaludMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
-          }
-        });
-        dependientesEconomicosUnico.forEach(data => {
-          const demoData = dimensiondependientesEconomicosMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
-          }
-        });
-        tiempoGenteACargoUnico.forEach(data => {
-          const demoData = dimensiontiempoGenteACargoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        modalidadTrabajoUnico.forEach(data => {
-          const demoData = dimensionmodalidadTrabajoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        describirOrganizacionUnico.forEach(data => {
-          const demoData = dimensiondescribirOrganizacionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        areaUnico.forEach(data => {
-          const demoData = dimensionareaMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cargoUnico.forEach(data => {
-          const demoData = dimensioncargoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        cargoMologadoUnico.forEach(data => {
-          const demoData = dimensioncargoMologadoMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
-          }
-        });
-        educacionUnico.forEach(data => {
-          const demoData = dimensioneducacionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        generacionUnico.forEach(data => {
-          const demoData = dimensiongeneracionMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE1Unico.forEach(data => {
-          const demoData = dimensionnivelE1Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE2Unico.forEach(data => {
-          const demoData = dimensionnivelE2Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE3Unico.forEach(data => {
-          const demoData = dimensionnivelE3Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE4Unico.forEach(data => {
-          const demoData = dimensionnivelE4Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE5Unico.forEach(data => {
-          const demoData = dimensionnivelE5Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE6Unico.forEach(data => {
-          const demoData = dimensionnivelE6Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE7Unico.forEach(data => {
-          const demoData = dimensionnivelE7Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE8Unico.forEach(data => {
-          const demoData = dimensionnivelE8Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE9Unico.forEach(data => {
-          const demoData = dimensionnivelE9Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
-          }
-        });
-        nivelE10Unico.forEach(data => {
-          const demoData = dimensionnivelE10Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
-          }
-        });
-        paisUnico.forEach(data => {
-          const demoData = dimensionpaisMap.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
-          }
-        });
-        localidad1Unico.forEach(data => {
-          const demoData = dimensionlocalidad1Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
-          }
-        });
-        localidad2Unico.forEach(data => {
-          const demoData = dimensionlocalidad2Map.get(item.id)[data];
-          if (demoData.count > 0) {
-            item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
-          }
-        });
+      });
+      oportunidadesMejoraUnico.forEach(data => {
+        const demoData = competenciaoportunidadesMejoraMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+        }
+      });
+      seguirDesarrollandomeUnico.forEach(data => {
+        const demoData = competenciaseguirDesarrollandomeMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesEmpleoUnico.forEach(data => {
+        const demoData = competenciaoportunidadesEmpleoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadEmpleosUnico.forEach(data => {
+        const demoData = competenciacantidadEmpleosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      padecimientoSaludUnico.forEach(data => {
+        const demoData = competenciapadecimientoSaludMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+        }
+      });
+      dependientesEconomicosUnico.forEach(data => {
+        const demoData = competenciadependientesEconomicosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoGenteACargoUnico.forEach(data => {
+        const demoData = competenciatiempoGenteACargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      modalidadTrabajoUnico.forEach(data => {
+        const demoData = competenciamodalidadTrabajoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      describirOrganizacionUnico.forEach(data => {
+        const demoData = competenciadescribirOrganizacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      areaUnico.forEach(data => {
+        const demoData = competenciaareaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoUnico.forEach(data => {
+        const demoData = competenciacargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoMologadoUnico.forEach(data => {
+        const demoData = competenciacargoMologadoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      educacionUnico.forEach(data => {
+        const demoData = competenciaeducacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      generacionUnico.forEach(data => {
+        const demoData = competenciageneracionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE1Unico.forEach(data => {
+        const demoData = competencianivelE1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE2Unico.forEach(data => {
+        const demoData = competencianivelE2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE3Unico.forEach(data => {
+        const demoData = competencianivelE3Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE4Unico.forEach(data => {
+        const demoData = competencianivelE4Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE5Unico.forEach(data => {
+        const demoData = competencianivelE5Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE6Unico.forEach(data => {
+        const demoData = competencianivelE6Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE7Unico.forEach(data => {
+        const demoData = competencianivelE7Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE8Unico.forEach(data => {
+        const demoData = competencianivelE8Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE9Unico.forEach(data => {
+        const demoData = competencianivelE9Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE10Unico.forEach(data => {
+        const demoData = competencianivelE10Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+        }
+      });
+      paisUnico.forEach(data => {
+        const demoData = competenciapaisMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad1Unico.forEach(data => {
+        const demoData = competencialocalidad1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad2Unico.forEach(data => {
+        const demoData = competencialocalidad2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+        }
+      });
+    }
+  });
+
+  formatted.forEach(item => {
+    if (item.level === 'subdimension') {
+      const subDimensionData = subDimensionMap.get(item.id);
+      if (subDimensionData && subDimensionData.count > 0) {
+        item.resultado = `${((subDimensionData.totalResult * 100 / subDimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
       }
-    });
-    return formatted;
+
+      // Cálculo por demografico submension
+      generosUnicos.forEach(genero => {
+        const generoData = subDimensionGeneroMap.get(item.id)[genero];
+        if (generoData.count > 0) {
+          item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+        }
+      });
+      medioTransporteUnico.forEach(data => {
+        const demoData = subDimensionmedioTransporteMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoLlegadaUnico.forEach(data => {
+        const demoData = subDimensiontiempoLlegadaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadReunionesUnico.forEach(data => {
+        const demoData = subDimensioncantidadReunionesMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesMejoraUnico.forEach(data => {
+        const demoData = subDimensionoportunidadesMejoraMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+        }
+      });
+      seguirDesarrollandomeUnico.forEach(data => {
+        const demoData = subDimensionseguirDesarrollandomeMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesEmpleoUnico.forEach(data => {
+        const demoData = subDimensionoportunidadesEmpleoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadEmpleosUnico.forEach(data => {
+        const demoData = subDimensioncantidadEmpleosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      padecimientoSaludUnico.forEach(data => {
+        const demoData = subDimensionpadecimientoSaludMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+        }
+      });
+      dependientesEconomicosUnico.forEach(data => {
+        const demoData = subDimensiondependientesEconomicosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoGenteACargoUnico.forEach(data => {
+        const demoData = subDimensiontiempoGenteACargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      modalidadTrabajoUnico.forEach(data => {
+        const demoData = subDimensionmodalidadTrabajoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      describirOrganizacionUnico.forEach(data => {
+        const demoData = subDimensiondescribirOrganizacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      areaUnico.forEach(data => {
+        const demoData = subDimensionareaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoUnico.forEach(data => {
+        const demoData = subDimensioncargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoMologadoUnico.forEach(data => {
+        const demoData = subDimensioncargoMologadoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      educacionUnico.forEach(data => {
+        const demoData = subDimensioneducacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      generacionUnico.forEach(data => {
+        const demoData = subDimensiongeneracionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE1Unico.forEach(data => {
+        const demoData = subDimensionnivelE1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE2Unico.forEach(data => {
+        const demoData = subDimensionnivelE2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE3Unico.forEach(data => {
+        const demoData = subDimensionnivelE3Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE4Unico.forEach(data => {
+        const demoData = subDimensionnivelE4Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE5Unico.forEach(data => {
+        const demoData = subDimensionnivelE5Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE6Unico.forEach(data => {
+        const demoData = subDimensionnivelE6Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE7Unico.forEach(data => {
+        const demoData = subDimensionnivelE7Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE8Unico.forEach(data => {
+        const demoData = subDimensionnivelE8Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE9Unico.forEach(data => {
+        const demoData = subDimensionnivelE9Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE10Unico.forEach(data => {
+        const demoData = subDimensionnivelE10Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+        }
+      });
+      paisUnico.forEach(data => {
+        const demoData = subDimensionpaisMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad1Unico.forEach(data => {
+        const demoData = subDimensionlocalidad1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad2Unico.forEach(data => {
+        const demoData = subDimensionlocalidad2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+        }
+      });
+    }
+  });
+
+  formatted.forEach(item => {
+    if (item.level === 'dimension') {
+      const dimensionData = dimensionMap.get(item.id);
+      if (dimensionData && dimensionData.count > 0) {
+        item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
+      }
+
+      // Cálculo por dimension demograficos
+      generosUnicos.forEach(genero => {
+        const generoData = dimensionGeneroMap.get(item.id)[genero];
+        if (generoData.count > 0) {
+          item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+        }
+      });
+      medioTransporteUnico.forEach(data => {
+        const demoData = dimensionmedioTransporteMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoLlegadaUnico.forEach(data => {
+        const demoData = dimensiontiempoLlegadaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadReunionesUnico.forEach(data => {
+        const demoData = dimensioncantidadReunionesMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesMejoraUnico.forEach(data => {
+        const demoData = dimensionoportunidadesMejoraMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+        }
+      });
+      seguirDesarrollandomeUnico.forEach(data => {
+        const demoData = dimensionseguirDesarrollandomeMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesEmpleoUnico.forEach(data => {
+        const demoData = dimensionoportunidadesEmpleoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadEmpleosUnico.forEach(data => {
+        const demoData = dimensioncantidadEmpleosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      padecimientoSaludUnico.forEach(data => {
+        const demoData = dimensionpadecimientoSaludMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+        }
+      });
+      dependientesEconomicosUnico.forEach(data => {
+        const demoData = dimensiondependientesEconomicosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoGenteACargoUnico.forEach(data => {
+        const demoData = dimensiontiempoGenteACargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      modalidadTrabajoUnico.forEach(data => {
+        const demoData = dimensionmodalidadTrabajoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      describirOrganizacionUnico.forEach(data => {
+        const demoData = dimensiondescribirOrganizacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      areaUnico.forEach(data => {
+        const demoData = dimensionareaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoUnico.forEach(data => {
+        const demoData = dimensioncargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoMologadoUnico.forEach(data => {
+        const demoData = dimensioncargoMologadoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      educacionUnico.forEach(data => {
+        const demoData = dimensioneducacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      generacionUnico.forEach(data => {
+        const demoData = dimensiongeneracionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE1Unico.forEach(data => {
+        const demoData = dimensionnivelE1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE2Unico.forEach(data => {
+        const demoData = dimensionnivelE2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE3Unico.forEach(data => {
+        const demoData = dimensionnivelE3Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE4Unico.forEach(data => {
+        const demoData = dimensionnivelE4Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE5Unico.forEach(data => {
+        const demoData = dimensionnivelE5Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE6Unico.forEach(data => {
+        const demoData = dimensionnivelE6Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE7Unico.forEach(data => {
+        const demoData = dimensionnivelE7Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE8Unico.forEach(data => {
+        const demoData = dimensionnivelE8Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE9Unico.forEach(data => {
+        const demoData = dimensionnivelE9Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE10Unico.forEach(data => {
+        const demoData = dimensionnivelE10Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+        }
+      });
+      paisUnico.forEach(data => {
+        const demoData = dimensionpaisMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad1Unico.forEach(data => {
+        const demoData = dimensionlocalidad1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad2Unico.forEach(data => {
+        const demoData = dimensionlocalidad2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+        }
+      });
+    }
+  });
+  return formatted;
   };
   
   const calculateYears = (date:Date) => {

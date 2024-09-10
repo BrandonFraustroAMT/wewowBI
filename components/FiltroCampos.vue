@@ -279,9 +279,10 @@ const applyFilter = () => {
 <style>
     .filtro-campos {
         width: 100%;
-        height: auto;
+        height: 500px;
         background-color: #fff;
         box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+        font-size: 0.8rem;
     }
     .filtro-campos__container {
         display: flex;
@@ -341,13 +342,12 @@ const applyFilter = () => {
   padding: 20px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
-  min-height: 100px;
-  height: 300px;
+  max-height: 400px;
   overflow-y: scroll;
 }
 
 .draggable-item {
-  padding: 10px;
+  padding: 4px;
   border: 1px solid #ccc;
   margin-bottom: 5px;
   cursor: move;
@@ -369,19 +369,23 @@ const applyFilter = () => {
     width: 100%;
     display: flex;
     flex-direction: row;
+    height: 200px;
 }
 .drag-col2{
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    height: 200px;
 }
 
 .dd-button {
-  margin-left: 10px;
   background-color: #EE4E4E;
   color: white;
   border: none;
   padding: 0px 10px;
   font-size: 0.7rem;
   cursor: pointer;
+  border-radius: 10px;
 }
 .dd-button:hover {
   background-color: #f26f6f;

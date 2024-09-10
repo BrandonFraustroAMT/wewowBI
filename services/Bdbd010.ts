@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BackendURL = 'http://localhost:8080/api'
+const BackendURL = 'http://40.124.176.57:8082/api'
 
 const getBdbd010ByEmp = async (id: number) => {
   try {

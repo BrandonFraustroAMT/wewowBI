@@ -289,8 +289,8 @@ const answersFounded = async (id: number) => {
     const contentTable = respuestasData.value.filter((rd:any) => rd.bid.bdinfdimid >= 2 && rd.bid.bdinfdimid <= 4);
     
     /* LIDERES */
-    lideres.value = bdbd010Data.value.filter((bd:any) => bd.bdcargoho === 'Jefe de Área o Supervisores' || 
-      bd.bdcargoho === 'C Level' || bd.bdcargoho === 'Gerente o SubGerente');
+    /* lideres.value = bdbd010Data.value.filter((bd:any) => bd.bdcargoho === 'Jefe de Área o Supervisores' || 
+      bd.bdcargoho === 'C Level' || bd.bdcargoho === 'Gerente o SubGerente'); */
 
     /* PREGUNTAS ABIERTAS */
     pregAbiertas.value = respuestasData.value.filter((rd:any) => rd.bid.bdinfdimid === 5);
@@ -530,13 +530,10 @@ const answersFounded = async (id: number) => {
       localidad2Map[psu] = dataRespuestas.filter((ps: any) => ps.bdinflocalb === psu);
     });
 
-    lideresUnico = [...new Set(lideres.value.filter((mt: any) => mt).map((mt:any) => mt.bdname))]
+    lideresUnico = [...new Set(bdbd010Data.value.filter((mt: any) => mt.bdnamejd !== 'VACANTE').map((mt:any) => mt.bdnamejd))]
     lideresUnico.forEach(psu => {
       lideresMap[psu] = bdbd010Data.value.filter((ps: any) => ps.bdnamejd === psu);
     });
-    console.log('bdbd010Data',bdbd010Data);
-    console.log('lideresUnico',lideresUnico);
-    console.log('lideresMap',lideresMap);
 
     tableData.value = transformData(
       (dataDimensions.filter((d: any) => d.dimid >= 2 && d.dimid <= 4)), 
@@ -1694,66 +1691,68 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
     // Mapear los géneros únicos a un objeto que contenga los datos agrupados por lider
     lideresUnico.forEach(dat => {
       const lidData = lideresMap[dat] || [];
-      // Extraemos los `bdinfid` de las personas que respondieron el género actual
-      const idsPorLid = lidData.map(item => item.bdbdo10id.bdid);
-
-
-      // Filtramos los valores en `generosCount` por `bdinfid` según el género
-      const generoFilteredCount = generosCount.value.filter(gen => 
-        idsPorLid.includes(gen.bid.bdinfid)
-      );
-      const generoCountValue = afirmaciones.filter(gen => 
-        idsPorLid.includes(gen.bid.bdinfid)
-      );
-
-      // Ahora podemos hacer los conteos según `bdinfindxvcn`
-      const generoCount = generoFilteredCount.filter(gen => 
-        gen.bdinfindxvcn >= 4
-      ).length;
-      const generoVal1 = generoFilteredCount.filter(gen =>
-        gen.bdinfindxvcn === 1
-      ).length;
-      const generoVal2 = generoFilteredCount.filter(gen =>
-        gen.bdinfindxvcn === 2
-      ).length;
-      const generoVal3 = generoFilteredCount.filter(gen =>
-        gen.bdinfindxvcn === 3
-      ).length;
-      const generoVal4 = generoFilteredCount.filter(gen =>
-        gen.bdinfindxvcn === 4
-      ).length;
-      const generoVal5 = generoFilteredCount.filter(gen =>
-        gen.bdinfindxvcn === 5
-      ).length;
-
-      if (generoCountValue.length != 0) {
-        afirmacion[`lideres_${dat}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0) || 0}%`;
-      } else {
-        afirmacion[`lideres_${dat}`] = `0%`;
-      }
-
-       // Acumular valores en el mapa de géneros
-      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-        let generoData = competencialideresMap.get(`${lindidlin}-${indclasifi}`)[dat];
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
-      }
-
-      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-        const generoData = subDimensionlideresMap.get(`${dimid}-${lindidlin}`)[dat];
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
-      }
-
-      if (dimensionMap.has(dimid)) {
-        // Si no existe, inicializamos generoData
-        let generoData = dimensionlideresMap.get(dimid)[dat];
-        if (!generoData) {
-          generoData = { total: 0, count: 0 };
-          dimensionlideresMap.get(dimid)[dat] = generoData; // Asignamos el objeto al map
+      if(lidData.length >= 3) {
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorLid = lidData.map(item => item.bdbdo10id.bdid);
+  
+  
+        // Filtramos los valores en `generosCount` por `bdinfid` según el género
+        const generoFilteredCount = generosCount.value.filter(gen => 
+          idsPorLid.includes(gen.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorLid.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const generoCount = generoFilteredCount.filter(gen => 
+          gen.bdinfindxvcn >= 4
+        ).length;
+        const generoVal1 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+        const generoVal2 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+        const generoVal3 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+        const generoVal4 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+        const generoVal5 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+  
+        if (generoCountValue.length != 0) {
+          afirmacion[`lideres_${dat}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0) || 0}%`;
+        } else {
+          afirmacion[`lideres_${dat}`] = `0%`;
         }
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
+  
+         // Acumular valores en el mapa de géneros
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let generoData = competencialideresMap.get(`${lindidlin}-${indclasifi}`)[dat];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionlideresMap.get(`${dimid}-${lindidlin}`)[dat];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionlideresMap.get(dimid)[dat];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionlideresMap.get(dimid)[dat] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
       }
     });
     generosUnicos.forEach(genero => {
