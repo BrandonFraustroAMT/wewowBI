@@ -84,8 +84,6 @@ const buildLink = (path) => {
 
 // Define el método `applyFilter` que manejará el filtro
 const applyFilter = (filterData) => {
-  //console.log('Filtro aplicado desde Menu:', filterData);
-  // Emitir el evento hacia el componente padre si es necesario
   emit('applyFilter', filterData);
 };
 

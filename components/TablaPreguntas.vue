@@ -14,6 +14,14 @@
             </td>
           </tr>
         </template>
+        <!-- Slot para cuando no hay datos -->
+        <template v-slot:no-data>
+          <tr>
+            <td colspan="100%" class="text-center">
+              Cargando datos.
+            </td>
+          </tr>
+        </template>
       </v-data-table-virtual>
     </div>
   </template>
@@ -525,17 +533,35 @@
   ]);
   
   watch(() => props.filterData.columns, (newColumns) => {
-    console.log('newColumns', newColumns);
     if (newColumns) {
       let dynamicHeaders = [];
-      if (newColumns.map(nc => nc.name).includes('Preguntas Abiertas')) {
-        pregAbUnico.forEach((pa, index) => {
+      if (newColumns.map(nc => nc.name).includes('¿Qué es lo más WOW de trabajar en tu organización?')) {
             dynamicHeaders.push({
-                title: pa,
+                title: '¿Qué es lo más WOW de trabajar en tu organización?',
                 sortable: false,
-                key: `preguntasab_${pa}`,
+                key: `preguntasab_Qué es lo más WOW de trabajar en tu organización?`,
             });
-        });
+      }
+      if (newColumns.map(nc => nc.name).includes('¿Qué es lo menos WOW de trabajar en tu organización?')) {
+            dynamicHeaders.push({
+                title: '¿Qué es lo menos WOW de trabajar en tu organización?',
+                sortable: false,
+                key: `preguntasab_Qué es lo menos WOW de trabajar en tu organización?`,
+            });
+      }
+      if (newColumns.map(nc => nc.name).includes('Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?')) {
+            dynamicHeaders.push({
+                title: 'Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?',
+                sortable: false,
+                key: `preguntasab_¿Si tu empresa fuera un vehículo que vehículo sería?`,
+            });
+      }
+      if (newColumns.map(nc => nc.name).includes('Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.')) {
+            dynamicHeaders.push({
+                title: 'Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.',
+                sortable: false,
+                key: `preguntasab_Menciona 3 características que explican porque tu organización sería ese vehículo.`,
+            });
       }
       // Verifica si 'generos' está en los nuevos columns
       if (newColumns.map(nc => nc.name).includes('Genero')) {
@@ -1096,9 +1122,9 @@
     ): any[] => {
     const formatted: any[] = [];
     const addedItems = new Set();
-    // Suponiendo que cada pregunta tiene la misma cantidad de respuestas (27 en tu ejemplo)
+    // Suponiendo que cada pregunta tiene la misma cantidad de respuestas 
     const rowCount = pregAbMap[pregAbUnico[0]].length;
-        
+
     for (let i = 0; i < rowCount; i++) {
       // Creamos un objeto para cada fila
       const row: any = {
@@ -1107,7 +1133,7 @@
     
       // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
       pregAbUnico.forEach((pregunta) => {
-        const respuesta = pregAbMap[pregunta][i]?.bdinfindxvc || 'N/A';  // Asegúrate de que `bdinfindxvc` existe
+        const respuesta = pregAbMap[pregunta][i]?.bdinfindxvc || 'N/A';  
         row[`preguntasab_${pregunta}`] = respuesta;
       });
 
@@ -1122,6 +1148,7 @@
         row[`nivele1_${nivelEst}`] = respuesta;  // Aquí es donde asignas el valor de cada nivel estructural
       });
 
+
       nivelE2Unico.forEach((nivelEst) => {
         let respuesta = {}
         // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
@@ -1130,6 +1157,7 @@
         });
         row[`nivele2_${nivelEst}`] = respuesta;  
       });
+      
       nivelE3Unico.forEach((nivelEst) => {
         let respuesta = {} 
         // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
@@ -1200,7 +1228,7 @@
         pregAbUnico.forEach((pregunta) => {
           respuesta = pregAbMap[pregunta][i]?.bdinflocal || 'N/A';
         });
-        row[`local1${nivelEst}`] = respuesta; 
+        row[`local1_${nivelEst}`] = respuesta; 
       });
       localidad2Unico.forEach((nivelEst) => {
         let respuesta = {}; 
@@ -1208,7 +1236,7 @@
         pregAbUnico.forEach((pregunta) => {
           respuesta = pregAbMap[pregunta][i]?.bdinflocalb || 'N/A';
         });
-        row[`local2${nivelEst}`] = respuesta;  
+        row[`local2_${nivelEst}`] = respuesta;  
       });
       paisUnico.forEach((nivelEst) => {
         let respuesta = {}; 
@@ -1233,6 +1261,102 @@
           respuesta = pregAbMap[pregunta][i]?.bdinfgradac || 'N/A';
         });
         row[`educacion_${nivelEst}`] = respuesta;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      generosUnicos.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = generoMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`genero_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      medioTransporteUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = medioTransporteMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`mediotransporte_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      tiempoLlegadaUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = tiempoLlegadaMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`tiempollegada_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      cantidadReunionesUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = cantidadReunionesMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`reunionesjefe_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      oportunidadesMejoraUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = oportunidadesMejoraMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`oportunidadesmejora_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      seguirDesarrollandomeUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = seguirDesarrollandomeMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`seguirdesarrollandome_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      oportunidadesEmpleoUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = oportunidadesEmpleoMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`oportunidadesempleo_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      cantidadEmpleosUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = cantidadEmpleosMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`cantidadempleos_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      padecimientoSaludUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = padecimientoSaludMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`padecimientosalud_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      dependientesEconomicosUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = dependientesEconomicosMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`dependienteseconomicos_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      tiempoGenteACargoUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = tiempoGenteACargoMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`tiempogente_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      modalidadTrabajoUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = modalidadTrabajoMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`modalidatrabajo_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      describirOrganizacionUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = describirOrganizacionMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`describirorganizacion_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      areaUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = areaMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`areaT_${nivelEst}`] = filtered[0]?.bdinfarea;
+      });
+      cargoUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = cargoMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bdbdo10id.bdid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`cargoT_${nivelEst}`] = filtered[0]?.bdcargo;  // Aquí es donde asignas el valor de cada nivel estructural
+      });
+      cargoMologadoUnico.forEach((nivelEst) => {
+        // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+        const medioData = cargoMologadoMap[nivelEst] || [];
+        const filtered = medioData.filter(item => item.bdbdo10id.bdid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+        row[`cargomologado_${nivelEst}`] = filtered[0]?.bdcargoho;  // Aquí es donde asignas el valor de cada nivel estructural
       });
       formatted.push(row);  // Agregamos la fila con las respuestas a los datos formateados
     }
@@ -1464,10 +1588,17 @@
           row[mt] = item[`local2_${mt}`] || '';
         });
       }
-      if (props.filterData.columns.map(nc => nc.name).includes('Preguntas Abiertas')) {
-        pregAbUnico.forEach((pregunta) => {
-          row[pregunta] = item[`preguntasab_${pregunta}`] || '';
-        });
+      if (props.filterData.columns.map(nc => nc.name).includes('¿Qué es lo más WOW de trabajar en tu organización?')) {
+        row['Qué es lo más WOW de trabajar en tu organización?'] = item[`preguntasab_Qué es lo más WOW de trabajar en tu organización?`] || '';
+      }
+      if (props.filterData.columns.map(nc => nc.name).includes('¿Qué es lo menos WOW de trabajar en tu organización?')) {
+        row['Qué es lo menos WOW de trabajar en tu organización?'] = item[`preguntasab_Qué es lo menos WOW de trabajar en tu organización?`] || '';
+      }
+      if (props.filterData.columns.map(nc => nc.name).includes('Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?')) {
+        row['¿Si tu empresa fuera un vehículo que vehículo sería?'] = item[`preguntasab_¿Si tu empresa fuera un vehículo que vehículo sería?`] || '';
+      }
+      if (props.filterData.columns.map(nc => nc.name).includes('Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.')) {
+        row['Menciona 3 características que explican porque tu organización sería ese vehículo.'] = item[`preguntasab_Menciona 3 características que explican porque tu organización sería ese vehículo.`] || '';
       }
       if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
         props.filterData.valores.map((val, index) => {
@@ -1499,7 +1630,12 @@
     await empresafounded(empresa.value);
     await answersFounded(empresa.value);
 
-    props.filterData.columns = [{ id: 42, name: 'Preguntas Abiertas', category: 'lidPreg' }];
+    props.filterData.columns = [
+      { id: 42, name: '¿Qué es lo más WOW de trabajar en tu organización?', category: 'preguntas' },
+      { id: 43, name: '¿Qué es lo menos WOW de trabajar en tu organización?', category: 'preguntas' },
+      { id: 44, name: 'Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?', category: 'preguntas' },
+      { id: 45, name: 'Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.', category: 'preguntas' },
+    ];
   });
   
   </script>

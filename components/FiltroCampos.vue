@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import CollapsibleFilter from './CollapsibleFilter.vue';
 
 const rows = ref<any[]>([]);
 const columns = ref<any[]>([]);
@@ -51,8 +50,11 @@ const items = ref([
   { id: 38, name: 'Valor 3', category: 'valoresCalculados' },
   { id: 39, name: 'Valor 4', category: 'valoresCalculados' },
   { id: 40, name: 'Valor 5', category: 'valoresCalculados' },
-  { id: 41, name: 'Lideres', category: 'lidPreg' },
-  { id: 42, name: 'Preguntas Abiertas', category: 'lidPreg' },
+  { id: 41, name: 'Lideres', category: 'lideres' },
+  { id: 42, name: '¿Qué es lo más WOW de trabajar en tu organización?', category: 'preguntas' },
+  { id: 43, name: '¿Qué es lo menos WOW de trabajar en tu organización?', category: 'preguntas' },
+  { id: 44, name: 'Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?', category: 'preguntas' },
+  { id: 45, name: 'Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.', category: 'preguntas' },
   // Agregar más elementos
 ]);
 
@@ -76,7 +78,8 @@ const categoryTitle = (category) => {
     demographics: 'Demográficos',
     modelo: 'Modelo',
     valoresCalculados: 'Valores Calculados',
-    lidPreg: 'Líderes',
+    lideres: 'Líderes',
+    preguntas: 'Preguntas Abiertas',
     // Agrega más títulos según las categorías
   };
   return titles[category];
@@ -123,7 +126,8 @@ const isValidDrop = (target) => {
   if (!draggedItem) return false;
 
   if ((target === 'rows' || target === 'columns') &&
-      (draggedItem.category === 'demographics' || draggedItem.category === 'modelo' || draggedItem.category === 'lidPreg')) {
+      (draggedItem.category === 'demographics' || draggedItem.category === 'modelo' || 
+      draggedItem.category === 'lideres' || draggedItem.category === 'preguntas')) {
     return true;
   } else if (target === 'valores' && draggedItem.category === 'valoresCalculados') {
     return true;
@@ -163,6 +167,7 @@ const applyFilter = () => {
     valores: valores.value,
   });
 };
+
 </script>
 
 <template>

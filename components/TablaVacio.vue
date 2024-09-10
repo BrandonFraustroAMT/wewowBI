@@ -13,6 +13,14 @@
             </td>
           </tr>
       </template>
+      <!-- Slot para cuando no hay datos -->
+      <template v-slot:no-data>
+          <tr>
+            <td colspan="100%" class="text-center">
+              Selecciona los campos
+            </td>
+          </tr>
+        </template>
     </v-data-table-virtual>
   </div>
 </template>
@@ -208,6 +216,7 @@ let nivelE9Unico: string[] = [];
 let nivelE10Unico: string[] = [];
 let paisUnico: string[] = [];
 let pregAbUnico: string[] = [];
+let lideresUnico: string[] = [];
 
 let generoMap: { [key: string]: any[] } = {};
 let medioTransporteMap: { [key: string]: any[] } = {};
@@ -242,6 +251,7 @@ let nivelE9Map: { [key: string]: any[] } = {};
 let nivelE10Map: { [key: string]: any[] } = {};
 let paisMap: { [key: string]: any[] } = {};
 let pregAbMap: { [key: string]: any[] } = {};
+let lideresMap: { [key: string]: any[] } = {};
 
 // Función para obtener los datos de la empresa por ID
 const empresafounded = async (id: number) => {
@@ -512,7 +522,15 @@ const answersFounded = async (id: number) => {
       pregAbMap[psu] = pregAbiertas.value.filter((ps: any) => ps.bid.bdinfidindn === (index+1));
     });
 
+    lideresUnico = [...new Set(bdbd010Data.value.filter((mt: any) => mt.bdnamejd !== 'VACANTE').map((mt:any) => mt.bdnamejd))]
+    lideresUnico.forEach(psu => {
+      lideresMap[psu] = bdbd010Data.value.filter((ps: any) => ps.bdnamejd === psu);
+    });
+
     tableData.value = transformData(
+      dataDimensions.filter((d: any) => d.dimid >= 2 && d.dimid <= 4), 
+      contentTable, 
+      cantidadRespuestas,
       pregAbMap, pregAbUnico,
       generoMap, generosUnicos, generosCount,
       medioTransporteMap, medioTransporteUnico, medioTransporteCount,
@@ -545,6 +563,7 @@ const answersFounded = async (id: number) => {
       paisMap, paisUnico,
       localidad1Map, localidad1Unico,
       localidad2Map, localidad2Unico,
+      lideresMap, lideresUnico,
     );
 
     updateFormattedData();
@@ -558,6 +577,34 @@ const headers = ref([
 watch(() => props.filterData.columns, (newColumns) => {
   if (newColumns) {
     let dynamicHeaders = [];
+    if (newColumns.map(nc => nc.name).includes('¿Qué es lo más WOW de trabajar en tu organización?')) {
+            dynamicHeaders.push({
+                title: '¿Qué es lo más WOW de trabajar en tu organización?',
+                sortable: false,
+                key: `preguntasab_Qué es lo más WOW de trabajar en tu organización?`,
+            });
+      }
+      if (newColumns.map(nc => nc.name).includes('¿Qué es lo menos WOW de trabajar en tu organización?')) {
+            dynamicHeaders.push({
+                title: '¿Qué es lo menos WOW de trabajar en tu organización?',
+                sortable: false,
+                key: `preguntasab_Qué es lo menos WOW de trabajar en tu organización?`,
+            });
+      }
+      if (newColumns.map(nc => nc.name).includes('Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?')) {
+            dynamicHeaders.push({
+                title: 'Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?',
+                sortable: false,
+                key: `preguntasab_¿Si tu empresa fuera un vehículo que vehículo sería?`,
+            });
+      }
+      if (newColumns.map(nc => nc.name).includes('Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.')) {
+            dynamicHeaders.push({
+                title: 'Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.',
+                sortable: false,
+                key: `preguntasab_Menciona 3 características que explican porque tu organización sería ese vehículo.`,
+            });
+      }
     if (newColumns.map(nc => nc.name).includes('Preguntas Abiertas')) {
       pregAbUnico.forEach((pa, index) => {
           dynamicHeaders.push({
@@ -1091,6 +1138,23 @@ watch(() => props.filterData.columns, (newColumns) => {
           });
       });
     }
+    // columns
+    if (newColumns.map(nc => nc.name).includes('Lideres')) {
+      dynamicHeaders.push({
+          title: 'Lideres',
+          align: 'center',
+          key: 'lideres-header',
+          colspan: lideresUnico.length,
+      });
+      
+      lideresUnico.forEach((cru, index) => {
+          dynamicHeaders.push({
+              title: cru,
+              sortable: false,
+              key: `lideres_${cru}`,
+          });
+      });
+    }
 
     let valoresHeaders = [];
     if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
@@ -1105,6 +1169,7 @@ watch(() => props.filterData.columns, (newColumns) => {
 
     headers.value = [
       { title: 'Modelo', sortable: false, key: 'modelo' },
+      ...valoresHeaders,
       ...dynamicHeaders,
     ];
   }
@@ -1116,6 +1181,63 @@ const applyFilter = () => {
   selectedLevels.value = [];
 
   if (props.filterData && Array.isArray(props.filterData.rows)) {
+    // Función de utilidad para filtrar niveles y definir expandibilidad
+const filterByLevels = (levelsToInclude, expandableLevels) => {
+  return tableData.value
+    .filter(item => levelsToInclude.includes(item.level))
+    .map(item => ({
+      ...item,
+      expandable: expandableLevels.includes(item.level),
+    }));
+};
+
+// Filtrar por dimensiones
+if (props.filterData.rows.some(nc => nc.name === 'Dimensiones')) {
+  formattedData.value.push({
+    modelo: 'Dimensiones',
+    expandable: false,
+    isCategoryTitle: true
+  });
+
+  formattedData.value.push(...filterByLevels(['dimension'], []));
+  selectedLevels.value.push('dimension');
+}
+
+// Filtrar por subdimensiones
+if (props.filterData.rows.some(nc => nc.name === 'Subdimensiones')) {
+  formattedData.value.push({
+    modelo: 'Subdimensiones',
+    expandable: false,
+    isCategoryTitle: true
+  });
+
+  formattedData.value.push(...filterByLevels(['dimension', 'subdimension'], ['dimension']));
+  selectedLevels.value.push('subdimension');
+}
+
+// Filtrar por competencias
+if (props.filterData.rows.some(nc => nc.name === 'Competencias')) {
+  formattedData.value.push({
+    modelo: 'Competencias',
+    expandable: false,
+    isCategoryTitle: true
+  });
+
+  formattedData.value.push(...filterByLevels(['dimension', 'subdimension', 'competencia'], ['dimension', 'subdimension']));
+  selectedLevels.value.push('competencia');
+}
+
+// Filtrar por afirmaciones
+if (props.filterData.rows.some(nc => nc.name === 'Afirmaciones')) {
+  formattedData.value.push({
+    modelo: 'Afirmaciones',
+    expandable: false,
+    isCategoryTitle: true
+  });
+
+  formattedData.value.push(...filterByLevels(['dimension', 'subdimension', 'competencia', 'afirmacion'], ['dimension', 'subdimension', 'competencia']));
+  selectedLevels.value.push('afirmacion');
+}
     // Filtra datos basados en los géneros disponibles
     if (props.filterData.rows.some(nc => nc.name === 'Genero')) {
       formattedData.value.push({
@@ -1587,8 +1709,6 @@ const applyFilter = () => {
   }
 };
 
-
-
 watch(() => props.filterData, () => {
   applyFilter(); // Actualiza los datos filtrados cuando cambie filterData
 }, { deep: true });
@@ -1599,6 +1719,7 @@ watch(() => tableData.value, () => {
 
 // Función para transformar datos planos a la estructura jerárquica
 const transformData = (
+      dataDimensions: any[], contentTable: any[], cantidadRespuestas:number, 
       pregAbMap: { [key: string]: any[] }, pregAbUnico: string[],
       generoMap: { [key: string]: any[] }, generosUnicos: string[], generosCount: any[], 
       medioTransporteMap: { [key: string]: any[] }, medioTransporteUnico: string[], medioTransporteCount: any[],
@@ -1631,9 +1752,3246 @@ const transformData = (
       paisMap: { [key: string]: any[] }, paisUnico: string[],
       localidad1Map: { [key: string]: any[] }, localidad1Unico: string[],
       localidad2Map: { [key: string]: any[] }, localidad2Unico: string[],
+      lideresMap: { [key: string]: any[] }, lideresUnico: string[],
   ): any[] => {
   const formatted: any[] = [];
   const addedItems = new Set();
+
+
+  const dimensionMap = new Map();
+  const subDimensionMap = new Map();
+  const competenciaMap = new Map();
+
+  // Crear acumuladores para cada género
+  const dimensionGeneroMap = new Map();
+  const subDimensionGeneroMap = new Map();
+  const competenciaGeneroMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionmedioTransporteMap = new Map();
+  const subDimensionmedioTransporteMap = new Map();
+  const competenciamedioTransporteMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiontiempoLlegadaMap = new Map();
+  const subDimensiontiempoLlegadaMap = new Map();
+  const competenciatiempoLlegadaMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncantidadReunionesMap = new Map();
+  const subDimensioncantidadReunionesMap = new Map();
+  const competenciacantidadReunionesMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionoportunidadesMejoraMap = new Map();
+  const subDimensionoportunidadesMejoraMap = new Map();
+  const competenciaoportunidadesMejoraMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionseguirDesarrollandomeMap = new Map();
+  const subDimensionseguirDesarrollandomeMap = new Map();
+  const competenciaseguirDesarrollandomeMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionoportunidadesEmpleoMap = new Map();
+  const subDimensionoportunidadesEmpleoMap = new Map();
+  const competenciaoportunidadesEmpleoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncantidadEmpleosMap = new Map();
+  const subDimensioncantidadEmpleosMap = new Map();
+  const competenciacantidadEmpleosMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionpadecimientoSaludMap = new Map();
+  const subDimensionpadecimientoSaludMap = new Map();
+  const competenciapadecimientoSaludMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiondependientesEconomicosMap = new Map();
+  const subDimensiondependientesEconomicosMap = new Map();
+  const competenciadependientesEconomicosMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiontiempoGenteACargoMap = new Map();
+  const subDimensiontiempoGenteACargoMap = new Map();
+  const competenciatiempoGenteACargoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionmodalidadTrabajoMap = new Map();
+  const subDimensionmodalidadTrabajoMap = new Map();
+  const competenciamodalidadTrabajoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiondescribirOrganizacionMap = new Map();
+  const subDimensiondescribirOrganizacionMap = new Map();
+  const competenciadescribirOrganizacionMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionareaMap = new Map();
+  const subDimensionareaMap = new Map();
+  const competenciaareaMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncargoMap = new Map();
+  const subDimensioncargoMap = new Map();
+  const competenciacargoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioncargoMologadoMap = new Map();
+  const subDimensioncargoMologadoMap = new Map();
+  const competenciacargoMologadoMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensioneducacionMap = new Map();
+  const subDimensioneducacionMap = new Map();
+  const competenciaeducacionMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensiongeneracionMap = new Map();
+  const subDimensiongeneracionMap = new Map();
+  const competenciageneracionMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE1Map = new Map();
+  const subDimensionnivelE1Map = new Map();
+  const competencianivelE1Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE2Map = new Map();
+  const subDimensionnivelE2Map = new Map();
+  const competencianivelE2Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE3Map = new Map();
+  const subDimensionnivelE3Map = new Map();
+  const competencianivelE3Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE4Map = new Map();
+  const subDimensionnivelE4Map = new Map();
+  const competencianivelE4Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE5Map = new Map();
+  const subDimensionnivelE5Map = new Map();
+  const competencianivelE5Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE6Map = new Map();
+  const subDimensionnivelE6Map = new Map();
+  const competencianivelE6Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE7Map = new Map();
+  const subDimensionnivelE7Map = new Map();
+  const competencianivelE7Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE8Map = new Map();
+  const subDimensionnivelE8Map = new Map();
+  const competencianivelE8Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE9Map = new Map();
+  const subDimensionnivelE9Map = new Map();
+  const competencianivelE9Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionnivelE10Map = new Map();
+  const subDimensionnivelE10Map = new Map();
+  const competencianivelE10Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionpaisMap = new Map();
+  const subDimensionpaisMap = new Map();
+  const competenciapaisMap = new Map();
+  // Crear acumuladores para cada género
+  const dimensionlocalidad1Map = new Map();
+  const subDimensionlocalidad1Map = new Map();
+  const competencialocalidad1Map = new Map();
+  // Crear acumuladores para cada género
+  const dimensionlocalidad2Map = new Map();
+  const subDimensionlocalidad2Map = new Map();
+  const competencialocalidad2Map = new Map();
+  const dimensionlideresMap = new Map();
+  const subDimensionlideresMap = new Map();
+  const competencialideresMap = new Map();
+
+  //const tableFilterData = contentTable;
+  dataDimensions.forEach(item => {
+    const {
+      empid, dimid, dimdesc, lindidlin, linddescc, indclasifi, indxlidln, indxldesc
+    } = item;
+
+    const afirmaciones = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn >= 4
+    );
+    const afirmVal1 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 1
+    );
+    const afirmVal2 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 2
+    );
+    const afirmVal3 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 3
+    );
+    const afirmVal4 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 4
+    );
+    const afirmVal5 = contentTable.filter(ct => 
+      ct.bid.bdinfdimid === dimid && 
+      ct.bid.bdinfidlinn === lindidlin && 
+      ct.bid.bdinfidindn === indxlidln && 
+      ct.bdinfindxvcn === 5
+    );
+
+    // Handle Dimensions
+    if (!addedItems.has(dimid)) {
+      formatted.push({
+        modelo: dimdesc,
+        level: 'dimension',
+        id: dimid,
+        expandable: true,
+        resultado: `0`,
+        val1: `0`,
+        val2: `0`,
+        val3: `0`,
+        val4: `0`,
+        val5: `0`,
+        // Inicializar géneros con '0%'
+        ...generosUnicos.reduce((acc, dat) => ({ ...acc, [`genero_${dat}`]: '0%' }), {}),
+        ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+        ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+        ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+        ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+        ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+        ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+        ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+        ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+        ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+        ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+        ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+        ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+        ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+        ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+        ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+        ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+        ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+        ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+        ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+        ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+        ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+        ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+        ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+        ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+        ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+        ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+        ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+        ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+        ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+        ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        ...lideresUnico.reduce((acc, dat) => ({ ...acc, [`lideres_${dat}`]: '0%' }), {}),
+        count: 0,
+      });
+      addedItems.add(dimid);
+      dimensionMap.set(dimid, { totalResult: 0,count: 0 });
+      // Inicializar mapa de demograficos en dimensiones
+      dimensionGeneroMap.set(dimid, generosUnicos.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionmedioTransporteMap.set(dimid, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiontiempoLlegadaMap.set(dimid, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncantidadReunionesMap.set(dimid, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionoportunidadesMejoraMap.set(dimid, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionseguirDesarrollandomeMap.set(dimid, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionoportunidadesEmpleoMap.set(dimid, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncantidadEmpleosMap.set(dimid, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionpadecimientoSaludMap.set(dimid, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiondependientesEconomicosMap.set(dimid, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiontiempoGenteACargoMap.set(dimid, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionmodalidadTrabajoMap.set(dimid, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiondescribirOrganizacionMap.set(dimid, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionareaMap.set(dimid, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncargoMap.set(dimid, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioncargoMologadoMap.set(dimid, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensioneducacionMap.set(dimid, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensiongeneracionMap.set(dimid, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE1Map.set(dimid, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE2Map.set(dimid, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE3Map.set(dimid, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE4Map.set(dimid, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE5Map.set(dimid, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE6Map.set(dimid, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE7Map.set(dimid, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE8Map.set(dimid, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE9Map.set(dimid, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionnivelE10Map.set(dimid, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionpaisMap.set(dimid, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionlocalidad1Map.set(dimid, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionlocalidad2Map.set(dimid, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      dimensionlideresMap.set(dimid, lideresUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+    }
+
+    // Handle Subdimensions
+    if (!addedItems.has(`${dimid}-${lindidlin}`)) {
+      formatted.push({
+        modelo: linddescc.trim(),
+        level: 'subdimension',
+        id: `${dimid}-${lindidlin}`,
+        parent: dimid,
+        expandable: true,
+        resultado: `0`,
+        val1: `0`,
+        val2: `0`,
+        val3: `0`,
+        val4: `0`,
+        val5: `0`,
+        ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
+        ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+        ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+        ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+        ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+        ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+        ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+        ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+        ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+        ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+        ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+        ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+        ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+        ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+        ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+        ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+        ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+        ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+        ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+        ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+        ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+        ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+        ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+        ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+        ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+        ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+        ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+        ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+        ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+        ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+        ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        ...lideresUnico.reduce((acc, dat) => ({ ...acc, [`lideres_${dat}`]: '0%' }), {}),
+        count: 0,
+      });
+      addedItems.add(`${dimid}-${lindidlin}`);
+      subDimensionMap.set(`${dimid}-${lindidlin}`, { totalResult: 0, count: 0 });
+
+      // Inicializar mapa de demográficos en subdimensiones
+      subDimensionGeneroMap.set(`${dimid}-${lindidlin}`, generosUnicos.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionmedioTransporteMap.set(`${dimid}-${lindidlin}`, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiontiempoLlegadaMap.set(`${dimid}-${lindidlin}`, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncantidadReunionesMap.set(`${dimid}-${lindidlin}`, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionoportunidadesMejoraMap.set(`${dimid}-${lindidlin}`, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionseguirDesarrollandomeMap.set(`${dimid}-${lindidlin}`, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionoportunidadesEmpleoMap.set(`${dimid}-${lindidlin}`, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncantidadEmpleosMap.set(`${dimid}-${lindidlin}`, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionpadecimientoSaludMap.set(`${dimid}-${lindidlin}`, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiondependientesEconomicosMap.set(`${dimid}-${lindidlin}`, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiontiempoGenteACargoMap.set(`${dimid}-${lindidlin}`, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionmodalidadTrabajoMap.set(`${dimid}-${lindidlin}`, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiondescribirOrganizacionMap.set(`${dimid}-${lindidlin}`, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionareaMap.set(`${dimid}-${lindidlin}`, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncargoMap.set(`${dimid}-${lindidlin}`, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioncargoMologadoMap.set(`${dimid}-${lindidlin}`, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensioneducacionMap.set(`${dimid}-${lindidlin}`, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensiongeneracionMap.set(`${dimid}-${lindidlin}`, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE1Map.set(`${dimid}-${lindidlin}`, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE2Map.set(`${dimid}-${lindidlin}`, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE3Map.set(`${dimid}-${lindidlin}`, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE4Map.set(`${dimid}-${lindidlin}`, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE5Map.set(`${dimid}-${lindidlin}`, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE6Map.set(`${dimid}-${lindidlin}`, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE7Map.set(`${dimid}-${lindidlin}`, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE8Map.set(`${dimid}-${lindidlin}`, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE9Map.set(`${dimid}-${lindidlin}`, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionnivelE10Map.set(`${dimid}-${lindidlin}`, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionpaisMap.set(`${dimid}-${lindidlin}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionlocalidad1Map.set(`${dimid}-${lindidlin}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionlocalidad2Map.set(`${dimid}-${lindidlin}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      subDimensionlideresMap.set(`${dimid}-${lindidlin}`, lideresUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+    }
+
+    // Handle Competencias
+    if (!addedItems.has(`${lindidlin}-${indclasifi}`)) {
+      formatted.push({
+        modelo: indclasifi,
+        level: 'competencia',
+        id: `${lindidlin}-${indclasifi}`,
+        parent: `${dimid}-${lindidlin}`,
+        expandable: true,
+        resultado: `0`,
+        val1: `0`,
+        val2: `0`,
+        val3: `0`,
+        val4: `0`,
+        val5: `0`,
+        ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
+        ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+        ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+        ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+        ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+        ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+        ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+        ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+        ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+        ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+        ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+        ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+        ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+        ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+        ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+        ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+        ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+        ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+        ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+        ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+        ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+        ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+        ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+        ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+        ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+        ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+        ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+        ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+        ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+        ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+        ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+        count: 0,
+      });
+      addedItems.add(`${lindidlin}-${indclasifi}`);
+      competenciaMap.set(`${lindidlin}-${indclasifi}`, { totalResult: 0, count: 0 });
+
+      // Inicializar mapa de demograficos en competencias
+      competenciaGeneroMap.set(`${lindidlin}-${indclasifi}`, generosUnicos.reduce((acc, genero) => ({ ...acc, [genero]: { total: 0, count: 0 } }), {}));
+      competenciamedioTransporteMap.set(`${lindidlin}-${indclasifi}`, medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciatiempoLlegadaMap.set(`${lindidlin}-${indclasifi}`, tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacantidadReunionesMap.set(`${lindidlin}-${indclasifi}`, cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaoportunidadesMejoraMap.set(`${lindidlin}-${indclasifi}`, oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaseguirDesarrollandomeMap.set(`${lindidlin}-${indclasifi}`, seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaoportunidadesEmpleoMap.set(`${lindidlin}-${indclasifi}`, oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacantidadEmpleosMap.set(`${lindidlin}-${indclasifi}`, cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciapadecimientoSaludMap.set(`${lindidlin}-${indclasifi}`, padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciadependientesEconomicosMap.set(`${lindidlin}-${indclasifi}`, dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciatiempoGenteACargoMap.set(`${lindidlin}-${indclasifi}`, tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciamodalidadTrabajoMap.set(`${lindidlin}-${indclasifi}`, modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciadescribirOrganizacionMap.set(`${lindidlin}-${indclasifi}`, describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaareaMap.set(`${lindidlin}-${indclasifi}`, areaUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacargoMap.set(`${lindidlin}-${indclasifi}`, cargoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciacargoMologadoMap.set(`${lindidlin}-${indclasifi}`, cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciaeducacionMap.set(`${lindidlin}-${indclasifi}`, educacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciageneracionMap.set(`${lindidlin}-${indclasifi}`, generacionUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE1Map.set(`${lindidlin}-${indclasifi}`, nivelE1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE2Map.set(`${lindidlin}-${indclasifi}`, nivelE2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE3Map.set(`${lindidlin}-${indclasifi}`, nivelE3Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE4Map.set(`${lindidlin}-${indclasifi}`, nivelE4Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE5Map.set(`${lindidlin}-${indclasifi}`, nivelE5Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE6Map.set(`${lindidlin}-${indclasifi}`, nivelE6Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE7Map.set(`${lindidlin}-${indclasifi}`, nivelE7Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE8Map.set(`${lindidlin}-${indclasifi}`, nivelE8Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE9Map.set(`${lindidlin}-${indclasifi}`, nivelE9Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencianivelE10Map.set(`${lindidlin}-${indclasifi}`, nivelE10Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competenciapaisMap.set(`${lindidlin}-${indclasifi}`, paisUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencialocalidad1Map.set(`${lindidlin}-${indclasifi}`, localidad1Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencialocalidad2Map.set(`${lindidlin}-${indclasifi}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+      competencialideresMap.set(`${lindidlin}-${indclasifi}`, lideresUnico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
+    }
+
+    // Handle Afirmaciones    
+    const afirmacion = {
+      modelo: indxldesc.trim(),
+      level: 'afirmacion',
+      id: `${lindidlin}-${indclasifi}-${indxlidln}`,
+      parent: `${lindidlin}-${indclasifi}`,
+      resultado: `${((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val1: `${((afirmVal1.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val2: `${((afirmVal2.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val3: `${((afirmVal3.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val4: `${((afirmVal4.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      val5: `${((afirmVal5.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
+      ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
+      ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
+      ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
+      ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
+      ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
+      ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
+      ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
+      ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
+      ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
+      ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
+      ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
+      ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
+      ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
+      ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
+      ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
+      ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
+      ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
+      ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
+      ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
+      ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
+      ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
+      ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
+      ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
+      ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
+      ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
+      ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
+      ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
+      ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
+      ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
+      ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
+      ...lideresUnico.reduce((acc, dat) => ({ ...acc, [`lideres_${dat}`]: '0%' }), {}),
+      expandable: false,
+    };
+
+    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por lider
+    lideresUnico.forEach(dat => {
+      const lidData = lideresMap[dat] || [];
+      if(lidData.length >= 3) {
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorLid = lidData.map(item => item.bdbdo10id.bdid);
+  
+  
+        // Filtramos los valores en `generosCount` por `bdinfid` según el género
+        const generoFilteredCount = generosCount.value.filter(gen => 
+          idsPorLid.includes(gen.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorLid.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const generoCount = generoFilteredCount.filter(gen => 
+          gen.bdinfindxvcn >= 4
+        ).length;
+        const generoVal1 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+        const generoVal2 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+        const generoVal3 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+        const generoVal4 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+        const generoVal5 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+  
+        if (generoCountValue.length != 0) {
+          afirmacion[`lideres_${dat}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0) || 0}%`;
+        } else {
+          afirmacion[`lideres_${dat}`] = `0%`;
+        }
+  
+         // Acumular valores en el mapa de géneros
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let generoData = competencialideresMap.get(`${lindidlin}-${indclasifi}`)[dat];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionlideresMap.get(`${dimid}-${lindidlin}`)[dat];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionlideresMap.get(dimid)[dat];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionlideresMap.get(dimid)[dat] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por género
+    // Añadir columnas dinámicas de género
+    generosUnicos.forEach(genero => {
+      const genData = generoMap[genero] || [];
+      if(genData.length >= 3) {
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorGenero = genData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `generosCount` por `bdinfid` según el género
+        const generoFilteredCount = generosCount.value.filter(gen => 
+          idsPorGenero.includes(gen.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorGenero.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const generoCount = generoFilteredCount.filter(gen => 
+          gen.bdinfindxvcn >= 4
+        ).length;
+        const generoVal1 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+        const generoVal2 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+        const generoVal3 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+        const generoVal4 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+        const generoVal5 = generoFilteredCount.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`genero_${genero}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0)}%`;
+  
+         // Acumular valores en el mapa de géneros
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let generoData = competenciaGeneroMap.get(`${lindidlin}-${indclasifi}`)[genero];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionGeneroMap.get(`${dimid}-${lindidlin}`)[genero];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionGeneroMap.get(dimid)[genero];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[genero] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+
+      }
+    });
+
+    medioTransporteUnico.forEach(medioTransporte => {
+      const mtransData = medioTransporteMap[medioTransporte] || [];
+      if(mtransData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorMedioTransporte = mtransData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const medioTransporteFilteredCount = medioTransporteCount.value.filter(mt => 
+          idsPorMedioTransporte.includes(mt.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorMedioTransporte.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const medioTransCount = medioTransporteFilteredCount.filter(mt => 
+          mt.bdinfindxvcn >= 4 && mt.bdinfindxvcn <= 5
+        ).length;
+        const medioTransVal1 = medioTransporteFilteredCount.filter(mt =>
+          mt.bdinfindxvcn === 1
+        ).length;
+        const medioTransVal2 = medioTransporteFilteredCount.filter(mt =>
+          mt.bdinfindxvcn === 2
+        ).length;
+        const medioTransVal3 = medioTransporteFilteredCount.filter(mt =>
+          mt.bdinfindxvcn === 3
+        ).length;
+        const medioTransVal4 = medioTransporteFilteredCount.filter(mt =>
+          mt.bdinfindxvcn === 4
+        ).length;
+        const medioTransVal5 = medioTransporteFilteredCount.filter(mt =>
+          mt.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`mediotransporte_${medioTransporte}`] = `${((generoCountValue.length * 100)/ medioTransporteFilteredCount.length).toFixed(0)}%`;
+        
+         // Acumular valores en el mapa de géneros
+         if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciamedioTransporteMap.get(`${lindidlin}-${indclasifi}`)[medioTransporte];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciamedioTransporteMap.get(`${lindidlin}-${indclasifi}`)[medioTransporte] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionmedioTransporteMap.get(`${dimid}-${lindidlin}`)[medioTransporte];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionmedioTransporteMap.get(dimid)[medioTransporte];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[medioTransporte] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+
+      }
+    });
+
+    tiempoLlegadaUnico.forEach(tiempoLleg => {
+      const tLlegData = tiempoLlegadaMap[tiempoLleg] || [];
+      if(tLlegData.length >= 3) {
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorTiempoLlegada = tLlegData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const tiempoLlegadaFilteredCount = tiempoLlegadaCount.value.filter(mt => 
+          idsPorTiempoLlegada.includes(mt.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorTiempoLlegada.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const tiempLlegCount = tiempoLlegadaFilteredCount.filter(tlfc => 
+          tlfc.bdinfindxvcn >= 4
+        ).length;
+        /* const tiempLlegVal1 = tiempoLlegadaFilteredCount.filter(tlfc =>
+          tlfc.bdinfindxvcn === 1
+        ).length;
+        const tiempLlegVal2 = tiempoLlegadaFilteredCount.filter(tlfc =>
+          tlfc.bdinfindxvcn === 2
+        ).length;
+        const tiempLlegVal3 = tiempoLlegadaFilteredCount.filter(tlfc =>
+          tlfc.bdinfindxvcn === 3
+        ).length;
+        const tiempLlegVal4 = tiempoLlegadaFilteredCount.filter(tlfc =>
+          tlfc.bdinfindxvcn === 4
+        ).length;
+        const tiempLlegVal5 = tiempoLlegadaFilteredCount.filter(tlfc =>
+          tlfc.bdinfindxvcn === 5
+        ).length; */
+
+        afirmacion[`tiempollegada_${tiempoLleg}`] = `${((generoCountValue.length * 100)/ tiempoLlegadaFilteredCount.length).toFixed(0)}%`;
+  
+  
+        // Acumular valores en el mapa de géneros
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciatiempoLlegadaMap.get(`${lindidlin}-${indclasifi}`)[tiempoLleg];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciatiempoLlegadaMap.get(`${lindidlin}-${indclasifi}`)[tiempoLleg] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensiontiempoLlegadaMap.get(`${dimid}-${lindidlin}`)[tiempoLleg];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensiontiempoLlegadaMap.get(dimid)[tiempoLleg];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[tiempoLleg] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    cantidadReunionesUnico.forEach(cantidadReu => {
+      const cReunData = cantidadReunionesMap[cantidadReu] || [];
+      if(cReunData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorCantidadReuniones = cReunData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        //console.log('cantidadReunionesCount', cantidadReunionesCount);
+        const cantidadReunionesFilteredCount = cantidadReunionesCount.value.filter(crc => 
+          idsPorCantidadReuniones.includes(crc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorCantidadReuniones.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const cantidReuCount = cantidadReunionesFilteredCount.filter(crfc => 
+          crfc.bdinfindxvcn >= 4
+        ).length;
+        const cantidReuVal1 = cantidadReunionesFilteredCount.filter(crfc =>
+          crfc.bdinfindxvcn === 1
+        ).length;
+        const cantidReuVal2 = cantidadReunionesFilteredCount.filter(crfc =>
+          crfc.bdinfindxvcn === 2
+        ).length;
+        const cantidReuVal3 = cantidadReunionesFilteredCount.filter(crfc =>
+          crfc.bdinfindxvcn === 3
+        ).length;
+        const cantidReuVal4 = cantidadReunionesFilteredCount.filter(crfc =>
+          crfc.bdinfindxvcn === 4
+        ).length;
+        const cantidReuVal5 = cantidadReunionesFilteredCount.filter(crfc =>
+          crfc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`reunionesjefe_${cantidadReu}`] = `${((generoCountValue.length * 100)/ cantidadReunionesFilteredCount.length).toFixed(0)}%`;
+        // Acumular valores en el mapa de géneros
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciacantidadReunionesMap.get(`${lindidlin}-${indclasifi}`)[cantidadReu];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciacantidadReunionesMap.get(`${lindidlin}-${indclasifi}`)[cantidadReu] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensioncantidadReunionesMap.get(`${dimid}-${lindidlin}`)[cantidadReu];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensioncantidadReunionesMap.get(dimid)[cantidadReu];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[cantidadReu] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+
+      }
+      
+    });
+
+    oportunidadesMejoraUnico.forEach(oportMej => {
+      const oMejoraData = oportunidadesMejoraMap[oportMej] || [];
+      if(oMejoraData.length >= 3){
+
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorOportunidadesMejora = oMejoraData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        //console.log('cantidadReunionesCount', cantidadReunionesCount);
+        const oportunidadesMejoraFilteredCount = oportunidadesMejoraCount.value.filter(omc => 
+          idsPorOportunidadesMejora.includes(omc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorOportunidadesMejora.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const oportMejCount = oportunidadesMejoraFilteredCount.filter(omfc => 
+          omfc.bdinfindxvcn >= 4
+        ).length;
+        const oportMejVal1 = oportunidadesMejoraFilteredCount.filter(omfc =>
+          omfc.bdinfindxvcn === 1
+        ).length;
+        const oportMejVal2 = oportunidadesMejoraFilteredCount.filter(omfc =>
+          omfc.bdinfindxvcn === 2
+        ).length;
+        const oportMejVal3 = oportunidadesMejoraFilteredCount.filter(omfc =>
+          omfc.bdinfindxvcn === 3
+        ).length;
+        const oportMejVal4 = oportunidadesMejoraFilteredCount.filter(omfc =>
+          omfc.bdinfindxvcn === 4
+        ).length;
+        const oportMejVal5 = oportunidadesMejoraFilteredCount.filter(omfc =>
+          omfc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`oportunidadesmejora_${oportMej}`] = `${((generoCountValue.length * 100)/ oportunidadesMejoraFilteredCount.length).toFixed(0)}%`;
+  
+        // Acumular valores en el mapa de géneros
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciaoportunidadesMejoraMap.get(`${lindidlin}-${indclasifi}`)[oportMej];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciaoportunidadesMejoraMap.get(`${lindidlin}-${indclasifi}`)[oportMej] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionoportunidadesMejoraMap.get(`${dimid}-${lindidlin}`)[oportMej];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionoportunidadesMejoraMap.get(dimid)[oportMej];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[oportMej] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    seguirDesarrollandomeUnico.forEach(segDes => {
+      const sDesarrollandomeData = seguirDesarrollandomeMap[segDes] || [];
+      if(sDesarrollandomeData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirDesarrollandome = sDesarrollandomeData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        //console.log('cantidadReunionesCount', cantidadReunionesCount);
+        const seguirDesarrollandomeFilteredCount = seguirDesarrollandomeCount.value.filter(sdc => 
+          idsPorSeguirDesarrollandome.includes(sdc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorSeguirDesarrollandome.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const segDesCount = seguirDesarrollandomeFilteredCount.filter(sdfc => 
+          sdfc.bdinfindxvcn >= 4
+        ).length;
+        const segDesVal1 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
+          sdfc.bdinfindxvcn === 1
+        ).length;
+        const segDesVal2 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
+          sdfc.bdinfindxvcn === 2
+        ).length;
+        const segDesVal3 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
+          sdfc.bdinfindxvcn === 3
+        ).length;
+        const segDesVal4 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
+          sdfc.bdinfindxvcn === 4
+        ).length;
+        const segDesVal5 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
+          sdfc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`seguirdesarrollandome_${segDes}`] = `${((generoCountValue.length * 100)/ seguirDesarrollandomeFilteredCount.length).toFixed(0)}%`;
+        
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciaseguirDesarrollandomeMap.get(`${lindidlin}-${indclasifi}`)[segDes];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciaseguirDesarrollandomeMap.get(`${lindidlin}-${indclasifi}`)[segDes] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionseguirDesarrollandomeMap.get(`${dimid}-${lindidlin}`)[segDes];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionseguirDesarrollandomeMap.get(dimid)[segDes];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[segDes] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    oportunidadesEmpleoUnico.forEach(opEmp => {
+      const oEmpleoData = oportunidadesEmpleoMap[opEmp] || [];
+      if(oEmpleoData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirOportunidadesEmpleo = oEmpleoData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        //console.log('cantidadReunionesCount', cantidadReunionesCount);
+        const oportunidadesEmpleoFilteredCount = oportunidadesEmpleoCount.value.filter(oec => 
+          idsPorSeguirOportunidadesEmpleo.includes(oec.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorSeguirOportunidadesEmpleo.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const opEmpCount = oportunidadesEmpleoFilteredCount.filter(oefc => 
+          oefc.bdinfindxvcn >= 4
+        ).length;
+        const opEmpVal1 = oportunidadesEmpleoFilteredCount.filter(oefc =>
+          oefc.bdinfindxvcn === 1
+        ).length;
+        const opEmpVal2 = oportunidadesEmpleoFilteredCount.filter(oefc =>
+          oefc.bdinfindxvcn === 2
+        ).length;
+        const opEmpVal3 = oportunidadesEmpleoFilteredCount.filter(oefc =>
+          oefc.bdinfindxvcn === 3
+        ).length;
+        const opEmpVal4 = oportunidadesEmpleoFilteredCount.filter(oefc =>
+          oefc.bdinfindxvcn === 4
+        ).length;
+        const opEmpVal5 = oportunidadesEmpleoFilteredCount.filter(oefc =>
+          oefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`oportunidadesempleo_${opEmp}`] = `${((generoCountValue.length * 100)/ oportunidadesEmpleoFilteredCount.length).toFixed(0)}%`;
+        
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciaoportunidadesEmpleoMap.get(`${lindidlin}-${indclasifi}`)[opEmp];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciaoportunidadesEmpleoMap.get(`${lindidlin}-${indclasifi}`)[opEmp] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionoportunidadesEmpleoMap.get(`${dimid}-${lindidlin}`)[opEmp];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionoportunidadesEmpleoMap.get(dimid)[opEmp];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[opEmp] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    cantidadEmpleosUnico.forEach(cantEmp => {
+      const cantEmpleoData = cantidadEmpleosMap[cantEmp] || [];
+      if(cantEmpleoData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirCantidadEmpleo = cantEmpleoData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const cantidadEmpleoFilteredCount = cantidadEmpleosCount.value.filter(cec => 
+          idsPorSeguirCantidadEmpleo.includes(cec.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorSeguirCantidadEmpleo.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const canEmpCount = cantidadEmpleoFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const canEmpVal1 = cantidadEmpleoFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const canEmpVal2 = cantidadEmpleoFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const canEmpVal3 = cantidadEmpleoFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const canEmpVal4 = cantidadEmpleoFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const canEmpVal5 = cantidadEmpleoFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`cantidadempleos_${cantEmp}`] = `${((generoCountValue.length * 100)/ cantidadEmpleoFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciacantidadEmpleosMap.get(`${lindidlin}-${indclasifi}`)[cantEmp];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciacantidadEmpleosMap.get(`${lindidlin}-${indclasifi}`)[cantEmp] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensioncantidadEmpleosMap.get(`${dimid}-${lindidlin}`)[cantEmp];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensioncantidadEmpleosMap.get(dimid)[cantEmp];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[cantEmp] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    padecimientoSaludUnico.forEach(padSal => {
+      const padSaludData = padecimientoSaludMap[padSal] || [];
+      if(padSaludData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirPadecimientoSalud = padSaludData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const padecimientoSaludFilteredCount = padecimientoSaludCount.value.filter(psc => 
+          idsPorSeguirPadecimientoSalud.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorSeguirPadecimientoSalud.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const canEmpCount = padecimientoSaludFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const canEmpVal1 = padecimientoSaludFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const canEmpVal2 = padecimientoSaludFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const canEmpVal3 = padecimientoSaludFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const canEmpVal4 = padecimientoSaludFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const canEmpVal5 = padecimientoSaludFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`padecimientosalud_${padSal}`] = `${((generoCountValue.length * 100)/ padecimientoSaludFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciapadecimientoSaludMap.get(`${lindidlin}-${indclasifi}`)[padSal];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciapadecimientoSaludMap.get(`${lindidlin}-${indclasifi}`)[padSal] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionpadecimientoSaludMap.get(`${dimid}-${lindidlin}`)[padSal];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionpadecimientoSaludMap.get(dimid)[padSal];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[padSal] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    dependientesEconomicosUnico.forEach(depEcon => {
+      const depEconData = dependientesEconomicosMap[depEcon] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirDependientesEconomicos = depEconData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const dependientesEconomicosFilteredCount = dependientesEconomicosCount.value.filter(psc => 
+        idsPorSeguirDependientesEconomicos.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+        idsPorSeguirDependientesEconomicos.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const depEconCount = dependientesEconomicosFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const depEconVal1 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const depEconVal2 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const depEconVal3 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const depEconVal4 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const depEconVal5 = dependientesEconomicosFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`dependienteseconomicos_${depEcon}`] = `${((generoCountValue.length * 100)/ dependientesEconomicosFilteredCount.length).toFixed(0)}%`;
+    
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon] = data; // Asignamos el objeto al map
+        }
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensiondependientesEconomicosMap.get(`${dimid}-${lindidlin}`)[depEcon];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensiondependientesEconomicosMap.get(dimid)[depEcon];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[depEcon] = generoData; // Asignamos el objeto al map
+        }
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+    
+    tiempoGenteACargoUnico.forEach(tiemGente => {
+      const tiemGenteData = tiempoGenteACargoMap[tiemGente] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirTiempoGente = tiemGenteData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const tiempoGenteFilteredCount = tiempoGenteACargoCount.value.filter(psc => 
+        idsPorSeguirTiempoGente.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+        idsPorSeguirTiempoGente.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const tiemGenteCount = tiempoGenteFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const tiemGenteVal1 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const tiemGenteVal2 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const tiemGenteVal3 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const tiemGenteVal4 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const tiemGenteVal5 = tiempoGenteFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`tiempogente_${tiemGente}`] = `${((generoCountValue.length * 100)/ tiempoGenteFilteredCount.length).toFixed(0)}%`;
+
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente] = data; // Asignamos el objeto al map
+        }
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensiontiempoGenteACargoMap.get(`${dimid}-${lindidlin}`)[tiemGente];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensiontiempoGenteACargoMap.get(dimid)[tiemGente];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[tiemGente] = generoData; // Asignamos el objeto al map
+        }
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+
+    modalidadTrabajoUnico.forEach(modalidad => {
+      const modalTrabData = modalidadTrabajoMap[modalidad] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirModalidadTrabajo = modalTrabData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const modalidadTrabajoFilteredCount = modalidadTrabajoCount.value.filter(psc => 
+        idsPorSeguirModalidadTrabajo.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+      idsPorSeguirModalidadTrabajo.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const modalidadTrabCount = modalidadTrabajoFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const modalidadTrabajoVal1 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const modalidadTrabajoVal2 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const modalidadTrabajoVal3 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const modalidadTrabajoVal4 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const modalidadTrabajoVal5 = modalidadTrabajoFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`modalidatrabajo_${modalidad}`] = `${((generoCountValue.length * 100)/ modalidadTrabajoFilteredCount.length).toFixed(0)}%`;
+
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad] = data; // Asignamos el objeto al map
+        }
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensionmodalidadTrabajoMap.get(`${dimid}-${lindidlin}`)[modalidad];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensionmodalidadTrabajoMap.get(dimid)[modalidad];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[modalidad] = generoData; // Asignamos el objeto al map
+        }
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+
+    describirOrganizacionUnico.forEach(descOrg => {
+      const descOrgData = describirOrganizacionMap[descOrg] || [];
+      
+      // Extraemos los `bdinfid` de las personas que respondieron el género actual
+      const idsPorSeguirDescrbOrg = descOrgData.map(item => item.bid.bdinfid);
+
+      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+      const descOrgFilteredCount = describirOrganizacionCount.value.filter(psc => 
+        idsPorSeguirDescrbOrg.includes(psc.bid.bdinfid)
+      );
+      const generoCountValue = afirmaciones.filter(gen => 
+      idsPorSeguirDescrbOrg.includes(gen.bid.bdinfid)
+      );
+      
+
+      // Ahora podemos hacer los conteos según `bdinfindxvcn`
+      const descOrgCount = descOrgFilteredCount.filter(cefc => 
+        cefc.bdinfindxvcn >= 4
+      ).length;
+      const descOrgVal1 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 1
+      ).length;
+      const descOrgVal2 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 2
+      ).length;
+      const descOrgVal3 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 3
+      ).length;
+      const descOrgVal4 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 4
+      ).length;
+      const descOrgVal5 = descOrgFilteredCount.filter(cefc =>
+        cefc.bdinfindxvcn === 5
+      ).length;
+
+      afirmacion[`describirorganizacion_${descOrg}`] = `${((generoCountValue.length * 100)/ descOrgFilteredCount.length).toFixed(0)}%`;
+
+      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+        let data = competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg];
+        // Si no existe, inicializamos medioTransporteData
+        if (!data) {
+          data = { total: 0, count: 0 };
+          competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg] = data; // Asignamos el objeto al map
+        }
+        data.total += generoCountValue.length;
+        data.count += 1;
+      }
+
+      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+        const generoData = subDimensiondescribirOrganizacionMap.get(`${dimid}-${lindidlin}`)[descOrg];
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+
+      if (dimensionMap.has(dimid)) {
+        // Si no existe, inicializamos generoData
+        let generoData = dimensiondescribirOrganizacionMap.get(dimid)[descOrg];
+        if (!generoData) {
+          generoData = { total: 0, count: 0 };
+          dimensionGeneroMap.get(dimid)[descOrg] = generoData; // Asignamos el objeto al map
+        }
+        generoData.total += generoCountValue.length;
+        generoData.count += 1;
+      }
+    });
+
+    areaUnico.forEach(areaT => {
+      const areaTData = areaMap[areaT] || [];
+      if(areaTData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorAreaT = areaTData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const areaTFilteredCount = generosCount.value.filter(psc => 
+          idsPorAreaT.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorAreaT.includes(gen.bid.bdinfid)
+        );
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const areaTCount = areaTFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const areaTVal1 = areaTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const areaTVal2 = areaTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const areaTVal3 = areaTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const areaTVal4 = areaTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const areaTVal5 = areaTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`areaT_${areaT}`] = `${((generoCountValue.length * 100)/ areaTFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciaareaMap.get(`${lindidlin}-${indclasifi}`)[areaT];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciaareaMap.get(`${lindidlin}-${indclasifi}`)[areaT] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionareaMap.get(`${dimid}-${lindidlin}`)[areaT];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionareaMap.get(dimid)[areaT];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[areaT] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    cargoUnico.forEach(cargoT => {
+      const cargoTData = cargoMap[cargoT] || [];
+      if(cargoTData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorCargoT = cargoTData.map(item => item.bdbdo10id.bdid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const cargoTFilteredCount = generosCount.value.filter(psc => 
+          idsPorCargoT.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorCargoT.includes(gen.bid.bdinfid)
+        );
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const cargoTCount = cargoTFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const cargoTVal1 = cargoTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const cargoTVal2 = cargoTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const cargoTVal3 = cargoTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const cargoTVal4 = cargoTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const cargoTVal5 = cargoTFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`cargoT_${cargoT}`] = `${((generoCountValue.length * 100)/ cargoTFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciacargoMap.get(`${lindidlin}-${indclasifi}`)[cargoT];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciacargoMap.get(`${lindidlin}-${indclasifi}`)[cargoT] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensioncargoMap.get(`${dimid}-${lindidlin}`)[cargoT];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensioncargoMap.get(dimid)[cargoT];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[cargoT] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    cargoMologadoUnico.forEach(cargoMologado => {
+      const cargoMolData = cargoMologadoMap[cargoMologado] || [];
+      if(cargoMolData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorCargoMol = cargoMolData.map(item => item.bdbdo10id.bdid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const cargoMolFilteredCount = generosCount.value.filter(psc => 
+          idsPorCargoMol.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorCargoMol.includes(gen.bid.bdinfid)
+        );
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const cargoMolCount = cargoMolFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const cargoMolVal1 = cargoMolFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const cargoMolVal2 = cargoMolFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const cargoMolVal3 = cargoMolFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const cargoMolVal4 = cargoMolFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const cargoMolVal5 = cargoMolFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`cargomologado_${cargoMologado}`] = `${((generoCountValue.length * 100)/ cargoMolFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciacargoMologadoMap.get(`${lindidlin}-${indclasifi}`)[cargoMologado];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciacargoMologadoMap.get(`${lindidlin}-${indclasifi}`)[cargoMologado] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensioncargoMologadoMap.get(`${dimid}-${lindidlin}`)[cargoMologado];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensioncargoMologadoMap.get(dimid)[cargoMologado];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[cargoMologado] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    educacionUnico.forEach(educacion => {
+      const educacionData = educacionMap[educacion] || [];
+      if(educacionData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorEducacion = educacionData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const educacionFilteredCount = generosCount.value.filter(psc => 
+          idsPorEducacion.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorEducacion.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = educacionFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = educacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = educacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = educacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = educacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = educacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`educacion_${educacion}`] = `${((generoCountValue.length * 100)/ educacionFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciaeducacionMap.get(`${lindidlin}-${indclasifi}`)[educacion];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciaeducacionMap.get(`${lindidlin}-${indclasifi}`)[educacion] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensioneducacionMap.get(`${dimid}-${lindidlin}`)[educacion];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensioneducacionMap.get(dimid)[educacion];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[educacion] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    generacionUnico.forEach(generac => {
+      const generacionData = generacionMap[generac] || [];
+      if(generacionData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorGeneracion = generacionData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const generacionFilteredCount = generosCount.value.filter(psc => 
+          idsPorGeneracion.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorGeneracion.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = generacionFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = generacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = generacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = generacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = generacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = generacionFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`generacion_${generac}`] = `${((generoCountValue.length * 100)/ generacionFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciageneracionMap.get(`${lindidlin}-${indclasifi}`)[generac];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciaeducacionMap.get(`${lindidlin}-${indclasifi}`)[generac] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensiongeneracionMap.get(`${dimid}-${lindidlin}`)[generac];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensiongeneracionMap.get(dimid)[generac];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[generac] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE1Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE1Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele1_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE1Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE1Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE1Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE1Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE2Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE2Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele2_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE2Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE2Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE2Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE2Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE3Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE3Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele3_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE3Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE3Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE3Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE3Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE4Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE4Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele4_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE4Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE4Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE4Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE4Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE5Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE5Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele5_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE5Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE5Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE5Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE5Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE6Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE6Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele6_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE6Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE6Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE6Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE6Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE7Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE7Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele7_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE7Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE7Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE7Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE7Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE8Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE8Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele8_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE8Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE8Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE8Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE8Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE9Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE9Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele9_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE9Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE9Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE9Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE9Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    nivelE10Unico.forEach(nivelEst => {
+      const nivelEsData = nivelE10Map[nivelEst] || [];
+      if(nivelEsData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const nivelEsFilteredCount = generosCount.value.filter(psc => 
+          idsPorNivelEst.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorNivelEst.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const educacionCount = nivelEsFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`nivele10_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencianivelE10Map.get(`${lindidlin}-${indclasifi}`)[nivelEst];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencianivelE10Map.get(`${lindidlin}-${indclasifi}`)[nivelEst] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionnivelE10Map.get(`${dimid}-${lindidlin}`)[nivelEst];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionnivelE10Map.get(dimid)[nivelEst];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[nivelEst] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    paisUnico.forEach(paisU => {
+      const paisUData = paisMap[paisU] || [];
+      if(paisUData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorPais = paisUData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const paisFilteredCount = generosCount.value.filter(psc => 
+          idsPorPais.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorPais.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const paisCount = paisFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const paisVal1 = paisFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const paisVal2 = paisFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const paisVal3 = paisFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const paisVal4 = paisFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const paisVal5 = paisFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`pais_${paisU}`] = `${((generoCountValue.length * 100)/ paisFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciapaisMap.get(`${lindidlin}-${indclasifi}`)[paisU];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciapaisMap.get(`${lindidlin}-${indclasifi}`)[paisU] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionpaisMap.get(`${dimid}-${lindidlin}`)[paisU];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionpaisMap.get(dimid)[paisU];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[paisU] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    localidad1Unico.forEach(local1 => {
+      const localData = localidad1Map[local1] || [];
+      if(localData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorLocal = localData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const localFilteredCount = generosCount.value.filter(psc => 
+          idsPorLocal.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorLocal.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const localCount = localFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const localVal1 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const localVal2 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const localVal3 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const localVal4 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const localVal5 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`local1_${local1}`] = `${((generoCountValue.length * 100)/ localFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencialocalidad1Map.get(`${lindidlin}-${indclasifi}`)[local1];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencialocalidad1Map.get(`${lindidlin}-${indclasifi}`)[local1] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionlocalidad1Map.get(`${dimid}-${lindidlin}`)[local1];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionlocalidad1Map.get(dimid)[local1];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[local1] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    localidad2Unico.forEach(local1 => {
+      const localData = localidad2Map[local1] || [];
+      if(localData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorLocal = localData.map(item => item.bid.bdinfid);
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const localFilteredCount = generosCount.value.filter(psc => 
+          idsPorLocal.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorLocal.includes(gen.bid.bdinfid)
+        );
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const localCount = localFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+        const localVal1 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 1
+        ).length;
+        const localVal2 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 2
+        ).length;
+        const localVal3 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 3
+        ).length;
+        const localVal4 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 4
+        ).length;
+        const localVal5 = localFilteredCount.filter(cefc =>
+          cefc.bdinfindxvcn === 5
+        ).length;
+  
+        afirmacion[`local2_${local1}`] = `${((generoCountValue.length * 100)/ localFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competencialocalidad2Map.get(`${lindidlin}-${indclasifi}`)[local1];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competencialocalidad2Map.get(`${lindidlin}-${indclasifi}`)[local1] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
+        }
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionlocalidad2Map.get(`${dimid}-${lindidlin}`)[local1];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionlocalidad2Map.get(dimid)[local1];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[local1] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
+      }
+    });
+
+    formatted.push(afirmacion);
+    const competenciaKey = `${lindidlin}-${indclasifi}`;
+    const subDimKey = `${dimid}-${lindidlin}`;
+    if (competenciaMap.has(competenciaKey)) {
+      const competenciaData = competenciaMap.get(competenciaKey);
+      competenciaData.totalResult += afirmaciones.length;
+      competenciaData.count += 1;
+      competenciaMap.set(competenciaKey, competenciaData);
+    }
+
+    if (subDimensionMap.has(subDimKey)) {
+      const subDimensionData = subDimensionMap.get(subDimKey);
+      subDimensionData.totalResult += afirmaciones.length;
+      subDimensionData.count += 1;
+      subDimensionMap.set(subDimKey, subDimensionData);
+    }
+
+    if (dimensionMap.has(dimid)) {
+      const dimensionData = dimensionMap.get(dimid);
+      dimensionData.totalResult += afirmaciones.length;
+      dimensionData.count += 1;
+      dimensionMap.set(dimid, dimensionData);
+    }
+  });
+  // Calculate and set average results for Competencias
+  formatted.forEach(item => {
+    if (item.level === 'competencia') {
+      const competenciaData = competenciaMap.get(item.id);
+      if (competenciaData && competenciaData.count > 0) {
+        item.resultado = `${(((competenciaData.totalResult * 100 )/ competenciaData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+      }
+      // Cálculo por demograficos en competencias
+      lideresUnico.forEach(data => {
+        const lidData = competencialideresMap.get(item.id)[data];
+        if (lidData.count > 0) {
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+            (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
+          ):(
+            0
+          )}%`;
+        }
+      });
+      // Cálculo por demograficos en competencias
+      generosUnicos.forEach(genero => {
+        const generoData = competenciaGeneroMap.get(item.id)[genero];
+        if (generoData.count > 0) {
+          item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+        }
+      });
+      medioTransporteUnico.forEach(data => {
+        const demoData = competenciamedioTransporteMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoLlegadaUnico.forEach(data => {
+        const demoData = competenciatiempoLlegadaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadReunionesUnico.forEach(data => {
+        const demoData = competenciacantidadReunionesMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesMejoraUnico.forEach(data => {
+        const demoData = competenciaoportunidadesMejoraMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+        }
+      });
+      seguirDesarrollandomeUnico.forEach(data => {
+        const demoData = competenciaseguirDesarrollandomeMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesEmpleoUnico.forEach(data => {
+        const demoData = competenciaoportunidadesEmpleoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadEmpleosUnico.forEach(data => {
+        const demoData = competenciacantidadEmpleosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      padecimientoSaludUnico.forEach(data => {
+        const demoData = competenciapadecimientoSaludMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+        }
+      });
+      dependientesEconomicosUnico.forEach(data => {
+        const demoData = competenciadependientesEconomicosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoGenteACargoUnico.forEach(data => {
+        const demoData = competenciatiempoGenteACargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      modalidadTrabajoUnico.forEach(data => {
+        const demoData = competenciamodalidadTrabajoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      describirOrganizacionUnico.forEach(data => {
+        const demoData = competenciadescribirOrganizacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      areaUnico.forEach(data => {
+        const demoData = competenciaareaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoUnico.forEach(data => {
+        const demoData = competenciacargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoMologadoUnico.forEach(data => {
+        const demoData = competenciacargoMologadoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      educacionUnico.forEach(data => {
+        const demoData = competenciaeducacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      generacionUnico.forEach(data => {
+        const demoData = competenciageneracionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE1Unico.forEach(data => {
+        const demoData = competencianivelE1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE2Unico.forEach(data => {
+        const demoData = competencianivelE2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE3Unico.forEach(data => {
+        const demoData = competencianivelE3Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE4Unico.forEach(data => {
+        const demoData = competencianivelE4Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE5Unico.forEach(data => {
+        const demoData = competencianivelE5Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE6Unico.forEach(data => {
+        const demoData = competencianivelE6Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE7Unico.forEach(data => {
+        const demoData = competencianivelE7Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE8Unico.forEach(data => {
+        const demoData = competencianivelE8Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE9Unico.forEach(data => {
+        const demoData = competencianivelE9Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE10Unico.forEach(data => {
+        const demoData = competencianivelE10Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+        }
+      });
+      paisUnico.forEach(data => {
+        const demoData = competenciapaisMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad1Unico.forEach(data => {
+        const demoData = competencialocalidad1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad2Unico.forEach(data => {
+        const demoData = competencialocalidad2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+        }
+      });
+    }
+  });
+
+  formatted.forEach(item => {
+    if (item.level === 'subdimension') {
+      const subDimensionData = subDimensionMap.get(item.id);
+      if (subDimensionData && subDimensionData.count > 0) {
+        item.resultado = `${((subDimensionData.totalResult * 100 / subDimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+      }
+
+      // Cálculo por demografico submension
+      lideresUnico.forEach(data => {
+        const lidData = subDimensionlideresMap.get(item.id)[data];
+        if (lidData.count > 0) {
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+            (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
+          ):(
+            0
+          )}%`;
+        }
+      });
+
+      // Cálculo por demografico submension
+      generosUnicos.forEach(genero => {
+        const generoData = subDimensionGeneroMap.get(item.id)[genero];
+        if (generoData.count > 0) {
+          item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+        }
+      });
+      medioTransporteUnico.forEach(data => {
+        const demoData = subDimensionmedioTransporteMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoLlegadaUnico.forEach(data => {
+        const demoData = subDimensiontiempoLlegadaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadReunionesUnico.forEach(data => {
+        const demoData = subDimensioncantidadReunionesMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesMejoraUnico.forEach(data => {
+        const demoData = subDimensionoportunidadesMejoraMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+        }
+      });
+      seguirDesarrollandomeUnico.forEach(data => {
+        const demoData = subDimensionseguirDesarrollandomeMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesEmpleoUnico.forEach(data => {
+        const demoData = subDimensionoportunidadesEmpleoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadEmpleosUnico.forEach(data => {
+        const demoData = subDimensioncantidadEmpleosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      padecimientoSaludUnico.forEach(data => {
+        const demoData = subDimensionpadecimientoSaludMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+        }
+      });
+      dependientesEconomicosUnico.forEach(data => {
+        const demoData = subDimensiondependientesEconomicosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoGenteACargoUnico.forEach(data => {
+        const demoData = subDimensiontiempoGenteACargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      modalidadTrabajoUnico.forEach(data => {
+        const demoData = subDimensionmodalidadTrabajoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      describirOrganizacionUnico.forEach(data => {
+        const demoData = subDimensiondescribirOrganizacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      areaUnico.forEach(data => {
+        const demoData = subDimensionareaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoUnico.forEach(data => {
+        const demoData = subDimensioncargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoMologadoUnico.forEach(data => {
+        const demoData = subDimensioncargoMologadoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      educacionUnico.forEach(data => {
+        const demoData = subDimensioneducacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      generacionUnico.forEach(data => {
+        const demoData = subDimensiongeneracionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE1Unico.forEach(data => {
+        const demoData = subDimensionnivelE1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE2Unico.forEach(data => {
+        const demoData = subDimensionnivelE2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE3Unico.forEach(data => {
+        const demoData = subDimensionnivelE3Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE4Unico.forEach(data => {
+        const demoData = subDimensionnivelE4Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE5Unico.forEach(data => {
+        const demoData = subDimensionnivelE5Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE6Unico.forEach(data => {
+        const demoData = subDimensionnivelE6Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE7Unico.forEach(data => {
+        const demoData = subDimensionnivelE7Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE8Unico.forEach(data => {
+        const demoData = subDimensionnivelE8Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE9Unico.forEach(data => {
+        const demoData = subDimensionnivelE9Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE10Unico.forEach(data => {
+        const demoData = subDimensionnivelE10Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+        }
+      });
+      paisUnico.forEach(data => {
+        const demoData = subDimensionpaisMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad1Unico.forEach(data => {
+        const demoData = subDimensionlocalidad1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad2Unico.forEach(data => {
+        const demoData = subDimensionlocalidad2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+        }
+      });
+    }
+  });
+
+  formatted.forEach(item => {
+    if (item.level === 'dimension') {
+      const dimensionData = dimensionMap.get(item.id);
+      if (dimensionData && dimensionData.count > 0) {
+        item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
+        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
+      }
+
+      // Cálculo por dimension demograficos
+      lideresUnico.forEach(data => {
+        const lidData = dimensionlideresMap.get(item.id)[data];
+        if (lidData.count > 0) {
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+            (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
+          ):(
+            0
+          )}%`;
+        }
+      });
+      generosUnicos.forEach(genero => {
+        const generoData = dimensionGeneroMap.get(item.id)[genero];
+        if (generoData.count > 0) {
+          item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+        }
+      });
+      medioTransporteUnico.forEach(data => {
+        const demoData = dimensionmedioTransporteMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoLlegadaUnico.forEach(data => {
+        const demoData = dimensiontiempoLlegadaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadReunionesUnico.forEach(data => {
+        const demoData = dimensioncantidadReunionesMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesMejoraUnico.forEach(data => {
+        const demoData = dimensionoportunidadesMejoraMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+        }
+      });
+      seguirDesarrollandomeUnico.forEach(data => {
+        const demoData = dimensionseguirDesarrollandomeMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+        }
+      });
+      oportunidadesEmpleoUnico.forEach(data => {
+        const demoData = dimensionoportunidadesEmpleoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cantidadEmpleosUnico.forEach(data => {
+        const demoData = dimensioncantidadEmpleosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      padecimientoSaludUnico.forEach(data => {
+        const demoData = dimensionpadecimientoSaludMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+        }
+      });
+      dependientesEconomicosUnico.forEach(data => {
+        const demoData = dimensiondependientesEconomicosMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+        }
+      });
+      tiempoGenteACargoUnico.forEach(data => {
+        const demoData = dimensiontiempoGenteACargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      modalidadTrabajoUnico.forEach(data => {
+        const demoData = dimensionmodalidadTrabajoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      describirOrganizacionUnico.forEach(data => {
+        const demoData = dimensiondescribirOrganizacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      areaUnico.forEach(data => {
+        const demoData = dimensionareaMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoUnico.forEach(data => {
+        const demoData = dimensioncargoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      cargoMologadoUnico.forEach(data => {
+        const demoData = dimensioncargoMologadoMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+        }
+      });
+      educacionUnico.forEach(data => {
+        const demoData = dimensioneducacionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      generacionUnico.forEach(data => {
+        const demoData = dimensiongeneracionMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE1Unico.forEach(data => {
+        const demoData = dimensionnivelE1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE2Unico.forEach(data => {
+        const demoData = dimensionnivelE2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE3Unico.forEach(data => {
+        const demoData = dimensionnivelE3Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE4Unico.forEach(data => {
+        const demoData = dimensionnivelE4Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE5Unico.forEach(data => {
+        const demoData = dimensionnivelE5Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE6Unico.forEach(data => {
+        const demoData = dimensionnivelE6Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE7Unico.forEach(data => {
+        const demoData = dimensionnivelE7Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE8Unico.forEach(data => {
+        const demoData = dimensionnivelE8Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE9Unico.forEach(data => {
+        const demoData = dimensionnivelE9Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+        }
+      });
+      nivelE10Unico.forEach(data => {
+        const demoData = dimensionnivelE10Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+        }
+      });
+      paisUnico.forEach(data => {
+        const demoData = dimensionpaisMap.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad1Unico.forEach(data => {
+        const demoData = dimensionlocalidad1Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+        }
+      });
+      localidad2Unico.forEach(data => {
+        const demoData = dimensionlocalidad2Map.get(item.id)[data];
+        if (demoData.count > 0) {
+          item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+        }
+      });
+    }
+  });
 
   // Iterar sobre cada valor único
   generosUnicos.forEach(genero => {
@@ -6599,7 +9957,243 @@ const transformData = (
 
     formatted.push(row);
   });
-  /* '''''''++++++++++++++' */
+
+  /* PREGUNTAS ABIERTAS */
+  const rowCount = pregAbMap[pregAbUnico[0]].length;
+
+  for (let i = 0; i < rowCount; i++) {
+    // Creamos un objeto para cada fila
+    const row: any = {
+      modelo: `Modelo ${i + 1}`,  // Puedes ajustar este campo según tus datos
+    };
+  
+    // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+    pregAbUnico.forEach((pregunta) => {
+      const respuesta = pregAbMap[pregunta][i]?.bdinfindxvc || 'N/A';  
+      row[`preguntasab_${pregunta}`] = respuesta;
+    });
+    // Añade los valores para los headers de 'Nivel estructural 1'
+    nivelE1Unico.forEach((nivelEst) => {
+      // Agrega los valores correspondientes a cada 'Nivel estructural 1' por fila
+      let respuesta = {} 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer1 || 'N/A';
+      });
+      row[`nivele1_${nivelEst}`] = respuesta;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    nivelE2Unico.forEach((nivelEst) => {
+      let respuesta = {}
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer2 || 'N/A';
+      });
+      row[`nivele2_${nivelEst}`] = respuesta;  
+    });
+    
+    nivelE3Unico.forEach((nivelEst) => {
+      let respuesta = {} 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer3 || 'N/A';
+      });
+      row[`nivele3_${nivelEst}`] = respuesta;  
+    });
+    nivelE4Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer4 || 'N/A';
+      });
+      row[`nivele4_${nivelEst}`] = respuesta;  
+    });
+    nivelE5Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer5 || 'N/A';
+      });
+      row[`nivele5_${nivelEst}`] = respuesta;  
+    });
+    nivelE6Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer6 || 'N/A';
+      });
+      row[`nivele6_${nivelEst}`] = respuesta;  
+    });
+    nivelE7Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer7 || 'N/A';
+      });
+      row[`nivele7_${nivelEst}`] = respuesta;  
+    });
+    nivelE8Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer8 || 'N/A';
+      });
+      row[`nivele8_${nivelEst}`] = respuesta;  
+    });
+    nivelE9Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer9 || 'N/A';
+      });
+      row[`nivele9_${nivelEst}`] = respuesta;  
+    });
+    nivelE10Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfjer10 || 'N/A';
+      });
+      row[`nivele10_${nivelEst}`] = respuesta;  
+    });
+    localidad1Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinflocal || 'N/A';
+      });
+      row[`local1_${nivelEst}`] = respuesta; 
+    });
+    localidad2Unico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinflocalb || 'N/A';
+      });
+      row[`local2_${nivelEst}`] = respuesta;  
+    });
+    paisUnico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfcont || 'N/A';
+      });
+      row[`pais_${nivelEst}`] = respuesta;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    generacionUnico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfgenracion || 'N/A';
+      });
+      row[`generacion_${nivelEst}`] = respuesta;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    educacionUnico.forEach((nivelEst) => {
+      let respuesta = {}; 
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      pregAbUnico.forEach((pregunta) => {
+        respuesta = pregAbMap[pregunta][i]?.bdinfgradac || 'N/A';
+      });
+      row[`educacion_${nivelEst}`] = respuesta;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    generosUnicos.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = generoMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`genero_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    medioTransporteUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = medioTransporteMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`mediotransporte_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    tiempoLlegadaUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = tiempoLlegadaMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`tiempollegada_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    cantidadReunionesUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = cantidadReunionesMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`reunionesjefe_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    oportunidadesMejoraUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = oportunidadesMejoraMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`oportunidadesmejora_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    seguirDesarrollandomeUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = seguirDesarrollandomeMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`seguirdesarrollandome_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    oportunidadesEmpleoUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = oportunidadesEmpleoMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`oportunidadesempleo_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    cantidadEmpleosUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = cantidadEmpleosMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`cantidadempleos_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    padecimientoSaludUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = padecimientoSaludMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`padecimientosalud_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    dependientesEconomicosUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = dependientesEconomicosMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`dependienteseconomicos_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    tiempoGenteACargoUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = tiempoGenteACargoMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`tiempogente_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    modalidadTrabajoUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = modalidadTrabajoMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`modalidatrabajo_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    describirOrganizacionUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = describirOrganizacionMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`describirorganizacion_${nivelEst}`] = filtered[0]?.bdinfindxvc;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    areaUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = areaMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bid.bdinfid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`areaT_${nivelEst}`] = filtered[0]?.bdinfarea;
+    });
+    cargoUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = cargoMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bdbdo10id.bdid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`cargoT_${nivelEst}`] = filtered[0]?.bdcargo;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    cargoMologadoUnico.forEach((nivelEst) => {
+      // Recorremos las preguntas abiertas para agregar las respuestas en las columnas respectivas
+      const medioData = cargoMologadoMap[nivelEst] || [];
+      const filtered = medioData.filter(item => item.bdbdo10id.bdid === pregAbMap[pregAbUnico[0]][i].bid.bdinfid);
+      row[`cargomologado_${nivelEst}`] = filtered[0]?.bdcargoho;  // Aquí es donde asignas el valor de cada nivel estructural
+    });
+    formatted.push(row);  // Agregamos la fila con las respuestas a los datos formateados
+  }
+  
   return formatted;
 };
 

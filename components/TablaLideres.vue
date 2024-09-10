@@ -35,6 +35,14 @@
           </td>
         </tr>
       </template>
+      <!-- Slot para cuando no hay datos -->
+      <template v-slot:no-data>
+          <tr>
+            <td colspan="100%" class="text-center">
+              Cargando datos.
+            </td>
+          </tr>
+        </template>
     </v-data-table-virtual>
   </div>
 </template>
