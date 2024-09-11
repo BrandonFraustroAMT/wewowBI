@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 import * as XLSX from 'xlsx';
 import { useRoute } from '#app';
 
@@ -66,7 +66,6 @@ const props = defineProps({
     default: () => ({})
   }
 });
-
 
 const getItemValue = (item, key) => {
   // Mapea el key del header al valor correspondiente en el item
@@ -113,6 +112,7 @@ const benchmark10 =  ref<number>(0);
 
 const cantidadRespuestas = ref<number>(0);
 
+const initialFilters:any = ref([]);
 
 /* VARIABLRES PARA LOS DEMOGRÁFICOS */
 const generos:any = ref({});
@@ -390,7 +390,6 @@ const answersFounded = async (id: number) => {
     medioTransporteUnico.forEach(mt => {
       medioTransporteMap[mt] = medioTransporte.value.filter((mtu: any) => mtu.bdinfindxvc === mt);
     });
-    console.log('medioTransporteMap',medioTransporteMap);
 
     tiempoLlegadaUnico = [...new Set(tiempoLlegada.value.map((tl:any) => tl.bdinfindxvc))];
     tiempoLlegadaUnico.forEach(tll => {
@@ -1138,7 +1137,7 @@ watch(() => props.filterData.columns, (newColumns) => {
 
     headers.value = [
       { title: 'Modelo', sortable: false, key: 'dimension' },
-      { title: `Overall ${(overallResult.value/3).toFixed(4)}%`, sortable: false, key: 'overall' },
+      { title: `Overall ${(overallResult.value/3).toFixed(0)}%`, sortable: false, key: 'overall' },
       { title: 'Resultado', sortable: false, key: 'resultado' },
       ...valoresHeaders,
       ...dynamicHeaders,
@@ -4169,7 +4168,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       const dimensionData = dimensionMap.get(item.id);
       if (dimensionData && dimensionData.count > 0) {
         item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
-        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
+        overallResult.value += ((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value)+1;
       }
 
       // Cálculo por dimension demograficos
@@ -4635,7 +4634,12 @@ onMounted(async () => {
   await empresafounded(empresa.value);
   await answersFounded(empresa.value);
 
-  props.filterData.rows = [{ id: 35, name: 'Afirmaciones', category: 'modelo' }];
+  props.filterData.rows = [
+    { id: 32, name: 'Dimensiones', category: 'modelo' },
+    { id: 33, name: 'Subdimensiones', category: 'modelo' },
+    { id: 34, name: 'Competencias', category: 'modelo' },
+    { id: 35, name: 'Afirmaciones', category: 'modelo' }, 
+  ];
 });
 
 </script>

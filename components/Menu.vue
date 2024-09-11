@@ -42,9 +42,9 @@
         </div>
         <div class="paises-container__buttons">
           <div class="btn_campos">
-              <UButton label="Campos" @click="isOpen = true" />
+              <UButton label="Campos" @click="openModal" />
               <UModal v-model="isOpen">
-                <FiltroCampos @applyFilter="applyFilter"/>
+                <FiltroCampos :initialFilterData="filterData" @applyFilter="applyFilter" @cancel="closeModal"/>
               </UModal>
           </div>
           <div class="paises-container__img">
@@ -76,15 +76,30 @@ const empresafounded = async (id) => {
   }
 };
 
+// Recibimos el valor de filterData desde dimensiones.vue
+const props = defineProps({
+  filterData: {
+    type: Object,
+    default: () => ({}) // Valor por defecto
+  }
+});
 
 const buildLink = (path) => {
   const query = { ...route.query }; // Clona los parámetros de consulta actuales
   return { path, query }; // Devuelve la ruta con los parámetros de consulta
 };
 
+const openModal = () => {
+  isOpen.value = true;
+};
+const closeModal = () => {
+  isOpen.value = false;
+};
+
 // Define el método `applyFilter` que manejará el filtro
 const applyFilter = (filterData) => {
   emit('applyFilter', filterData);
+  console.log('filterData',filterData);
 };
 
 const emitExport = () => {

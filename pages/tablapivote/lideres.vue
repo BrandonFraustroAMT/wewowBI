@@ -2,7 +2,7 @@
     <div class="portal">
       <!-- <BarraLateral/> -->
       <div class="menu-column">
-        <Menu @applyFilter="handleFilter" @exportExcel="handleExport"/>
+        <Menu :filterData="filterData" @applyFilter="handleFilter" @exportExcel="handleExport"/>
         <div>
           <div>
               <TablaLideres :filterData="filterData" ref="tablaLideres"/>

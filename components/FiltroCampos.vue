@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const rows = ref<any[]>([]);
 const columns = ref<any[]>([]);
 const valores = ref<any[]>([]);
 const validDrop = ref(null); // Estado para validar el contenedor activo
-const emit = defineEmits(['applyFilter']);
+const emit = defineEmits(['applyFilter', 'cancel']);
+
+// Recibimos initialFilterData como prop
+const props = defineProps({
+  initialFilterData: {
+    type: Object,
+    default: () => ({}) // Valor por defecto
+  }
+});
 
 // Lista de ítems inicial, agrupando por categoría
 const items = ref([
@@ -44,7 +52,6 @@ const items = ref([
   { id: 33, name: 'Subdimensiones', category: 'modelo' },
   { id: 34, name: 'Competencias', category: 'modelo' },
   { id: 35, name: 'Afirmaciones', category: 'modelo' },
-  /* { id: 3, name: 'Benchmark 1', category: 'benchmark' }, */
   { id: 36, name: 'Valor 1', category: 'valoresCalculados' },
   { id: 37, name: 'Valor 2', category: 'valoresCalculados' },
   { id: 38, name: 'Valor 3', category: 'valoresCalculados' },
@@ -153,11 +160,21 @@ const removeItem = (item, container) => {
   }
 };
 
-
 // Función para expandir o colapsar categorías
 const toggleCategory = (category) => {
   expandedCategories.value[category] = !expandedCategories.value[category];
 };
+
+// Observamos los cambios en initialFilterData para inicializar los valores
+watch(() => props.initialFilterData, (newData) => {
+  if (newData && Object.keys(newData).length > 0) {
+    rows.value = newData.rows?.map(nd => items.value.find(item => item.id === nd.id)) || []; // Ejemplo para 'Dimensiones'
+    columns.value = newData.columns?.map(nd => items.value.find(item => item.id === nd.id)) || []; // Ejemplo para 'Subdimensiones'
+    valores.value = newData.valores?.map(nd => items.value.find(item => item.id === nd.id)) || []; // Ejemplo para 'Afirmaciones'
+  }
+}, { immediate: true }); // Se ejecuta inmediatamente
+
+
 
 // Emitir filas y columnas seleccionadas cuando se haga clic en "Aplicar"
 const applyFilter = () => {
@@ -166,6 +183,10 @@ const applyFilter = () => {
     columns: columns.value,
     valores: valores.value,
   });
+};
+
+const cancel = () => {
+  emit('cancel');
 };
 
 </script>
@@ -177,7 +198,7 @@ const applyFilter = () => {
             <div class="filtro-campos__title"><h3>Campos</h3></div>
             <div class="filtro-campos__buttons">
                 <button class="btn-apply" @click="applyFilter">Aplicar</button>
-                <button class="btn-cancel">Cancelar</button>
+                <button class="btn-cancel" @click="cancel">Cancelar</button>
             </div>
         </div>
         <div class="drag-container">

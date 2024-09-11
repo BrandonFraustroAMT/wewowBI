@@ -4192,7 +4192,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       const dimensionData = dimensionMap.get(item.id);
       if (dimensionData && dimensionData.count > 0) {
         item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
-        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
+        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value+1;
       }
 
       // Cálculo por dimension demograficos
@@ -4673,7 +4673,11 @@ onMounted(async () => {
   await answersFounded(empresa.value);
 
 
-  props.filterData.rows = [{ id: 35, name: 'Afirmaciones', category: 'modelo' }];
+  props.filterData.rows = [
+    { id: 32, name: 'Dimensiones', category: 'modelo' },
+    { id: 33, name: 'Subdimensiones', category: 'modelo' },
+    { id: 34, name: 'Competencias', category: 'modelo' },
+    { id: 35, name: 'Afirmaciones', category: 'modelo' },];
   props.filterData.columns = [{ id: 41, name: 'Lideres', category: 'lidPreg' },];
 });
 
