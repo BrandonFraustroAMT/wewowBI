@@ -516,10 +516,17 @@
         localidad2Map[psu] = dataRespuestas.filter((ps: any) => ps.bdinflocalb === psu);
       });
 
-      pregAbUnico = [...new Set(dataDimensions.filter((rd:any) => rd.dimid === 5).map((mt:any) => mt.indxldesc))];
+      pregAbUnico = [
+        "Qué es lo más WOW de trabajar en tu organización?",
+        "Qué es lo menos WOW de trabajar en tu organización?",
+        "¿Si tu empresa fuera un vehículo que vehículo sería?", 
+        "Menciona 3 características que explican porque tu organización sería ese vehículo."
+      ];
       pregAbUnico.forEach((psu, index) => {
         pregAbMap[psu] = pregAbiertas.value.filter((ps: any) => ps.bid.bdinfidindn === (index+1));
       });
+      console.log('pregAbMap',pregAbMap);
+      console.log('pregAbUnico',pregAbUnico);
   
       tableData.value = transformData(
         pregAbMap, pregAbUnico,
