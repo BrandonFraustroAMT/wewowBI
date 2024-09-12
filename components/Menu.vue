@@ -29,7 +29,7 @@
         <div class="paises-container__img">
           <button class="btn_menu">Filtro</button>
         </div>
-        <div class="tablas-pivote">
+        <div v-if="isTablePivotePage" class="tablas-pivote">
           <nav class="menu-nav">
             <ul class="menu-slice__link">
               <li><NuxtLink :to="buildLink('/tablapivote/dimensiones')">Dimensiones</NuxtLink></li>
@@ -58,7 +58,7 @@
 
 <script setup>
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRoute } from '#app';
 import empresaService from '~/services/Empresas';
 
@@ -95,6 +95,12 @@ const openModal = () => {
 const closeModal = () => {
   isOpen.value = false;
 };
+
+// Computed para verificar si la ruta es /tablapivote/dimensiones
+const isTablePivotePage = computed(() => {
+  return route.path.startsWith('/tablapivote/dimensiones');
+});
+
 
 // Define el método `applyFilter` que manejará el filtro
 const applyFilter = (filterData) => {
