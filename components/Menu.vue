@@ -40,7 +40,7 @@
             </ul>
           </nav>
         </div>
-        <div class="paises-container__buttons">
+        <div v-if="isTablePivotePage" class="paises-container__buttons">
           <div class="btn_campos">
               <UButton label="Campos" @click="openModal" />
               <UModal v-model="isOpen">
