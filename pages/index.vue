@@ -4,7 +4,6 @@
     <div class="portal">
       <div class="menu-column">
         <Menu :empresa="empresa" :mod="mod" :sub="sub"/>
-        <h2>Portada</h2>
       </div>
     </div>
   </div>
@@ -13,53 +12,56 @@
   </div> -->
 </template>
 
-<script setup="ts">
+<script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
 import { useRoute } from '#app';
-import { validateToken } from '~/services/Validatetoken';
 
 const route = useRoute();
 const empresa = ref(0);
 const mod = ref(0);
 const sub = ref(0);
-/* const isAuthenticated = ref(false); */
+const tokenPayload = ref<any>(null);
 
 onMounted(() => {
-  const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
-  const modid = route.query.modid ? Number(route.query.modid) : null;
-  const subid = route.query.subid ? Number(route.query.subid) : null;
-  empresa.value = isNaN(empresaId) ? null : empresaId;
-  mod.value = isNaN(modid) ? null : empresaId;
-  sub.value = isNaN(subid) ? null : empresaId;
+  const route = useRoute();
+
+  // Decodificar el token en Base64
+  const token = route.query.token as string;
+  if (token) {
+    try {
+      // Verificar si el token necesita padding
+      const decodedToken = decodeBase64UrlSafe(token);
+
+      // Tratar de decodificar como UTF-16 y luego convertir a JSON
+      tokenPayload.value = parseTokenAsUtf16(decodedToken);
+
+      empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
+      mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;
+      sub.value = tokenPayload.value.subid ? Number(tokenPayload.value.subid) : null;
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+    }
+  }
 });
 
-/* 
+// Función para decodificar Base64 URL-Safe
+function decodeBase64UrlSafe(base64String: string) {
+  // Reemplaza los caracteres que cambian en las URLs
+  const base64 = base64String.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(base64);
+}
 
-https://sitio.com/portada?empresa=2&token=eyJhbGc...
-
-
-onMounted(async () => {
-  const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
-  empresa.value = isNaN(empresaId) ? null : empresaId;
-
-  // Extrae el token de la URL
-  const token = route.query.token as string;
-
-  if (token) {
-    // Valida el token
-    isAuthenticated.value = await validateToken(token);
-
-    if (!isAuthenticated.value) {
-      // Redirige al usuario a una página de acceso denegado o login si el token no es válido
-      router.push('/login');
-    }
-  } else {
-    // Redirige al usuario a una página de acceso denegado o login si no hay token
-    router.push('/login');
+// Función para convertir UTF-16 a cadena legible
+function parseTokenAsUtf16(decodedString: string) {
+  let result = '';
+  for (let i = 0; i < decodedString.length; i += 2) {
+    // Obtiene dos bytes a la vez (UTF-16 usa 2 bytes por carácter)
+    const code = decodedString.charCodeAt(i) + (decodedString.charCodeAt(i + 1) << 8);
+    result += String.fromCharCode(code);
   }
-})
-*/
+  return JSON.parse(result); // Intenta convertir la cadena a un objeto JSON
+}
 </script>
 
 <style>

@@ -27,7 +27,70 @@
     <section class="paises">
       <div class="paises-container">
         <div class="paises-container__img">
-          <button class="btn_menu">Filtro</button>
+          <div class="dropdown-container">
+            <button class="dropdown-button" @click="toggleDropdown">
+              Filtro
+              <span :class="dropdownOpen ? 'rotate-up' : 'rotate-down'">&#9662;</span> <!-- Icono de flecha -->
+            </button>
+          
+            <!-- Dropdown Menu -->
+            <div v-if="dropdownOpen" class="dropdown-menu">
+              <ul>
+                <!-- Sin Filtro -->
+                <li @click="handleClick('Sinfiltro')">
+                  Sin filtro
+                </li>
+                <!-- Pais de Certificacion -->
+                <li @click="handleClick('Paiscertificacion')">
+                  Pais de certificación
+                </li>
+                <!-- Business Unit -->
+                <li @click="handleClick('Businessunit')">
+                  Business Unit
+                </li>
+              
+                <!-- País -->
+                <div >
+                  País
+                  <ul v-if="selectedOption === 'Pais' || selectedOption === 'Sinfiltro'">
+                    <li v-for="(pais, index) in paisUnico" :key="index" >
+                      <div @click="handleClick('Pais', pais)">
+                        {{ pais }}
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              
+                <!-- Localidad 1 -->
+                <div>
+                  Localidad 1
+                  <ul v-if="selectedOption === 'Localidad1' || selectedOption === 'Sinfiltro'">
+                    <li v-for="(localidad1, index) in localidad1Unico" :key="index">
+                      <div @click="handleClick('Localidad1', localidad1)">
+                        {{ localidad1 }}
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              
+                <!-- Localidad 2 -->
+                <div>
+                  Localidad 2
+                  <ul v-if="selectedOption === 'Localidad2' || selectedOption === 'Sinfiltro'">
+                    <li v-for="(localidad2, index) in localidad2Unico" :key="index">
+                      <div @click="handleClick('Localidad2', localidad2)">
+                        {{ localidad2 }}
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <!-- Lideres -->
+                <li @click="handleClick('Lideres')">
+                  Lideres
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
         <div v-if="isTablePivotePage" class="tablas-pivote">
           <nav class="menu-nav">
@@ -61,28 +124,69 @@
 import { onMounted, ref, computed } from 'vue';
 import { useRoute } from '#app';
 import empresaService from '~/services/Empresas';
+import respuestasService from '~/services/Respuestas';
 
 const route = useRoute();
-const empresa = ref(0);
 const empresaData = ref({});
 const isOpen = ref(false)
 const emit = defineEmits(['applyFilter', 'exportExcel']);
 
-const empresafounded = async (id) => {
-  if (id) {
-    const data = await empresaService.getEmpresaId(id);
-    empresaData.value = data;
-    //console.log("Datos de la empresa: ", empresaData.value);
-  }
-};
+
+const respuestasData = ref([]);
+const localidad1 = ref({});  
+const localidad2 = ref({});
+const pais = ref({});
+let localidad1Unico = [];
+let localidad2Unico = [];
+let paisUnico = [];
+
+const dropdownOpen = ref(false);
+const selectedOption = ref('Sinfiltro'); 
 
 // Recibimos el valor de filterData desde dimensiones.vue
 const props = defineProps({
   filterData: {
     type: Object,
     default: () => ({}) // Valor por defecto
-  }
+  },
+  empresa: {
+    type: Number,
+    required: true,
+  },
+  mod: {
+    type: Number,
+    required: true,
+  },
+  sub: {
+    type: Number,
+    required: true,
+  },
 });
+
+// Alternar el menú dropdown
+const toggleDropdown = () => {
+  dropdownOpen.value = !dropdownOpen.value;
+};
+
+const empresafounded = async (id) => {
+  if (id) {
+    const data = await empresaService.getEmpresaId(id);
+    empresaData.value = data;
+
+    const dataAnswers = await respuestasService.getAnswersID(id);
+    
+    respuestasData.value = dataAnswers;
+    const dataRespuestas = respuestasData.value.filter((rd) => rd.bid.bdinfidlinn == 1 && rd.bid.bdinfidindn == 1)
+    localidad1.value = dataRespuestas.map((dr) => dr.bdinflocal);
+    localidad2.value = dataRespuestas.map((dr) => dr.bdinflocalb);
+    pais.value = dataRespuestas.map((dr) => dr.bdinfcont);
+    paisUnico = [...new Set(pais.value.filter((mt) => mt !== 'VACANTE').map((mt) => mt))];
+    localidad1Unico = [...new Set(localidad1.value.filter((mt) => mt !== 'VACANTE').map((mt) => mt))];
+    localidad2Unico = [...new Set(localidad2.value.filter((mt) => mt !== 'VACANTE').map((mt) => mt))];
+
+  }
+};
+
 
 const buildLink = (path) => {
   const query = { ...route.query }; // Clona los parámetros de consulta actuales
@@ -98,26 +202,65 @@ const closeModal = () => {
 
 // Computed para verificar si la ruta es /tablapivote/dimensiones
 const isTablePivotePage = computed(() => {
-  return route.path.startsWith('/tablapivote/dimensiones');
+  return route.path.startsWith('/tablapivote/');
 });
 
 
 // Define el método `applyFilter` que manejará el filtro
 const applyFilter = (filterData) => {
   emit('applyFilter', filterData);
-  console.log('filterData',filterData);
 };
 
 const emitExport = () => {
   emit('exportExcel');
 };
 
+// Llama a la función empresafounded cuando se monte el componente
 onMounted(() => {
-  const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
-  empresa.value = isNaN(empresaId) ? null : empresaId;
-  empresafounded(empresa.value);
+  empresafounded(props.empresa);
 });
 
+
+/* BOTON FILTRO */
+const handleClick = (option, value = null) => {
+  selectedOption.value = option;
+  // Actualiza filterData con el valor seleccionado
+  const filterData = { ...props.filterData };
+
+  if (option === 'Pais') {
+    filterData.pais = value;
+  } else if (option === 'Localidad1') {
+    filterData.localidad1 = value;
+  } else if (option === 'Localidad2') {
+    filterData.localidad2 = value;
+  } else if (option === 'Sinfiltro') {
+    filterData.pais = null;
+    filterData.localidad1 = null;
+    filterData.localidad2 = null;
+  } else if (option === 'Paiscertificacion') {
+    filterData.pais = null;
+    filterData.localidad1 = null;
+    filterData.localidad2 = null;
+  } else if (option === 'Businessunit') {
+    filterData.pais = null;
+    filterData.localidad1 = null;
+    filterData.localidad2 = null;
+  } else if (option === 'Lideres') {
+    filterData.pais = null;
+    filterData.localidad1 = null;
+    filterData.localidad2 = null;
+  }
+
+  // Emitir los datos del filtro actualizados
+  applyFilter(filterData);
+};
+
+// Verifica cambios en los props (en caso de que cambie la empresa)
+watch(() => props.empresa, (newEmpresa) => {
+  if (newEmpresa) {
+    empresafounded(newEmpresa);
+  }
+});
 </script>
 
 <style>
@@ -270,4 +413,61 @@ onMounted(() => {
   .btn_campos {
     margin-right: 20px;
   }
+
+  .dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  background-color: #D2DFE8;
+    color: #3D495B;
+    padding: 5px 10px;
+    margin-right: 20px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+}
+  .dropdown-button:hover{
+    background-color: #bcbfc1;
+  }
+
+.dropdown-button span {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.rotate-up {
+  transform: rotate(180deg);
+}
+
+.rotate-down {
+  transform: rotate(0deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 8px 0;
+  width: 200px;
+  z-index: 1000;
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f1f1f1;
+}
 </style>

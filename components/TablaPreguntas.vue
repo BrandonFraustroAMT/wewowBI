@@ -70,8 +70,10 @@
   
   
   // Variables reactivas
-  const route = useRoute();
   const empresa = ref<number>(0);
+  const mod = ref<number>(0);
+  const sub = ref<number>(0);
+  const tokenPayload = ref<any>(null);
   const empresaData:any = ref({});
   const tableData:any = ref([]);
   const formattedData:any = ref([]);
@@ -525,8 +527,6 @@
       pregAbUnico.forEach((psu, index) => {
         pregAbMap[psu] = pregAbiertas.value.filter((ps: any) => ps.bid.bdinfidindn === (index+1));
       });
-      console.log('pregAbMap',pregAbMap);
-      console.log('pregAbUnico',pregAbUnico);
   
       tableData.value = transformData(
         pregAbMap, pregAbUnico,
@@ -1115,9 +1115,31 @@
   
   
   // Filtrar los datos según la selección
-  const applyFilter = () => {
-    
-  };
+const applyFilter = () => {
+  /* formattedData.value = [];
+  selectedLevels.value = [];
+
+  if (props.filterData && Array.isArray(props.filterData.rows)) {
+    // Filtra datos basados en los géneros disponibles
+    if (props.filterData.rows.some(nc => nc.name === 'Genero')) {
+      formattedData.value.push({
+        modelo: 'Géneros',
+        expandable: false,
+        isCategoryTitle: true
+      });
+      generosUnicos.forEach(data => {
+        // Filtra los datos de tableData para el género actual
+        const filteredItems = tableData.value
+          .filter(item => item.modelo === data);
+
+        // Agrega los datos filtrados a formattedData
+        formattedData.value.push(...filteredItems);
+      });
+    }
+  }else {
+    console.error("filterData o filterData.rows no está definido o no es un array.");
+  } */
+};
   
   
   // Observa los cambios en filterData para aplicar el filtro automáticamente
@@ -1632,8 +1654,25 @@
   
   // Lifecycle hook para cargar datos al montar el componente
   onMounted(async () => {
-    const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
-    empresa.value = isNaN(empresaId) ? null : empresaId;
+    const route = useRoute();
+
+  // Decodificar el token en Base64
+  const token = route.query.token as string;
+  if (token) {
+    try {
+      // Verificar si el token necesita padding
+      const decodedToken = decodeBase64UrlSafe(token);
+
+      // Tratar de decodificar como UTF-16 y luego convertir a JSON
+      tokenPayload.value = parseTokenAsUtf16(decodedToken);
+
+      empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
+      mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;
+      sub.value = tokenPayload.value.subid ? Number(tokenPayload.value.subid) : null;
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+    }
+  }
     await empresafounded(empresa.value);
     await answersFounded(empresa.value);
 
@@ -1645,6 +1684,23 @@
     ];
   });
   
+  // Función para decodificar Base64 URL-Safe
+function decodeBase64UrlSafe(base64String: string) {
+  // Reemplaza los caracteres que cambian en las URLs
+  const base64 = base64String.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(base64);
+}
+
+// Función para convertir UTF-16 a cadena legible
+function parseTokenAsUtf16(decodedString: string) {
+  let result = '';
+  for (let i = 0; i < decodedString.length; i += 2) {
+    // Obtiene dos bytes a la vez (UTF-16 usa 2 bytes por carácter)
+    const code = decodedString.charCodeAt(i) + (decodedString.charCodeAt(i + 1) << 8);
+    result += String.fromCharCode(code);
+  }
+  return JSON.parse(result); // Intenta convertir la cadena a un objeto JSON
+}
   </script>
   
   <style scoped>

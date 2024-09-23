@@ -8,7 +8,7 @@
       <template v-slot:item="{ item }">
         <tr>
             <!-- Columnas estáticas -->
-            <td v-for="header in headers" :key="header.key">
+            <td v-for="header in headers" :key="header.key" :style="{ paddingLeft: `${getPadding(item.level)}px` }">
               <span>{{ item[header.key] || '-' }}</span> 
             </td>
           </tr>
@@ -69,8 +69,10 @@ const getItemValue = (item, key) => {
 
 
 // Variables reactivas
-const route = useRoute();
 const empresa = ref<number>(0);
+const mod = ref<number>(0);
+const sub = ref<number>(0);
+const tokenPayload = ref<any>(null);
 const empresaData:any = ref({});
 const tableData:any = ref([]);
 const formattedData:any = ref([]);
@@ -181,7 +183,39 @@ const pregAbiertas:any = ref({});
 const pregAbiertasCount:any = ref({});
 
 let overallResult = ref(0);
-
+const overallGeneroResult = ref<{ [key: string]: number }>({});
+const overallMedioTResult = ref<{ [key: string]: number }>({});
+const overallTiempoLResult = ref<{ [key: string]: number }>({});
+const overallCantiReuResult = ref<{ [key: string]: number }>({});
+const overallOportMejResult = ref<{ [key: string]: number }>({});
+const overallSeguDesResult = ref<{ [key: string]: number }>({});
+const overallOportEmpResult = ref<{ [key: string]: number }>({});
+const overallCantiEmpResult = ref<{ [key: string]: number }>({});
+const overallPadeSaludResult = ref<{ [key: string]: number }>({});
+const overallDependEconResult = ref<{ [key: string]: number }>({});
+const overallTiempoGenteResult = ref<{ [key: string]: number }>({});
+const overallModalidadResult = ref<{ [key: string]: number }>({});
+const overallDescOrgResult = ref<{ [key: string]: number }>({});
+const overallAñosTrabResult = ref<{ [key: string]: number }>({});
+const overallAreaResult = ref<{ [key: string]: number }>({});
+const overallCargoResult = ref<{ [key: string]: number }>({});
+const overallCargoMolResult = ref<{ [key: string]: number }>({});
+const overallEducacionResult = ref<{ [key: string]: number }>({});
+const overallGenerResult = ref<{ [key: string]: number }>({});
+const overallLocal1Result = ref<{ [key: string]: number }>({});
+const overallLocal2Result = ref<{ [key: string]: number }>({});
+const overallNivel1Result = ref<{ [key: string]: number }>({});
+const overallNivel2Result = ref<{ [key: string]: number }>({});
+const overallNivel3Result = ref<{ [key: string]: number }>({});
+const overallNivel4Result = ref<{ [key: string]: number }>({});
+const overallNivel5Result = ref<{ [key: string]: number }>({});
+const overallNivel6Result = ref<{ [key: string]: number }>({});
+const overallNivel7Result = ref<{ [key: string]: number }>({});
+const overallNivel8Result = ref<{ [key: string]: number }>({});
+const overallNivel9Result = ref<{ [key: string]: number }>({});
+const overallNivel10Result = ref<{ [key: string]: number }>({});
+const overallPaisResult = ref<{ [key: string]: number }>({});
+const overallLideresResult = ref<{ [key: string]: number }>({});
 
 let generosUnicos: string[] = [];
 let medioTransporteUnico: string[] = [];
@@ -624,11 +658,25 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
 
       generosUnicos.forEach((genero, index) => {
-          dynamicHeaders.push({
-              title: genero,
+        const generoOverall = overallGeneroResult.value[genero]
+          ? `${(overallGeneroResult.value[genero]/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
+
+        dynamicHeaders.push({
+            title: `${genero} Overall ${generoOverall}`,
+            sortable: false,
+            key: `genero_${genero}`,
+        });
+        // valores por demográfico
+        if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+          props.filterData.valores.forEach((val, valIndex) => {
+            dynamicHeaders.push({
+              title: `Valor ${valIndex + 1} (${genero})`,
               sortable: false,
-              key: `genero_${genero}`,
+              key: `genero_${genero}_val${valIndex + 1}`,
+            });
           });
+        }
       });
     }
 
@@ -642,11 +690,25 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       medioTransporteUnico.forEach((mt, index) => {
+        const dataOverall = overallMedioTResult.value[mt]
+          ? `${((overallMedioTResult.value[mt])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
+
           dynamicHeaders.push({
-              title: mt,
+              title: `${mt} Overall ${dataOverall}`,
               sortable: false,
               key: `mediotransporte_${mt}`,
           });
+
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${mt})`,
+                sortable: false,
+                key: `mediotransporte_${mt}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -660,11 +722,24 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       tiempoLlegadaUnico.forEach((tll, index) => {
+        const dataOverall = overallTiempoLResult.value[tll]
+          ? `${((overallTiempoLResult.value[tll])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
+
           dynamicHeaders.push({
-              title: tll,
+              title: `${tll} Overall ${dataOverall}`,
               sortable: false,
               key: `tiempollegada_${tll}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${tll})`,
+                sortable: false,
+                key: `tiempollegada_${tll}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -678,11 +753,24 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       cantidadReunionesUnico.forEach((cru, index) => {
-          dynamicHeaders.push({
-              title: cru,
+        const dataOverall = overallCantiReuResult.value[cru]
+          ? `${((overallCantiReuResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
+
+        dynamicHeaders.push({
+            title: `${cru} Overall ${dataOverall}`,
+            sortable: false,
+            key: `reunionesjefe_${cru}`,
+        });
+        if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+          props.filterData.valores.forEach((val, valIndex) => {
+            dynamicHeaders.push({
+              title: `Valor ${valIndex + 1} (${cru})`,
               sortable: false,
-              key: `reunionesjefe_${cru}`,
+              key: `reunionesjefe_${cru}_val${valIndex + 1}`,
+            });
           });
+        }
       });
     }
 
@@ -696,11 +784,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       oportunidadesMejoraUnico.forEach((cru, index) => {
+        const dataOverall = overallOportMejResult.value[cru]
+          ? `${((overallOportMejResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `oportunidadesmejora_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `oportunidadesmejora_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Seguir desarrollandome' está en los nuevos columns
@@ -713,11 +813,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       seguirDesarrollandomeUnico.forEach((cru, index) => {
+        const dataOverall = overallSeguDesResult.value[cru]
+          ? `${((overallSeguDesResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `seguirdesarrollandome_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `seguirdesarrollandome_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Buscar oportunidades de empleo' está en los nuevos columns
@@ -730,11 +842,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       oportunidadesEmpleoUnico.forEach((cru, index) => {
+        const dataOverall = overallOportEmpResult.value[cru]
+          ? `${((overallOportEmpResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `oportunidadesempleo_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `oportunidadesempleo_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Cantidad de empleos' está en los nuevos columns
@@ -747,11 +871,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       cantidadEmpleosUnico.forEach((cru, index) => {
+        const dataOverall = overallCantiEmpResult.value[cru]
+          ? `${((overallCantiEmpResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `cantidadempleos_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `cantidadempleos_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Cantidad de empleos' está en los nuevos columns
@@ -764,11 +900,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       padecimientoSaludUnico.forEach((cru, index) => {
+        const dataOverall = overallPadeSaludResult.value[cru]
+          ? `${((overallPadeSaludResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `padecimientosalud_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `padecimientosalud_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -781,11 +929,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       dependientesEconomicosUnico.forEach((cru, index) => {
+        const dataOverall = overallDependEconResult.value[cru]
+          ? `${((overallDependEconResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `dependienteseconomicos_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `dependienteseconomicos_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -799,11 +959,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       tiempoGenteACargoUnico.forEach((cru, index) => {
+        const dataOverall = overallTiempoGenteResult.value[cru]
+          ? `${((overallTiempoGenteResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `tiempogente_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `tiempogente_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -817,11 +989,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       modalidadTrabajoUnico.forEach((cru, index) => {
+        const dataOverall = overallModalidadResult.value[cru]
+          ? `${((overallModalidadResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `modalidatrabajo_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `modalidatrabajo_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -835,11 +1019,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       describirOrganizacionUnico.forEach((cru, index) => {
+        const dataOverall = overallDescOrgResult.value[cru]
+          ? `${((overallDescOrgResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `describirorganizacion_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `describirorganizacion_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -852,11 +1048,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       areaUnico.forEach((cru, index) => {
+        const dataOverall = overallAreaResult.value[cru]
+          ? `${((overallAreaResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `areaT_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `areaT_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -869,11 +1077,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       cargoUnico.forEach((cru, index) => {
+        const dataOverall = overallCargoResult.value[cru]
+          ? `${((overallCargoResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `cargoT_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `cargoT_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -886,11 +1106,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       cargoMologadoUnico.forEach((cru, index) => {
+        const dataOverall = overallCargoMolResult.value[cru]
+          ? `${((overallCargoMolResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `cargomologado_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `cargomologado_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -903,11 +1135,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       educacionUnico.forEach((cru, index) => {
+        const dataOverall = overallEducacionResult.value[cru]
+          ? `${((overallEducacionResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `educacion_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `educacion_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -920,11 +1164,23 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       generacionUnico.forEach((cru, index) => {
+        const dataOverall = overallGenerResult.value[cru]
+          ? `${((overallGenerResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `generacion_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `generacion_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -933,15 +1189,28 @@ watch(() => props.filterData.columns, (newColumns) => {
           title: 'Nivel estructural 1',
           align: 'center',
           key: 'nivele1-header',
+          colspan: nivelE1Unico.length,
       });
+      
       nivelE1Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel1Result.value[cru]
+          ? `${((overallNivel1Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele1_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele1_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
-      
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
     if (newColumns.map(nc => nc.name).includes('Nivel estructural 2')) {
@@ -951,13 +1220,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele2-header',
           colspan: nivelE2Unico.length,
       });
-
+      
       nivelE2Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel2Result.value[cru]
+          ? `${((overallNivel2Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele2_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele2_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -968,12 +1249,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele3-header',
           colspan: nivelE3Unico.length,
       });
+      
       nivelE3Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel3Result.value[cru]
+          ? `${((overallNivel3Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele3_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele3_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -984,12 +1278,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele4-header',
           colspan: nivelE4Unico.length,
       });
+      
       nivelE4Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel4Result.value[cru]
+          ? `${((overallNivel4Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele4_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele4_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1000,12 +1307,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele5-header',
           colspan: nivelE5Unico.length,
       });
+      
       nivelE5Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel5Result.value[cru]
+          ? `${((overallNivel5Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele5_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele5_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1016,12 +1336,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele6-header',
           colspan: nivelE6Unico.length,
       });
+      
       nivelE6Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel6Result.value[cru]
+          ? `${((overallNivel6Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele6_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele6_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1032,12 +1365,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele7-header',
           colspan: nivelE7Unico.length,
       });
+      
       nivelE7Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel7Result.value[cru]
+          ? `${((overallNivel7Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele7_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele7_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1048,12 +1394,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele8-header',
           colspan: nivelE8Unico.length,
       });
+      
       nivelE8Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel8Result.value[cru]
+          ? `${((overallNivel8Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele8_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele8_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1064,12 +1423,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele9-header',
           colspan: nivelE9Unico.length,
       });
+      
       nivelE9Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel9Result.value[cru]
+          ? `${((overallNivel9Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele9_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele9_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1080,12 +1452,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'nivele10-header',
           colspan: nivelE10Unico.length,
       });
+      
       nivelE10Unico.forEach((cru, index) => {
+        const dataOverall = overallNivel10Result.value[cru]
+          ? `${((overallNivel10Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `nivele10_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `nivele10_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -1097,12 +1482,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'pais-header',
           colspan: paisUnico.length,
       });
+      
       paisUnico.forEach((cru, index) => {
+        const dataOverall = overallPaisResult.value[cru]
+          ? `${((overallPaisResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `pais_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `pais_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
 
@@ -1114,12 +1512,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'local1-header',
           colspan: localidad1Unico.length,
       });
+      
       localidad1Unico.forEach((cru, index) => {
+        const dataOverall = overallLocal1Result.value[cru]
+          ? `${((overallLocal1Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `local1_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `local1_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // Verifica si 'Dependientes económicos' está en los nuevos columns
@@ -1130,12 +1541,25 @@ watch(() => props.filterData.columns, (newColumns) => {
           key: 'local2-header',
           colspan: localidad2Unico.length,
       });
+      
       localidad2Unico.forEach((cru, index) => {
+        const dataOverall = overallLocal2Result.value[cru]
+          ? `${((overallLocal2Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `local2_${cru}`,
           });
+          if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
+            props.filterData.valores.forEach((val, valIndex) => {
+              dynamicHeaders.push({
+                title: `Valor ${valIndex + 1} (${cru})`,
+                sortable: false,
+                key: `local2_${cru}_val${valIndex + 1}`,
+              });
+            });
+          }
       });
     }
     // columns
@@ -1148,8 +1572,12 @@ watch(() => props.filterData.columns, (newColumns) => {
       });
       
       lideresUnico.forEach((cru, index) => {
+        const dataOverall = overallLideresResult.value[cru]
+          ? `${((overallLideresResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          : '0%';  // Valor por defecto si no hay resultados
+
           dynamicHeaders.push({
-              title: cru,
+              title: `${cru} Overall ${dataOverall}`,
               sortable: false,
               key: `lideres_${cru}`,
           });
@@ -1891,6 +2319,7 @@ const transformData = (
   const competencialideresMap = new Map();
 
   //const tableFilterData = contentTable;
+  //const tableFilterData = contentTable;
   dataDimensions.forEach(item => {
     const {
       empid, dimid, dimdesc, lindidlin, linddescc, indclasifi, indxlidln, indxldesc
@@ -1936,16 +2365,11 @@ const transformData = (
     // Handle Dimensions
     if (!addedItems.has(dimid)) {
       formatted.push({
-        modelo: dimdesc,
+        name: dimdesc,
         level: 'dimension',
         id: dimid,
         expandable: true,
         resultado: `0`,
-        val1: `0`,
-        val2: `0`,
-        val3: `0`,
-        val4: `0`,
-        val5: `0`,
         // Inicializar géneros con '0%'
         ...generosUnicos.reduce((acc, dat) => ({ ...acc, [`genero_${dat}`]: '0%' }), {}),
         ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
@@ -2021,17 +2445,12 @@ const transformData = (
     // Handle Subdimensions
     if (!addedItems.has(`${dimid}-${lindidlin}`)) {
       formatted.push({
-        modelo: linddescc.trim(),
+        name: linddescc.trim(),
         level: 'subdimension',
         id: `${dimid}-${lindidlin}`,
         parent: dimid,
         expandable: true,
         resultado: `0`,
-        val1: `0`,
-        val2: `0`,
-        val3: `0`,
-        val4: `0`,
-        val5: `0`,
         ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
         ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
         ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
@@ -2107,7 +2526,7 @@ const transformData = (
     // Handle Competencias
     if (!addedItems.has(`${lindidlin}-${indclasifi}`)) {
       formatted.push({
-        modelo: indclasifi,
+        name: indclasifi,
         level: 'competencia',
         id: `${lindidlin}-${indclasifi}`,
         parent: `${dimid}-${lindidlin}`,
@@ -2118,37 +2537,6 @@ const transformData = (
         val3: `0`,
         val4: `0`,
         val5: `0`,
-        ...generosUnicos.reduce((acc, genero) => ({ ...acc, [`genero_${genero}`]: '0%' }), {}),
-        ...medioTransporteUnico.reduce((acc, dat) => ({ ...acc, [`mediotransporte_${dat}`]: '0%' }), {}),
-        ...tiempoLlegadaUnico.reduce((acc, dat) => ({ ...acc, [`tiempollegada_${dat}`]: '0%' }), {}),
-        ...cantidadReunionesUnico.reduce((acc, dat) => ({ ...acc, [`reunionesjefe_${dat}`]: '0%' }), {}),
-        ...oportunidadesMejoraUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesmejora_${dat}`]: '0%' }), {}),
-        ...seguirDesarrollandomeUnico.reduce((acc, dat) => ({ ...acc, [`seguirdesarrollandome_${dat}`]: '0%' }), {}),
-        ...oportunidadesEmpleoUnico.reduce((acc, dat) => ({ ...acc, [`oportunidadesempleo_${dat}`]: '0%' }), {}),
-        ...cantidadEmpleosUnico.reduce((acc, dat) => ({ ...acc, [`cantidadempleos_${dat}`]: '0%' }), {}),
-        ...padecimientoSaludUnico.reduce((acc, dat) => ({ ...acc, [`padecimientosalud_${dat}`]: '0%' }), {}),
-        ...dependientesEconomicosUnico.reduce((acc, dat) => ({ ...acc, [`dependienteseconomicos_${dat}`]: '0%' }), {}),
-        ...tiempoGenteACargoUnico.reduce((acc, dat) => ({ ...acc, [`tiempogente_${dat}`]: '0%' }), {}),
-        ...modalidadTrabajoUnico.reduce((acc, dat) => ({ ...acc, [`modalidatrabajo_${dat}`]: '0%' }), {}),
-        ...describirOrganizacionUnico.reduce((acc, dat) => ({ ...acc, [`describirorganizacion_${dat}`]: '0%' }), {}),
-        ...areaUnico.reduce((acc, dat) => ({ ...acc, [`areaT_${dat}`]: '0%' }), {}),
-        ...cargoUnico.reduce((acc, dat) => ({ ...acc, [`cargoT_${dat}`]: '0%' }), {}),
-        ...cargoMologadoUnico.reduce((acc, dat) => ({ ...acc, [`cargomologado_${dat}`]: '0%' }), {}),
-        ...educacionUnico.reduce((acc, dat) => ({ ...acc, [`educacion_${dat}`]: '0%' }), {}),
-        ...generacionUnico.reduce((acc, dat) => ({ ...acc, [`generacion_${dat}`]: '0%' }), {}),
-        ...nivelE1Unico.reduce((acc, dat) => ({ ...acc, [`nivele1_${dat}`]: '0%' }), {}),
-        ...nivelE2Unico.reduce((acc, dat) => ({ ...acc, [`nivele2_${dat}`]: '0%' }), {}),
-        ...nivelE3Unico.reduce((acc, dat) => ({ ...acc, [`nivele3_${dat}`]: '0%' }), {}),
-        ...nivelE4Unico.reduce((acc, dat) => ({ ...acc, [`nivele4_${dat}`]: '0%' }), {}),
-        ...nivelE5Unico.reduce((acc, dat) => ({ ...acc, [`nivele5_${dat}`]: '0%' }), {}),
-        ...nivelE6Unico.reduce((acc, dat) => ({ ...acc, [`nivele6_${dat}`]: '0%' }), {}),
-        ...nivelE7Unico.reduce((acc, dat) => ({ ...acc, [`nivele7_${dat}`]: '0%' }), {}),
-        ...nivelE8Unico.reduce((acc, dat) => ({ ...acc, [`nivele8_${dat}`]: '0%' }), {}),
-        ...nivelE9Unico.reduce((acc, dat) => ({ ...acc, [`nivele9_${dat}`]: '0%' }), {}),
-        ...nivelE10Unico.reduce((acc, dat) => ({ ...acc, [`nivele10_${dat}`]: '0%' }), {}),
-        ...paisUnico.reduce((acc, dat) => ({ ...acc, [`pais_${dat}`]: '0%' }), {}),
-        ...localidad1Unico.reduce((acc, dat) => ({ ...acc, [`local1_${dat}`]: '0%' }), {}),
-        ...localidad2Unico.reduce((acc, dat) => ({ ...acc, [`local2_${dat}`]: '0%' }), {}),
         count: 0,
       });
       addedItems.add(`${lindidlin}-${indclasifi}`);
@@ -2191,7 +2579,7 @@ const transformData = (
 
     // Handle Afirmaciones    
     const afirmacion = {
-      modelo: indxldesc.trim(),
+      name: indxldesc.trim(),
       level: 'afirmacion',
       id: `${lindidlin}-${indclasifi}-${indxlidln}`,
       parent: `${lindidlin}-${indclasifi}`,
@@ -2256,21 +2644,6 @@ const transformData = (
         const generoCount = generoFilteredCount.filter(gen => 
           gen.bdinfindxvcn >= 4
         ).length;
-        const generoVal1 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 1
-        ).length;
-        const generoVal2 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 2
-        ).length;
-        const generoVal3 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 3
-        ).length;
-        const generoVal4 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 4
-        ).length;
-        const generoVal5 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 5
-        ).length;
   
         if (generoCountValue.length != 0) {
           afirmacion[`lideres_${dat}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0) || 0}%`;
@@ -2303,14 +2676,54 @@ const transformData = (
         }
       }
     });
-    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por género
-    // Añadir columnas dinámicas de género
     generosUnicos.forEach(genero => {
       const genData = generoMap[genero] || [];
+      const idsValores = genData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`genero_${genero}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`genero_${genero}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`genero_${genero}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`genero_${genero}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`genero_${genero}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+
       if(genData.length >= 3) {
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorGenero = genData.map(item => item.bid.bdinfid);
-  
+        
         // Filtramos los valores en `generosCount` por `bdinfid` según el género
         const generoFilteredCount = generosCount.value.filter(gen => 
           idsPorGenero.includes(gen.bid.bdinfid)
@@ -2322,21 +2735,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const generoCount = generoFilteredCount.filter(gen => 
           gen.bdinfindxvcn >= 4
-        ).length;
-        const generoVal1 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 1
-        ).length;
-        const generoVal2 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 2
-        ).length;
-        const generoVal3 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 3
-        ).length;
-        const generoVal4 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 4
-        ).length;
-        const generoVal5 = generoFilteredCount.filter(gen =>
-          gen.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`genero_${genero}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0)}%`;
@@ -2370,6 +2768,47 @@ const transformData = (
 
     medioTransporteUnico.forEach(medioTransporte => {
       const mtransData = medioTransporteMap[medioTransporte] || [];
+      const idsValores = mtransData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = medioTransporteCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`mediotransporte_${medioTransporte}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`mediotransporte_${medioTransporte}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`mediotransporte_${medioTransporte}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`mediotransporte_${medioTransporte}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`mediotransporte_${medioTransporte}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
       if(mtransData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorMedioTransporte = mtransData.map(item => item.bid.bdinfid);
@@ -2385,21 +2824,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const medioTransCount = medioTransporteFilteredCount.filter(mt => 
           mt.bdinfindxvcn >= 4 && mt.bdinfindxvcn <= 5
-        ).length;
-        const medioTransVal1 = medioTransporteFilteredCount.filter(mt =>
-          mt.bdinfindxvcn === 1
-        ).length;
-        const medioTransVal2 = medioTransporteFilteredCount.filter(mt =>
-          mt.bdinfindxvcn === 2
-        ).length;
-        const medioTransVal3 = medioTransporteFilteredCount.filter(mt =>
-          mt.bdinfindxvcn === 3
-        ).length;
-        const medioTransVal4 = medioTransporteFilteredCount.filter(mt =>
-          mt.bdinfindxvcn === 4
-        ).length;
-        const medioTransVal5 = medioTransporteFilteredCount.filter(mt =>
-          mt.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`mediotransporte_${medioTransporte}`] = `${((generoCountValue.length * 100)/ medioTransporteFilteredCount.length).toFixed(0)}%`;
@@ -2438,6 +2862,48 @@ const transformData = (
 
     tiempoLlegadaUnico.forEach(tiempoLleg => {
       const tLlegData = tiempoLlegadaMap[tiempoLleg] || [];
+      const idsValores = tLlegData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = tiempoLlegadaCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`tiempollegada_${tiempoLleg}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempollegada_${tiempoLleg}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempollegada_${tiempoLleg}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempollegada_${tiempoLleg}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempollegada_${tiempoLleg}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(tLlegData.length >= 3) {
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorTiempoLlegada = tLlegData.map(item => item.bid.bdinfid);
@@ -2454,21 +2920,6 @@ const transformData = (
         const tiempLlegCount = tiempoLlegadaFilteredCount.filter(tlfc => 
           tlfc.bdinfindxvcn >= 4
         ).length;
-        /* const tiempLlegVal1 = tiempoLlegadaFilteredCount.filter(tlfc =>
-          tlfc.bdinfindxvcn === 1
-        ).length;
-        const tiempLlegVal2 = tiempoLlegadaFilteredCount.filter(tlfc =>
-          tlfc.bdinfindxvcn === 2
-        ).length;
-        const tiempLlegVal3 = tiempoLlegadaFilteredCount.filter(tlfc =>
-          tlfc.bdinfindxvcn === 3
-        ).length;
-        const tiempLlegVal4 = tiempoLlegadaFilteredCount.filter(tlfc =>
-          tlfc.bdinfindxvcn === 4
-        ).length;
-        const tiempLlegVal5 = tiempoLlegadaFilteredCount.filter(tlfc =>
-          tlfc.bdinfindxvcn === 5
-        ).length; */
 
         afirmacion[`tiempollegada_${tiempoLleg}`] = `${((generoCountValue.length * 100)/ tiempoLlegadaFilteredCount.length).toFixed(0)}%`;
   
@@ -2506,6 +2957,48 @@ const transformData = (
 
     cantidadReunionesUnico.forEach(cantidadReu => {
       const cReunData = cantidadReunionesMap[cantidadReu] || [];
+      const idsValores = cReunData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = cantidadReunionesCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`reunionesjefe_${cantidadReu}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`reunionesjefe_${cantidadReu}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`reunionesjefe_${cantidadReu}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`reunionesjefe_${cantidadReu}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`reunionesjefe_${cantidadReu}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(cReunData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorCantidadReuniones = cReunData.map(item => item.bid.bdinfid);
@@ -2523,21 +3016,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const cantidReuCount = cantidadReunionesFilteredCount.filter(crfc => 
           crfc.bdinfindxvcn >= 4
-        ).length;
-        const cantidReuVal1 = cantidadReunionesFilteredCount.filter(crfc =>
-          crfc.bdinfindxvcn === 1
-        ).length;
-        const cantidReuVal2 = cantidadReunionesFilteredCount.filter(crfc =>
-          crfc.bdinfindxvcn === 2
-        ).length;
-        const cantidReuVal3 = cantidadReunionesFilteredCount.filter(crfc =>
-          crfc.bdinfindxvcn === 3
-        ).length;
-        const cantidReuVal4 = cantidadReunionesFilteredCount.filter(crfc =>
-          crfc.bdinfindxvcn === 4
-        ).length;
-        const cantidReuVal5 = cantidadReunionesFilteredCount.filter(crfc =>
-          crfc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`reunionesjefe_${cantidadReu}`] = `${((generoCountValue.length * 100)/ cantidadReunionesFilteredCount.length).toFixed(0)}%`;
@@ -2576,6 +3054,48 @@ const transformData = (
 
     oportunidadesMejoraUnico.forEach(oportMej => {
       const oMejoraData = oportunidadesMejoraMap[oportMej] || [];
+      const idsValores = oMejoraData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = oportunidadesMejoraCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`oportunidadesmejora_${oportMej}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesmejora_${oportMej}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesmejora_${oportMej}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesmejora_${oportMej}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesmejora_${oportMej}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(oMejoraData.length >= 3){
 
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
@@ -2594,21 +3114,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const oportMejCount = oportunidadesMejoraFilteredCount.filter(omfc => 
           omfc.bdinfindxvcn >= 4
-        ).length;
-        const oportMejVal1 = oportunidadesMejoraFilteredCount.filter(omfc =>
-          omfc.bdinfindxvcn === 1
-        ).length;
-        const oportMejVal2 = oportunidadesMejoraFilteredCount.filter(omfc =>
-          omfc.bdinfindxvcn === 2
-        ).length;
-        const oportMejVal3 = oportunidadesMejoraFilteredCount.filter(omfc =>
-          omfc.bdinfindxvcn === 3
-        ).length;
-        const oportMejVal4 = oportunidadesMejoraFilteredCount.filter(omfc =>
-          omfc.bdinfindxvcn === 4
-        ).length;
-        const oportMejVal5 = oportunidadesMejoraFilteredCount.filter(omfc =>
-          omfc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`oportunidadesmejora_${oportMej}`] = `${((generoCountValue.length * 100)/ oportunidadesMejoraFilteredCount.length).toFixed(0)}%`;
@@ -2646,6 +3151,48 @@ const transformData = (
 
     seguirDesarrollandomeUnico.forEach(segDes => {
       const sDesarrollandomeData = seguirDesarrollandomeMap[segDes] || [];
+      const idsValores = sDesarrollandomeData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = seguirDesarrollandomeCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`seguirdesarrollandome_${segDes}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`seguirdesarrollandome_${segDes}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`seguirdesarrollandome_${segDes}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`seguirdesarrollandome_${segDes}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`seguirdesarrollandome_${segDes}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(sDesarrollandomeData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirDesarrollandome = sDesarrollandomeData.map(item => item.bid.bdinfid);
@@ -2663,21 +3210,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const segDesCount = seguirDesarrollandomeFilteredCount.filter(sdfc => 
           sdfc.bdinfindxvcn >= 4
-        ).length;
-        const segDesVal1 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
-          sdfc.bdinfindxvcn === 1
-        ).length;
-        const segDesVal2 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
-          sdfc.bdinfindxvcn === 2
-        ).length;
-        const segDesVal3 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
-          sdfc.bdinfindxvcn === 3
-        ).length;
-        const segDesVal4 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
-          sdfc.bdinfindxvcn === 4
-        ).length;
-        const segDesVal5 = seguirDesarrollandomeFilteredCount.filter(sdfc =>
-          sdfc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`seguirdesarrollandome_${segDes}`] = `${((generoCountValue.length * 100)/ seguirDesarrollandomeFilteredCount.length).toFixed(0)}%`;
@@ -2714,6 +3246,48 @@ const transformData = (
 
     oportunidadesEmpleoUnico.forEach(opEmp => {
       const oEmpleoData = oportunidadesEmpleoMap[opEmp] || [];
+      const idsValores = oEmpleoData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = oportunidadesEmpleoCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`oportunidadesempleo_${opEmp}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesempleo_${opEmp}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesempleo_${opEmp}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesempleo_${opEmp}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`oportunidadesempleo_${opEmp}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(oEmpleoData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirOportunidadesEmpleo = oEmpleoData.map(item => item.bid.bdinfid);
@@ -2731,21 +3305,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const opEmpCount = oportunidadesEmpleoFilteredCount.filter(oefc => 
           oefc.bdinfindxvcn >= 4
-        ).length;
-        const opEmpVal1 = oportunidadesEmpleoFilteredCount.filter(oefc =>
-          oefc.bdinfindxvcn === 1
-        ).length;
-        const opEmpVal2 = oportunidadesEmpleoFilteredCount.filter(oefc =>
-          oefc.bdinfindxvcn === 2
-        ).length;
-        const opEmpVal3 = oportunidadesEmpleoFilteredCount.filter(oefc =>
-          oefc.bdinfindxvcn === 3
-        ).length;
-        const opEmpVal4 = oportunidadesEmpleoFilteredCount.filter(oefc =>
-          oefc.bdinfindxvcn === 4
-        ).length;
-        const opEmpVal5 = oportunidadesEmpleoFilteredCount.filter(oefc =>
-          oefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`oportunidadesempleo_${opEmp}`] = `${((generoCountValue.length * 100)/ oportunidadesEmpleoFilteredCount.length).toFixed(0)}%`;
@@ -2782,6 +3341,48 @@ const transformData = (
 
     cantidadEmpleosUnico.forEach(cantEmp => {
       const cantEmpleoData = cantidadEmpleosMap[cantEmp] || [];
+      const idsValores = cantEmpleoData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = cantidadEmpleosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`cantidadempleos_${cantEmp}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cantidadempleos_${cantEmp}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cantidadempleos_${cantEmp}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cantidadempleos_${cantEmp}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cantidadempleos_${cantEmp}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(cantEmpleoData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirCantidadEmpleo = cantEmpleoData.map(item => item.bid.bdinfid);
@@ -2797,21 +3398,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const canEmpCount = cantidadEmpleoFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const canEmpVal1 = cantidadEmpleoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const canEmpVal2 = cantidadEmpleoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const canEmpVal3 = cantidadEmpleoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const canEmpVal4 = cantidadEmpleoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const canEmpVal5 = cantidadEmpleoFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`cantidadempleos_${cantEmp}`] = `${((generoCountValue.length * 100)/ cantidadEmpleoFilteredCount.length).toFixed(0)}%`;
@@ -2848,6 +3434,48 @@ const transformData = (
 
     padecimientoSaludUnico.forEach(padSal => {
       const padSaludData = padecimientoSaludMap[padSal] || [];
+      const idsValores = padSaludData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = padecimientoSaludCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`padecimientosalud_${padSal}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`padecimientosalud_${padSal}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`padecimientosalud_${padSal}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`padecimientosalud_${padSal}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`padecimientosalud_${padSal}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(padSaludData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorSeguirPadecimientoSalud = padSaludData.map(item => item.bid.bdinfid);
@@ -2864,21 +3492,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const canEmpCount = padecimientoSaludFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const canEmpVal1 = padecimientoSaludFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const canEmpVal2 = padecimientoSaludFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const canEmpVal3 = padecimientoSaludFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const canEmpVal4 = padecimientoSaludFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const canEmpVal5 = padecimientoSaludFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`padecimientosalud_${padSal}`] = `${((generoCountValue.length * 100)/ padecimientoSaludFilteredCount.length).toFixed(0)}%`;
@@ -2915,270 +3528,426 @@ const transformData = (
 
     dependientesEconomicosUnico.forEach(depEcon => {
       const depEconData = dependientesEconomicosMap[depEcon] || [];
-      
-      // Extraemos los `bdinfid` de las personas que respondieron el género actual
-      const idsPorSeguirDependientesEconomicos = depEconData.map(item => item.bid.bdinfid);
-
-      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-      const dependientesEconomicosFilteredCount = dependientesEconomicosCount.value.filter(psc => 
-        idsPorSeguirDependientesEconomicos.includes(psc.bid.bdinfid)
+      const idsValores = depEconData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = dependientesEconomicosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
-      const generoCountValue = afirmaciones.filter(gen => 
-        idsPorSeguirDependientesEconomicos.includes(gen.bid.bdinfid)
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`dependienteseconomicos_${depEcon}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`dependienteseconomicos_${depEcon}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`dependienteseconomicos_${depEcon}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`dependienteseconomicos_${depEcon}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`dependienteseconomicos_${depEcon}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
       
 
-      // Ahora podemos hacer los conteos según `bdinfindxvcn`
-      const depEconCount = dependientesEconomicosFilteredCount.filter(cefc => 
-        cefc.bdinfindxvcn >= 4
-      ).length;
-      const depEconVal1 = dependientesEconomicosFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 1
-      ).length;
-      const depEconVal2 = dependientesEconomicosFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 2
-      ).length;
-      const depEconVal3 = dependientesEconomicosFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 3
-      ).length;
-      const depEconVal4 = dependientesEconomicosFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 4
-      ).length;
-      const depEconVal5 = dependientesEconomicosFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 5
-      ).length;
-
-      afirmacion[`dependienteseconomicos_${depEcon}`] = `${((generoCountValue.length * 100)/ dependientesEconomicosFilteredCount.length).toFixed(0)}%`;
-    
-      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-        let data = competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon];
-        // Si no existe, inicializamos medioTransporteData
-        if (!data) {
-          data = { total: 0, count: 0 };
-          competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon] = data; // Asignamos el objeto al map
+      if(depEconData.length >= 3){
+        const idsPorSeguirDependientesEconomicos = depEconData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const dependientesEconomicosFilteredCount = dependientesEconomicosCount.value.filter(psc => 
+          idsPorSeguirDependientesEconomicos.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorSeguirDependientesEconomicos.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const depEconCount = dependientesEconomicosFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+  
+        afirmacion[`dependienteseconomicos_${depEcon}`] = `${((generoCountValue.length * 100)/ dependientesEconomicosFilteredCount.length).toFixed(0)}%`;
+      
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciadependientesEconomicosMap.get(`${lindidlin}-${indclasifi}`)[depEcon] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
         }
-        data.total += generoCountValue.length;
-        data.count += 1;
-      }
-
-      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-        const generoData = subDimensiondependientesEconomicosMap.get(`${dimid}-${lindidlin}`)[depEcon];
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
-      }
-
-      if (dimensionMap.has(dimid)) {
-        // Si no existe, inicializamos generoData
-        let generoData = dimensiondependientesEconomicosMap.get(dimid)[depEcon];
-        if (!generoData) {
-          generoData = { total: 0, count: 0 };
-          dimensionGeneroMap.get(dimid)[depEcon] = generoData; // Asignamos el objeto al map
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensiondependientesEconomicosMap.get(`${dimid}-${lindidlin}`)[depEcon];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
         }
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensiondependientesEconomicosMap.get(dimid)[depEcon];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[depEcon] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
       }
     });
     
     tiempoGenteACargoUnico.forEach(tiemGente => {
       const tiemGenteData = tiempoGenteACargoMap[tiemGente] || [];
-      
-      // Extraemos los `bdinfid` de las personas que respondieron el género actual
-      const idsPorSeguirTiempoGente = tiemGenteData.map(item => item.bid.bdinfid);
-
-      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-      const tiempoGenteFilteredCount = tiempoGenteACargoCount.value.filter(psc => 
-        idsPorSeguirTiempoGente.includes(psc.bid.bdinfid)
+      const idsValores = tiemGenteData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = tiempoGenteACargoCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
-      const generoCountValue = afirmaciones.filter(gen => 
-        idsPorSeguirTiempoGente.includes(gen.bid.bdinfid)
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`tiempogente_${tiemGente}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempogente_${tiemGente}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempogente_${tiemGente}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempogente_${tiemGente}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`tiempogente_${tiemGente}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
       
-
-      // Ahora podemos hacer los conteos según `bdinfindxvcn`
-      const tiemGenteCount = tiempoGenteFilteredCount.filter(cefc => 
-        cefc.bdinfindxvcn >= 4
-      ).length;
-      const tiemGenteVal1 = tiempoGenteFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 1
-      ).length;
-      const tiemGenteVal2 = tiempoGenteFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 2
-      ).length;
-      const tiemGenteVal3 = tiempoGenteFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 3
-      ).length;
-      const tiemGenteVal4 = tiempoGenteFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 4
-      ).length;
-      const tiemGenteVal5 = tiempoGenteFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 5
-      ).length;
-
-      afirmacion[`tiempogente_${tiemGente}`] = `${((generoCountValue.length * 100)/ tiempoGenteFilteredCount.length).toFixed(0)}%`;
-
-      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-        let data = competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente];
-        // Si no existe, inicializamos medioTransporteData
-        if (!data) {
-          data = { total: 0, count: 0 };
-          competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente] = data; // Asignamos el objeto al map
+      if(tiemGenteData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirTiempoGente = tiemGenteData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const tiempoGenteFilteredCount = tiempoGenteACargoCount.value.filter(psc => 
+          idsPorSeguirTiempoGente.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+          idsPorSeguirTiempoGente.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const tiemGenteCount = tiempoGenteFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+  
+        afirmacion[`tiempogente_${tiemGente}`] = `${((generoCountValue.length * 100)/ tiempoGenteFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciatiempoGenteACargoMap.get(`${lindidlin}-${indclasifi}`)[tiemGente] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
         }
-        data.total += generoCountValue.length;
-        data.count += 1;
-      }
-
-      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-        const generoData = subDimensiontiempoGenteACargoMap.get(`${dimid}-${lindidlin}`)[tiemGente];
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
-      }
-
-      if (dimensionMap.has(dimid)) {
-        // Si no existe, inicializamos generoData
-        let generoData = dimensiontiempoGenteACargoMap.get(dimid)[tiemGente];
-        if (!generoData) {
-          generoData = { total: 0, count: 0 };
-          dimensionGeneroMap.get(dimid)[tiemGente] = generoData; // Asignamos el objeto al map
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensiontiempoGenteACargoMap.get(`${dimid}-${lindidlin}`)[tiemGente];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
         }
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensiontiempoGenteACargoMap.get(dimid)[tiemGente];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[tiemGente] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
       }
+      
     });
 
     modalidadTrabajoUnico.forEach(modalidad => {
       const modalTrabData = modalidadTrabajoMap[modalidad] || [];
-      
-      // Extraemos los `bdinfid` de las personas que respondieron el género actual
-      const idsPorSeguirModalidadTrabajo = modalTrabData.map(item => item.bid.bdinfid);
-
-      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-      const modalidadTrabajoFilteredCount = modalidadTrabajoCount.value.filter(psc => 
-        idsPorSeguirModalidadTrabajo.includes(psc.bid.bdinfid)
+      const idsValores = modalTrabData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = modalidadTrabajoCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
-      const generoCountValue = afirmaciones.filter(gen => 
-      idsPorSeguirModalidadTrabajo.includes(gen.bid.bdinfid)
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`modalidatrabajo_${modalidad}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`modalidatrabajo_${modalidad}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`modalidatrabajo_${modalidad}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`modalidatrabajo_${modalidad}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`modalidatrabajo_${modalidad}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
       
-
-      // Ahora podemos hacer los conteos según `bdinfindxvcn`
-      const modalidadTrabCount = modalidadTrabajoFilteredCount.filter(cefc => 
-        cefc.bdinfindxvcn >= 4
-      ).length;
-      const modalidadTrabajoVal1 = modalidadTrabajoFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 1
-      ).length;
-      const modalidadTrabajoVal2 = modalidadTrabajoFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 2
-      ).length;
-      const modalidadTrabajoVal3 = modalidadTrabajoFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 3
-      ).length;
-      const modalidadTrabajoVal4 = modalidadTrabajoFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 4
-      ).length;
-      const modalidadTrabajoVal5 = modalidadTrabajoFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 5
-      ).length;
-
-      afirmacion[`modalidatrabajo_${modalidad}`] = `${((generoCountValue.length * 100)/ modalidadTrabajoFilteredCount.length).toFixed(0)}%`;
-
-      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-        let data = competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad];
-        // Si no existe, inicializamos medioTransporteData
-        if (!data) {
-          data = { total: 0, count: 0 };
-          competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad] = data; // Asignamos el objeto al map
+      if(modalTrabData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirModalidadTrabajo = modalTrabData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const modalidadTrabajoFilteredCount = modalidadTrabajoCount.value.filter(psc => 
+          idsPorSeguirModalidadTrabajo.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorSeguirModalidadTrabajo.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const modalidadTrabCount = modalidadTrabajoFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+  
+        afirmacion[`modalidatrabajo_${modalidad}`] = `${((generoCountValue.length * 100)/ modalidadTrabajoFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciamodalidadTrabajoMap.get(`${lindidlin}-${indclasifi}`)[modalidad] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
         }
-        data.total += generoCountValue.length;
-        data.count += 1;
-      }
-
-      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-        const generoData = subDimensionmodalidadTrabajoMap.get(`${dimid}-${lindidlin}`)[modalidad];
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
-      }
-
-      if (dimensionMap.has(dimid)) {
-        // Si no existe, inicializamos generoData
-        let generoData = dimensionmodalidadTrabajoMap.get(dimid)[modalidad];
-        if (!generoData) {
-          generoData = { total: 0, count: 0 };
-          dimensionGeneroMap.get(dimid)[modalidad] = generoData; // Asignamos el objeto al map
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensionmodalidadTrabajoMap.get(`${dimid}-${lindidlin}`)[modalidad];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
         }
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensionmodalidadTrabajoMap.get(dimid)[modalidad];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[modalidad] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
       }
+      
     });
 
     describirOrganizacionUnico.forEach(descOrg => {
       const descOrgData = describirOrganizacionMap[descOrg] || [];
-      
-      // Extraemos los `bdinfid` de las personas que respondieron el género actual
-      const idsPorSeguirDescrbOrg = descOrgData.map(item => item.bid.bdinfid);
-
-      // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
-      const descOrgFilteredCount = describirOrganizacionCount.value.filter(psc => 
-        idsPorSeguirDescrbOrg.includes(psc.bid.bdinfid)
+      const idsValores = descOrgData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = describirOrganizacionCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
-      const generoCountValue = afirmaciones.filter(gen => 
-      idsPorSeguirDescrbOrg.includes(gen.bid.bdinfid)
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
       );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`describirorganizacion_${descOrg}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`describirorganizacion_${descOrg}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`describirorganizacion_${descOrg}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`describirorganizacion_${descOrg}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`describirorganizacion_${descOrg}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
       
-
-      // Ahora podemos hacer los conteos según `bdinfindxvcn`
-      const descOrgCount = descOrgFilteredCount.filter(cefc => 
-        cefc.bdinfindxvcn >= 4
-      ).length;
-      const descOrgVal1 = descOrgFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 1
-      ).length;
-      const descOrgVal2 = descOrgFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 2
-      ).length;
-      const descOrgVal3 = descOrgFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 3
-      ).length;
-      const descOrgVal4 = descOrgFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 4
-      ).length;
-      const descOrgVal5 = descOrgFilteredCount.filter(cefc =>
-        cefc.bdinfindxvcn === 5
-      ).length;
-
-      afirmacion[`describirorganizacion_${descOrg}`] = `${((generoCountValue.length * 100)/ descOrgFilteredCount.length).toFixed(0)}%`;
-
-      if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
-        let data = competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg];
-        // Si no existe, inicializamos medioTransporteData
-        if (!data) {
-          data = { total: 0, count: 0 };
-          competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg] = data; // Asignamos el objeto al map
+      if(descOrgData.length >= 3){
+        // Extraemos los `bdinfid` de las personas que respondieron el género actual
+        const idsPorSeguirDescrbOrg = descOrgData.map(item => item.bid.bdinfid);
+  
+        // Filtramos los valores en `medioTransCount` por `bdinfid` según el género
+        const descOrgFilteredCount = describirOrganizacionCount.value.filter(psc => 
+          idsPorSeguirDescrbOrg.includes(psc.bid.bdinfid)
+        );
+        const generoCountValue = afirmaciones.filter(gen => 
+        idsPorSeguirDescrbOrg.includes(gen.bid.bdinfid)
+        );
+        
+  
+        // Ahora podemos hacer los conteos según `bdinfindxvcn`
+        const descOrgCount = descOrgFilteredCount.filter(cefc => 
+          cefc.bdinfindxvcn >= 4
+        ).length;
+  
+        afirmacion[`describirorganizacion_${descOrg}`] = `${((generoCountValue.length * 100)/ descOrgFilteredCount.length).toFixed(0)}%`;
+  
+        if (competenciaMap.has(`${lindidlin}-${indclasifi}`)) {
+          let data = competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg];
+          // Si no existe, inicializamos medioTransporteData
+          if (!data) {
+            data = { total: 0, count: 0 };
+            competenciadescribirOrganizacionMap.get(`${lindidlin}-${indclasifi}`)[descOrg] = data; // Asignamos el objeto al map
+          }
+          data.total += generoCountValue.length;
+          data.count += 1;
         }
-        data.total += generoCountValue.length;
-        data.count += 1;
-      }
-
-      if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
-        const generoData = subDimensiondescribirOrganizacionMap.get(`${dimid}-${lindidlin}`)[descOrg];
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
-      }
-
-      if (dimensionMap.has(dimid)) {
-        // Si no existe, inicializamos generoData
-        let generoData = dimensiondescribirOrganizacionMap.get(dimid)[descOrg];
-        if (!generoData) {
-          generoData = { total: 0, count: 0 };
-          dimensionGeneroMap.get(dimid)[descOrg] = generoData; // Asignamos el objeto al map
+  
+        if (subDimensionMap.has(`${dimid}-${lindidlin}`)) {
+          const generoData = subDimensiondescribirOrganizacionMap.get(`${dimid}-${lindidlin}`)[descOrg];
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
         }
-        generoData.total += generoCountValue.length;
-        generoData.count += 1;
+  
+        if (dimensionMap.has(dimid)) {
+          // Si no existe, inicializamos generoData
+          let generoData = dimensiondescribirOrganizacionMap.get(dimid)[descOrg];
+          if (!generoData) {
+            generoData = { total: 0, count: 0 };
+            dimensionGeneroMap.get(dimid)[descOrg] = generoData; // Asignamos el objeto al map
+          }
+          generoData.total += generoCountValue.length;
+          generoData.count += 1;
+        }
       }
     });
 
     areaUnico.forEach(areaT => {
       const areaTData = areaMap[areaT] || [];
+      const idsValores = areaTData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`areaT_${areaT}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`areaT_${areaT}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`areaT_${areaT}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`areaT_${areaT}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`areaT_${areaT}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(areaTData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorAreaT = areaTData.map(item => item.bid.bdinfid);
@@ -3192,21 +3961,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const areaTCount = areaTFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const areaTVal1 = areaTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const areaTVal2 = areaTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const areaTVal3 = areaTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const areaTVal4 = areaTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const areaTVal5 = areaTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`areaT_${areaT}`] = `${((generoCountValue.length * 100)/ areaTFilteredCount.length).toFixed(0)}%`;
@@ -3243,6 +3997,48 @@ const transformData = (
 
     cargoUnico.forEach(cargoT => {
       const cargoTData = cargoMap[cargoT] || [];
+      const idsValores = cargoTData.map(item => item.bdbdo10id.bdid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`cargoT_${cargoT}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargoT_${cargoT}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargoT_${cargoT}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargoT_${cargoT}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargoT_${cargoT}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(cargoTData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorCargoT = cargoTData.map(item => item.bdbdo10id.bdid);
@@ -3256,21 +4052,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const cargoTCount = cargoTFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const cargoTVal1 = cargoTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const cargoTVal2 = cargoTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const cargoTVal3 = cargoTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const cargoTVal4 = cargoTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const cargoTVal5 = cargoTFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`cargoT_${cargoT}`] = `${((generoCountValue.length * 100)/ cargoTFilteredCount.length).toFixed(0)}%`;
@@ -3307,6 +4088,48 @@ const transformData = (
 
     cargoMologadoUnico.forEach(cargoMologado => {
       const cargoMolData = cargoMologadoMap[cargoMologado] || [];
+      const idsValores = cargoMolData.map(item => item.bdbdo10id.bdid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`cargomologado_${cargoMologado}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargomologado_${cargoMologado}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargomologado_${cargoMologado}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargomologado_${cargoMologado}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`cargomologado_${cargoMologado}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(cargoMolData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorCargoMol = cargoMolData.map(item => item.bdbdo10id.bdid);
@@ -3320,21 +4143,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const cargoMolCount = cargoMolFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const cargoMolVal1 = cargoMolFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const cargoMolVal2 = cargoMolFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const cargoMolVal3 = cargoMolFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const cargoMolVal4 = cargoMolFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const cargoMolVal5 = cargoMolFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`cargomologado_${cargoMologado}`] = `${((generoCountValue.length * 100)/ cargoMolFilteredCount.length).toFixed(0)}%`;
@@ -3371,6 +4179,48 @@ const transformData = (
 
     educacionUnico.forEach(educacion => {
       const educacionData = educacionMap[educacion] || [];
+      const idsValores = educacionData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`educacion_${educacion}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`educacion_${educacion}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`educacion_${educacion}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`educacion_${educacion}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`educacion_${educacion}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(educacionData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorEducacion = educacionData.map(item => item.bid.bdinfid);
@@ -3385,21 +4235,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = educacionFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = educacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = educacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = educacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = educacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = educacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`educacion_${educacion}`] = `${((generoCountValue.length * 100)/ educacionFilteredCount.length).toFixed(0)}%`;
@@ -3436,6 +4271,48 @@ const transformData = (
 
     generacionUnico.forEach(generac => {
       const generacionData = generacionMap[generac] || [];
+      const idsValores = generacionData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`generacion_${generac}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`generacion_${generac}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`generacion_${generac}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`generacion_${generac}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`generacion_${generac}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(generacionData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorGeneracion = generacionData.map(item => item.bid.bdinfid);
@@ -3450,21 +4327,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = generacionFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = generacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = generacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = generacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = generacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = generacionFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`generacion_${generac}`] = `${((generoCountValue.length * 100)/ generacionFilteredCount.length).toFixed(0)}%`;
@@ -3501,6 +4363,48 @@ const transformData = (
 
     nivelE1Unico.forEach(nivelEst => {
       const nivelEsData = nivelE1Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele1_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele1_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele1_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele1_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele1_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3515,21 +4419,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele1_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3566,6 +4455,48 @@ const transformData = (
 
     nivelE2Unico.forEach(nivelEst => {
       const nivelEsData = nivelE2Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele2_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele2_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele2_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele2_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele2_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3580,21 +4511,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele2_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3631,6 +4547,48 @@ const transformData = (
 
     nivelE3Unico.forEach(nivelEst => {
       const nivelEsData = nivelE3Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele3_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele3_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele3_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele3_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele3_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3645,21 +4603,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele3_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3696,6 +4639,48 @@ const transformData = (
 
     nivelE4Unico.forEach(nivelEst => {
       const nivelEsData = nivelE4Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele4_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele4_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele4_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele4_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele4_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3710,21 +4695,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele4_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3761,6 +4731,48 @@ const transformData = (
 
     nivelE5Unico.forEach(nivelEst => {
       const nivelEsData = nivelE5Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele5_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele5_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele5_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele5_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele5_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3775,21 +4787,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele5_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3826,6 +4823,48 @@ const transformData = (
 
     nivelE6Unico.forEach(nivelEst => {
       const nivelEsData = nivelE6Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele6_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele6_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele6_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele6_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele6_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3840,21 +4879,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele6_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3891,6 +4915,48 @@ const transformData = (
 
     nivelE7Unico.forEach(nivelEst => {
       const nivelEsData = nivelE7Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele7_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele7_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele7_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele7_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele7_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3905,21 +4971,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele7_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -3956,6 +5007,48 @@ const transformData = (
 
     nivelE8Unico.forEach(nivelEst => {
       const nivelEsData = nivelE8Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele8_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele8_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele8_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele8_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele8_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -3970,21 +5063,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele8_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -4021,6 +5099,48 @@ const transformData = (
 
     nivelE9Unico.forEach(nivelEst => {
       const nivelEsData = nivelE9Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele9_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele9_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele9_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele9_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele9_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -4035,21 +5155,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const educacionCount = nivelEsFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const educacionVal1 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const educacionVal2 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const educacionVal3 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const educacionVal4 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const educacionVal5 = nivelEsFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`nivele9_${nivelEst}`] = `${((generoCountValue.length * 100)/ nivelEsFilteredCount.length).toFixed(0)}%`;
@@ -4086,6 +5191,48 @@ const transformData = (
 
     nivelE10Unico.forEach(nivelEst => {
       const nivelEsData = nivelE10Map[nivelEst] || [];
+      const idsValores = nivelEsData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`nivele10_${nivelEst}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele10_${nivelEst}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele10_${nivelEst}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele10_${nivelEst}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`nivele10_${nivelEst}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(nivelEsData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorNivelEst = nivelEsData.map(item => item.bid.bdinfid);
@@ -4151,6 +5298,48 @@ const transformData = (
 
     paisUnico.forEach(paisU => {
       const paisUData = paisMap[paisU] || [];
+      const idsValores = paisUData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`pais_${paisU}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`pais_${paisU}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`pais_${paisU}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`pais_${paisU}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`pais_${paisU}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(paisUData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorPais = paisUData.map(item => item.bid.bdinfid);
@@ -4165,21 +5354,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const paisCount = paisFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const paisVal1 = paisFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const paisVal2 = paisFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const paisVal3 = paisFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const paisVal4 = paisFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const paisVal5 = paisFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`pais_${paisU}`] = `${((generoCountValue.length * 100)/ paisFilteredCount.length).toFixed(0)}%`;
@@ -4216,6 +5390,48 @@ const transformData = (
 
     localidad1Unico.forEach(local1 => {
       const localData = localidad1Map[local1] || [];
+      const idsValores = localData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`local1_${local1}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local1_${local1}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local1_${local1}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local1_${local1}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local1_${local1}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(localData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorLocal = localData.map(item => item.bid.bdinfid);
@@ -4230,21 +5446,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const localCount = localFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const localVal1 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const localVal2 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const localVal3 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const localVal4 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const localVal5 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`local1_${local1}`] = `${((generoCountValue.length * 100)/ localFilteredCount.length).toFixed(0)}%`;
@@ -4281,6 +5482,48 @@ const transformData = (
 
     localidad2Unico.forEach(local1 => {
       const localData = localidad2Map[local1] || [];
+      const idsValores = localData.map(item => item.bid.bdinfid);
+      const valoresFilteredCount = generosCount.value.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue1 = afirmVal1.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue2 = afirmVal2.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue3 = afirmVal3.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue4 = afirmVal4.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+      const valoresCountValue5 = afirmVal5.filter(gen => 
+        idsValores.includes(gen.bid.bdinfid)
+      );
+
+      const demoVal1 = valoresCountValue1.filter(gen =>
+          gen.bdinfindxvcn === 1
+        ).length;
+      const demoVal2 = valoresCountValue2.filter(gen =>
+          gen.bdinfindxvcn === 2
+        ).length;
+      const demoVal3 = valoresCountValue3.filter(gen =>
+          gen.bdinfindxvcn === 3
+        ).length;
+      const demoVal4 = valoresCountValue4.filter(gen =>
+          gen.bdinfindxvcn === 4
+        ).length;
+      const demoVal5 = valoresCountValue5.filter(gen =>
+          gen.bdinfindxvcn === 5
+        ).length;
+
+      afirmacion[`local2_${local1}_val1`] = `${((demoVal1*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local2_${local1}_val2`] = `${((demoVal2*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local2_${local1}_val3`] = `${((demoVal3*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local2_${local1}_val4`] = `${((demoVal4*100)/valoresFilteredCount.length).toFixed(0)}%`
+      afirmacion[`local2_${local1}_val5`] = `${((demoVal5*100)/valoresFilteredCount.length).toFixed(0)}%`
+      
       if(localData.length >= 3){
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorLocal = localData.map(item => item.bid.bdinfid);
@@ -4295,21 +5538,6 @@ const transformData = (
         // Ahora podemos hacer los conteos según `bdinfindxvcn`
         const localCount = localFilteredCount.filter(cefc => 
           cefc.bdinfindxvcn >= 4
-        ).length;
-        const localVal1 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 1
-        ).length;
-        const localVal2 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 2
-        ).length;
-        const localVal3 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 3
-        ).length;
-        const localVal4 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 4
-        ).length;
-        const localVal5 = localFilteredCount.filter(cefc =>
-          cefc.bdinfindxvcn === 5
         ).length;
   
         afirmacion[`local2_${local1}`] = `${((generoCountValue.length * 100)/ localFilteredCount.length).toFixed(0)}%`;
@@ -4785,12 +6013,108 @@ const transformData = (
     }
   });
 
+  generosUnicos.forEach(genero => {
+    overallGeneroResult.value[genero] = 0;  // Inicializa con 0
+  });
+  medioTransporteUnico.forEach(data => {
+    overallMedioTResult.value[data] = 0;
+  });
+  tiempoLlegadaUnico.forEach(data => {
+    overallTiempoLResult.value[data] = 0;
+  });
+  cantidadReunionesUnico.forEach(data => {
+    overallCantiReuResult.value[data] = 0;
+  });
+  oportunidadesMejoraUnico.forEach(data => {
+    overallOportMejResult.value[data] = 0;
+  });
+  seguirDesarrollandomeUnico.forEach(data => {
+    overallSeguDesResult.value[data] = 0;
+  });
+  oportunidadesEmpleoUnico.forEach(data => {
+    overallOportEmpResult.value[data] = 0;
+  });
+  cantidadEmpleosUnico.forEach(data => {
+    overallCantiEmpResult.value[data] = 0;
+  });
+  padecimientoSaludUnico.forEach(data => {
+    overallPadeSaludResult.value[data] = 0;
+  });
+  dependientesEconomicosUnico.forEach(data => {
+    overallDependEconResult.value[data] = 0;
+  });
+  tiempoGenteACargoUnico.forEach(data => {
+    overallTiempoGenteResult.value[data] = 0;
+  });
+  modalidadTrabajoUnico.forEach(data => {
+    overallModalidadResult.value[data] = 0;
+  });
+  describirOrganizacionUnico.forEach(data => {
+    overallDescOrgResult.value[data] = 0;
+  });
+  areaUnico.forEach(data => {
+    overallAreaResult.value[data] = 0;
+  });
+  cargoUnico.forEach(data => {
+    overallCargoResult.value[data] = 0;
+  });
+  cargoMologadoUnico.forEach(data => {
+    overallCargoMolResult.value[data] = 0;
+  });
+  educacionUnico.forEach(data => {
+    overallEducacionResult.value[data] = 0;
+  });
+  generacionUnico.forEach(data => {
+    overallGenerResult.value[data] = 0;
+  });
+  nivelE1Unico.forEach(data => {
+    overallNivel1Result.value[data] = 0;
+  });
+  nivelE2Unico.forEach(data => {
+    overallNivel2Result.value[data] = 0;
+  });
+  nivelE3Unico.forEach(data => {
+    overallNivel3Result.value[data] = 0;
+  });
+  nivelE4Unico.forEach(data => {
+    overallNivel4Result.value[data] = 0;
+  });
+  nivelE5Unico.forEach(data => {
+    overallNivel5Result.value[data] = 0;
+  });
+  nivelE6Unico.forEach(data => {
+    overallNivel6Result.value[data] = 0;
+  });
+  nivelE7Unico.forEach(data => {
+    overallNivel7Result.value[data] = 0;
+  });
+  nivelE8Unico.forEach(data => {
+    overallNivel8Result.value[data] = 0;
+  });
+  nivelE9Unico.forEach(data => {
+    overallNivel9Result.value[data] = 0;
+  });
+  nivelE10Unico.forEach(data => {
+    overallNivel10Result.value[data] = 0;
+  });
+  paisUnico.forEach(data => {
+    overallPaisResult.value[data] = 0;
+  });
+  localidad2Unico.forEach(data => {
+    overallLocal1Result.value[data] = 0;
+  });
+  localidad2Unico.forEach(data => {
+    overallLocal1Result.value[data] = 0;
+  });
+  lideresUnico.forEach(data => {
+    overallLideresResult.value[data] = 0;
+  });
   formatted.forEach(item => {
     if (item.level === 'dimension') {
       const dimensionData = dimensionMap.get(item.id);
       if (dimensionData && dimensionData.count > 0) {
         item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
-        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
+        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value+1;
       }
 
       // Cálculo por dimension demograficos
@@ -4802,192 +6126,226 @@ const transformData = (
           ):(
             0
           )}%`;
+          overallLideresResult.value[data] += ((lidData.total * 100) / lidData.count)/lideresMap[data].length;
         }
       });
       generosUnicos.forEach(genero => {
         const generoData = dimensionGeneroMap.get(item.id)[genero];
         if (generoData.count > 0) {
           item[`genero_${genero}`] = `${(((generoData.total * 100) / generoData.count)/generoMap[genero].length).toFixed(0)}%`;
+          overallGeneroResult.value[genero] += ((generoData.total * 100) / generoData.count)/generoMap[genero].length;
         }
       });
+
+      // Cálculo por dimension demograficos
       medioTransporteUnico.forEach(data => {
         const demoData = dimensionmedioTransporteMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`mediotransporte_${data}`] = `${(((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length).toFixed(0)}%`;
+          overallMedioTResult.value[data] += ((demoData.total * 100) / demoData.count)/medioTransporteMap[data].length;
         }
       });
       tiempoLlegadaUnico.forEach(data => {
         const demoData = dimensiontiempoLlegadaMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`tiempollegada_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length).toFixed(0)}%`;
+          overallTiempoLResult.value[data] += ((demoData.total * 100) / demoData.count)/tiempoLlegadaMap[data].length;
         }
       });
       cantidadReunionesUnico.forEach(data => {
         const demoData = dimensioncantidadReunionesMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`reunionesjefe_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length).toFixed(0)}%`;
+          overallCantiReuResult.value[data] += ((demoData.total * 100) / demoData.count)/cantidadReunionesMap[data].length;
         }
       });
       oportunidadesMejoraUnico.forEach(data => {
         const demoData = dimensionoportunidadesMejoraMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`oportunidadesmejora_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length).toFixed(0)}%`;
+          overallOportMejResult.value[data] += ((demoData.total * 100) / demoData.count)/oportunidadesMejoraMap[data].length;
         }
       });
       seguirDesarrollandomeUnico.forEach(data => {
         const demoData = dimensionseguirDesarrollandomeMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`seguirdesarrollandome_${data}`] = `${(((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length).toFixed(0)}%`;
+          overallSeguDesResult.value[data] += ((demoData.total * 100) / demoData.count)/seguirDesarrollandomeMap[data].length;
         }
       });
       oportunidadesEmpleoUnico.forEach(data => {
         const demoData = dimensionoportunidadesEmpleoMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`oportunidadesempleo_${data}`] = `${(((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length).toFixed(0)}%`;
+          overallOportEmpResult.value[data] += ((demoData.total * 100) / demoData.count)/oportunidadesEmpleoMap[data].length;
         }
       });
       cantidadEmpleosUnico.forEach(data => {
         const demoData = dimensioncantidadEmpleosMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`cantidadempleos_${data}`] = `${(((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length).toFixed(0)}%`;
+          overallCantiEmpResult.value[data] += ((demoData.total * 100) / demoData.count)/cantidadEmpleosMap[data].length;
         }
       });
       padecimientoSaludUnico.forEach(data => {
         const demoData = dimensionpadecimientoSaludMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`padecimientosalud_${data}`] = `${(((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length).toFixed(0)}%`;
+          overallPadeSaludResult.value[data] += ((demoData.total * 100) / demoData.count)/padecimientoSaludMap[data].length;
         }
       });
       dependientesEconomicosUnico.forEach(data => {
         const demoData = dimensiondependientesEconomicosMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`dependienteseconomicos_${data}`] = `${(((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length).toFixed(0)}%`;
+          overallDependEconResult.value[data] += ((demoData.total * 100) / demoData.count)/dependientesEconomicosMap[data].length;
         }
       });
       tiempoGenteACargoUnico.forEach(data => {
         const demoData = dimensiontiempoGenteACargoMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`tiempogente_${data}`] = `${(((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length).toFixed(0)}%`;
+          overallTiempoGenteResult.value[data] += ((demoData.total * 100) / demoData.count)/tiempoGenteACargoMap[data].length;
         }
       });
       modalidadTrabajoUnico.forEach(data => {
         const demoData = dimensionmodalidadTrabajoMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`modalidatrabajo_${data}`] = `${(((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length).toFixed(0)}%`;
+          overallModalidadResult.value[data] += ((demoData.total * 100) / demoData.count)/modalidadTrabajoMap[data].length;
         }
       });
       describirOrganizacionUnico.forEach(data => {
         const demoData = dimensiondescribirOrganizacionMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`describirorganizacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length).toFixed(0)}%`;
+          overallDescOrgResult.value[data] += ((demoData.total * 100) / demoData.count)/describirOrganizacionMap[data].length;
         }
       });
       areaUnico.forEach(data => {
         const demoData = dimensionareaMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`areaT_${data}`] = `${(((demoData.total * 100) / demoData.count)/areaMap[data].length).toFixed(0)}%`;
+          overallAreaResult.value[data] += ((demoData.total * 100) / demoData.count)/areaMap[data].length;
         }
       });
       cargoUnico.forEach(data => {
         const demoData = dimensioncargoMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`cargoT_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMap[data].length).toFixed(0)}%`;
+          overallCargoResult.value[data] += ((demoData.total * 100) / demoData.count)/cargoMap[data].length;
         }
       });
       cargoMologadoUnico.forEach(data => {
         const demoData = dimensioncargoMologadoMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`cargomologado_${data}`] = `${(((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length).toFixed(0)}%`;
+          overallCargoMolResult.value[data] += ((demoData.total * 100) / demoData.count)/cargoMologadoMap[data].length;
         }
       });
       educacionUnico.forEach(data => {
         const demoData = dimensioneducacionMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`educacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/educacionMap[data].length).toFixed(0)}%`;
+          overallEducacionResult.value[data] += ((demoData.total * 100) / demoData.count)/educacionMap[data].length;
         }
       });
       generacionUnico.forEach(data => {
         const demoData = dimensiongeneracionMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`generacion_${data}`] = `${(((demoData.total * 100) / demoData.count)/generacionMap[data].length).toFixed(0)}%`;
+          overallGenerResult.value[data] += ((demoData.total * 100) / demoData.count)/generacionMap[data].length;
         }
       });
       nivelE1Unico.forEach(data => {
         const demoData = dimensionnivelE1Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele1_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE1Map[data].length).toFixed(0)}%`;
+          overallNivel1Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE1Map[data].length;
         }
       });
       nivelE2Unico.forEach(data => {
         const demoData = dimensionnivelE2Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele2_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE2Map[data].length).toFixed(0)}%`;
+          overallNivel2Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE2Map[data].length;
         }
       });
       nivelE3Unico.forEach(data => {
         const demoData = dimensionnivelE3Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele3_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE3Map[data].length).toFixed(0)}%`;
+          overallNivel3Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE3Map[data].length;
         }
       });
       nivelE4Unico.forEach(data => {
         const demoData = dimensionnivelE4Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele4_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE4Map[data].length).toFixed(0)}%`;
+          overallNivel4Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE4Map[data].length;
         }
       });
       nivelE5Unico.forEach(data => {
         const demoData = dimensionnivelE5Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele5_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE5Map[data].length).toFixed(0)}%`;
+          overallNivel5Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE5Map[data].length;
         }
       });
       nivelE6Unico.forEach(data => {
         const demoData = dimensionnivelE6Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele6_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE6Map[data].length).toFixed(0)}%`;
+          overallNivel6Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE6Map[data].length;
         }
       });
       nivelE7Unico.forEach(data => {
         const demoData = dimensionnivelE7Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele7_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE7Map[data].length).toFixed(0)}%`;
+          overallNivel7Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE7Map[data].length;
         }
       });
       nivelE8Unico.forEach(data => {
         const demoData = dimensionnivelE8Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele8_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE8Map[data].length).toFixed(0)}%`;
+          overallNivel8Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE8Map[data].length;
         }
       });
       nivelE9Unico.forEach(data => {
         const demoData = dimensionnivelE9Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele9_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE9Map[data].length).toFixed(0)}%`;
+          overallNivel9Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE9Map[data].length;
         }
       });
       nivelE10Unico.forEach(data => {
         const demoData = dimensionnivelE10Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`nivele10_${data}`] = `${(((demoData.total * 100) / demoData.count)/nivelE10Map[data].length).toFixed(0)}%`;
+          overallNivel10Result.value[data] += ((demoData.total * 100) / demoData.count)/nivelE10Map[data].length;
         }
       });
       paisUnico.forEach(data => {
         const demoData = dimensionpaisMap.get(item.id)[data];
         if (demoData.count > 0) {
           item[`pais_${data}`] = `${(((demoData.total * 100) / demoData.count)/paisMap[data].length).toFixed(0)}%`;
+          overallPaisResult.value[data] += ((demoData.total * 100) / demoData.count)/paisMap[data].length;
         }
       });
       localidad1Unico.forEach(data => {
         const demoData = dimensionlocalidad1Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`local1_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad1Map[data].length).toFixed(0)}%`;
+          overallLocal1Result.value[data] += ((demoData.total * 100) / demoData.count)/localidad1Map[data].length;
         }
       });
       localidad2Unico.forEach(data => {
         const demoData = dimensionlocalidad2Map.get(item.id)[data];
         if (demoData.count > 0) {
           item[`local2_${data}`] = `${(((demoData.total * 100) / demoData.count)/localidad2Map[data].length).toFixed(0)}%`;
+          overallLocal2Result.value[data] += ((demoData.total * 100) / demoData.count)/localidad2Map[data].length;
         }
       });
     }
@@ -4997,9 +6355,33 @@ const transformData = (
   generosUnicos.forEach(genero => {
     const data = generoMap[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    
 
     // Crear una fila
     const row = { modelo: genero };
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     medioTransporteUnico.forEach(medioTransporte => {
       const medioData = medioTransporteMap[medioTransporte] || [];
@@ -5158,9 +6540,32 @@ const transformData = (
   medioTransporteUnico.forEach(dataFila => {
     const data = medioTransporteMap[dataFila] || [];
     const ids = data.map(item => item.bid.bdinfid);
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
 
     // Crear una fila
     const row = { modelo: dataFila };
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -5322,6 +6727,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: dataFila };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -5473,7 +6901,6 @@ const transformData = (
       const filtered = medioData.filter(item => ids.includes(item.bid.bdinfid));
       row[`local2_${dataCol}`] = `${((filtered.length*100)/data.length).toFixed(0)}%`;
     });
-
     formatted.push(row);
   });
   // Iterar sobre cada valor único
@@ -5483,6 +6910,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: dataFila };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -5644,6 +7094,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -5805,6 +7278,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -5965,6 +7462,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -6127,6 +7647,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -6288,6 +7831,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -6448,6 +8015,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -6609,6 +8199,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -6769,6 +8383,29 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
 
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
@@ -6931,6 +8568,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -7092,6 +8753,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -7252,6 +8937,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -7412,6 +9121,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -7572,6 +9305,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -7732,6 +9489,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -7885,7 +9666,6 @@ const transformData = (
 
     formatted.push(row);
   });
-
 
   nivelE1Unico.forEach(genero => {
     const data = nivelE1Map[genero] || [];
@@ -7893,6 +9673,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -8046,12 +9850,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE2Unico.forEach(genero => {
     const data = nivelE2Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -8205,12 +10034,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE3Unico.forEach(genero => {
     const data = nivelE3Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -8364,12 +10218,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE4Unico.forEach(genero => {
     const data = nivelE4Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -8523,12 +10402,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE5Unico.forEach(genero => {
     const data = nivelE5Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -8682,12 +10586,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE6Unico.forEach(genero => {
     const data = nivelE6Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -8841,12 +10770,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE7Unico.forEach(genero => {
     const data = nivelE7Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -9000,12 +10954,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE8Unico.forEach(genero => {
     const data = nivelE8Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -9159,12 +11138,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE9Unico.forEach(genero => {
     const data = nivelE9Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -9318,12 +11322,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   nivelE10Unico.forEach(genero => {
     const data = nivelE10Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -9484,6 +11513,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -9645,6 +11698,30 @@ const transformData = (
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -9798,12 +11875,37 @@ const transformData = (
 
     formatted.push(row);
   });
+
   localidad2Unico.forEach(genero => {
     const data = localidad2Map[genero] || [];
     const ids = data.map(item => item.bid.bdinfid);
 
     // Crear una fila
     const row = { modelo: genero };
+    const valoresFilteredCount = generosCount.value.filter(gen => 
+      ids.includes(gen.bid.bdinfid)
+    );
+    const valoresCountValue1 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 1
+    );
+    const valoresCountValue2 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 2
+    );
+    const valoresCountValue3 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 3
+    );
+    const valoresCountValue4 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 4
+    );
+    const valoresCountValue5 = valoresFilteredCount.filter(gen => 
+      gen.bdinfindxvcn === 5
+    );
+    row[`val1`] = `${((valoresCountValue1.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val2`] = `${((valoresCountValue2.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val3`] = `${((valoresCountValue3.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val4`] = `${((valoresCountValue4.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+    row[`val5`] = `${((valoresCountValue5.length * 100)/valoresFilteredCount.length).toFixed(0)}%`
+
     generosUnicos.forEach(dataCol => {
       const medioData = generoMap[dataCol] || [];
       const filteredByGenero = medioData.filter(item => ids.includes(item.bid.bdinfid));
@@ -10454,13 +12556,47 @@ defineExpose({ exportToExcel });
 
 // Lifecycle hook para cargar datos al montar el componente
 onMounted(async () => {
-  const empresaId = route.query.empresa ? Number(route.query.empresa) : null;
-  empresa.value = isNaN(empresaId) ? null : empresaId;
+  const route = useRoute();
+
+  // Decodificar el token en Base64
+  const token = route.query.token as string;
+  if (token) {
+    try {
+      // Verificar si el token necesita padding
+      const decodedToken = decodeBase64UrlSafe(token);
+
+      // Tratar de decodificar como UTF-16 y luego convertir a JSON
+      tokenPayload.value = parseTokenAsUtf16(decodedToken);
+
+      empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
+      mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;
+      sub.value = tokenPayload.value.subid ? Number(tokenPayload.value.subid) : null;
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+    }
+  }
   await empresafounded(empresa.value);
   await answersFounded(empresa.value);
 
 });
 
+// Función para decodificar Base64 URL-Safe
+function decodeBase64UrlSafe(base64String: string) {
+  // Reemplaza los caracteres que cambian en las URLs
+  const base64 = base64String.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(base64);
+}
+
+// Función para convertir UTF-16 a cadena legible
+function parseTokenAsUtf16(decodedString: string) {
+  let result = '';
+  for (let i = 0; i < decodedString.length; i += 2) {
+    // Obtiene dos bytes a la vez (UTF-16 usa 2 bytes por carácter)
+    const code = decodedString.charCodeAt(i) + (decodedString.charCodeAt(i + 1) << 8);
+    result += String.fromCharCode(code);
+  }
+  return JSON.parse(result); // Intenta convertir la cadena a un objeto JSON
+}
 </script>
 
 <style scoped>

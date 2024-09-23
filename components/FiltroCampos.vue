@@ -207,10 +207,10 @@ const cancel = () => {
                <div class="container">
                   <h3>Elementos</h3>
                   <div v-for="(group, category) in groupedItems" :key="category">
-                    <h4>
+                    <h4 class="drag-element"@click="toggleCategory(category)">
                       {{ categoryTitle(category) }}
                       <!-- Botón para expandir/colapsar la categoría -->
-                      <button @click="toggleCategory(category)">
+                      <button>
                         {{ expandedCategories[category] ? '-' : '+' }}
                       </button>
                     </h4>
@@ -389,6 +389,9 @@ const cancel = () => {
     justify-content: flex-start;
     width: 100%;
     padding: 0 10px;
+}
+.drag-element:hover{
+  cursor: pointer;
 }
 
 .drag-col1{
