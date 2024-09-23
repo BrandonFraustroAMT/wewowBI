@@ -5,7 +5,7 @@
         <Menu :empresa="empresa" :mod="mod" :sub="sub" />
         <div>
           <div class="reporte-container">
-              <iframe title="DEMO 240816" class="reporte" src="https://app.powerbi.com/view?r=eyJrIjoiMTZlZjM5Y2YtYTI1My00YmFjLWI1MTctNWU4MjZmZjM3MGNlIiwidCI6IjgxMzdjMTE5LWI0NmMtNDE4YS04OTE0LTY4MzM0NjNlZWViMCJ9" frameborder="0" allowFullScreen="true"></iframe>
+              <iframe title="DEMO 240816" class="reporte" src="https://app.powerbi.com/view?r=eyJrIjoiNTgxZjNiZjctMjRiZi00NmVlLTkxZGEtOGNlZThlYzA0ZDhiIiwidCI6IjgxMzdjMTE5LWI0NmMtNDE4YS04OTE0LTY4MzM0NjNlZWViMCJ9" frameborder="0" allowFullScreen="true"></iframe>
               
           </div>
         </div>
