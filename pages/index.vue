@@ -3,7 +3,10 @@
   <div>
     <div class="portal">
       <div class="menu-column">
-        <Menu :empresa="empresa" :mod="mod" :sub="sub"/>
+        <Menu :empresa="empresa" :mod="mod" :sub="sub" />
+        <div class="image-container">
+          <img src="assets/img/wewowatworklogo.png" alt="insignia">
+        </div>
       </div>
     </div>
   </div>
@@ -17,7 +20,6 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from '#app';
 
-const route = useRoute();
 const empresa = ref(0);
 const mod = ref(0);
 const sub = ref(0);
@@ -73,5 +75,14 @@ function parseTokenAsUtf16(decodedString: string) {
 
 .menu-column {
   width: 100%;
+}
+
+.image-container {
+  width: 100%;
+  height: 500px;
+}
+.image-container img{
+  width: 100%;
+  height: 100%;
 }
 </style>

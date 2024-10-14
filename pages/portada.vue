@@ -56,7 +56,8 @@ function parseTokenAsUtf16(decodedString: string) {
       <!-- <BarraLateral/> -->
       <div class="menu-column">
         <Menu :empresa="empresa" :mod="mod" :sub="sub"/>
-        <div>
+        <div class="image-container">
+          <img src="assets/img/wewowatworklogo.png" alt="insignia">
         </div>
       </div>
     </div>
@@ -77,5 +78,14 @@ function parseTokenAsUtf16(decodedString: string) {
 
 .btn {
   background-color: wheat;
+}
+
+.image-container {
+  width: 100%;
+  height: 500px;
+}
+.image-container img{
+  width: 100%;
+  height: 100%;
 }
 </style>

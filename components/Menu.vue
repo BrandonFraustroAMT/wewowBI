@@ -5,9 +5,7 @@
     <div class="menu-slice">
       <div class="menu-slice__container">
         <div class="menu-slice__empresa">
-          <div class="menu-slice__empresa-logo">
-            <img src="" alt="">
-          </div>
+
           <div class="menu-slice__title">
             <h3>{{ empresaData.empnombre }}</h3>
           </div>
@@ -37,24 +35,31 @@
             <div v-if="dropdownOpen" class="dropdown-menu">
               <ul>
                 <!-- Sin Filtro -->
-                <li @click="handleClick('Sinfiltro')">
-                  Sin filtro
-                </li>
+                <div class="dropdown-menu__container">
+                  <p class="dropdown-menu__title">Sin filtro</p>
+                  <li @click="handleClick('Sinfiltro')">
+                    Sin filtro
+                  </li>
+                </div>
                 <!-- Pais de Certificacion -->
-                <li @click="handleClick('Paiscertificacion')">
-                  Pais de certificación
-                </li>
+                <div class="dropdown-menu__container">
+                  <p class="dropdown-menu__title">Pais de certificación</p>
+                  <li @click="handleClick('Paiscertificacion')">
+                  </li>
+                </div>
                 <!-- Business Unit -->
-                <li @click="handleClick('Businessunit')">
-                  Business Unit
-                </li>
+                <div class="dropdown-menu__container">
+                  <p class="dropdown-menu__title">Business Unit</p>
+                  <li @click="handleClick('Businessunit')">
+                  </li>
+                </div>
               
                 <!-- País -->
-                <div >
-                  País
+                <div class="dropdown-menu__container">
+                  <p class="dropdown-menu__title">País</p>
                   <ul v-if="selectedOption === 'Pais' || selectedOption === 'Sinfiltro'">
                     <li v-for="(pais, index) in paisUnico" :key="index" >
-                      <div @click="handleClick('Pais', pais)">
+                      <div @click="handleClick('Pais', pais)" class="dropdown-menu__content-list">
                         {{ pais }}
                       </div>
                     </li>
@@ -62,11 +67,11 @@
                 </div>
               
                 <!-- Localidad 1 -->
-                <div>
-                  Localidad 1
+                <div class="dropdown-menu__container">
+                  <p class="dropdown-menu__title">Localidad 1</p>
                   <ul v-if="selectedOption === 'Localidad1' || selectedOption === 'Sinfiltro'">
                     <li v-for="(localidad1, index) in localidad1Unico" :key="index">
-                      <div @click="handleClick('Localidad1', localidad1)">
+                      <div @click="handleClick('Localidad1', localidad1)" class="dropdown-menu__content-list">
                         {{ localidad1 }}
                       </div>
                     </li>
@@ -74,20 +79,21 @@
                 </div>
               
                 <!-- Localidad 2 -->
-                <div>
-                  Localidad 2
+                <div class="dropdown-menu__container">
+                  <p class="dropdown-menu__title">Localidad 2</p>
                   <ul v-if="selectedOption === 'Localidad2' || selectedOption === 'Sinfiltro'">
                     <li v-for="(localidad2, index) in localidad2Unico" :key="index">
-                      <div @click="handleClick('Localidad2', localidad2)">
+                      <div @click="handleClick('Localidad2', localidad2)" class="dropdown-menu__content-list">
                         {{ localidad2 }}
                       </div>
                     </li>
                   </ul>
                 </div>
                 <!-- Lideres -->
+                <!-- <p class="dropdown-menu__title">País</p>
                 <li @click="handleClick('Lideres')">
                   Lideres
-                </li>
+                </li> -->
               </ul>
             </div>
           </div>
@@ -306,6 +312,8 @@ watch(() => props.empresa, (newEmpresa) => {
 
   .menu-slice__title{
     color: #A2BDD0;
+    font-weight: 500;
+    font-size: 1.5rem;
   }
 
   
@@ -453,6 +461,8 @@ watch(() => props.empresa, (newEmpresa) => {
   border-radius: 4px;
   padding: 8px 0;
   width: 200px;
+  max-height: 400px;
+  overflow-y: scroll;
   z-index: 1000;
 }
 
@@ -463,11 +473,24 @@ watch(() => props.empresa, (newEmpresa) => {
 }
 
 .dropdown-menu li {
-  padding: 8px 16px;
+  padding: 2px 0px;
   cursor: pointer;
 }
 
 .dropdown-menu li:hover {
   background-color: #f1f1f1;
+}
+
+.dropdown-menu__container{
+  padding: 10px 5px;
+}
+.dropdown-menu__title{
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgb(192, 192, 192);
+}
+
+.dropdown-menu__content-list {
+  font-size: 1rem
 }
 </style>
