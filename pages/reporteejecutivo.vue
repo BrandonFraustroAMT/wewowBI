@@ -2,11 +2,10 @@
     <div class="portal">
       <!-- <BarraLateral/> -->
       <div class="menu-column">
-        <Menu :empresa="empresa" :mod="mod" :sub="sub" />
+        <Menu 
+          @applyFilter="handleFilter"
+          :empresa="empresa" :mod="mod" :sub="sub" />
         <div>
-          <!-- <div class="reporte-container">
-              <iframe title="DEMO 240816" class="reporte" src="https://app.powerbi.com/view?r=eyJrIjoiNTgxZjNiZjctMjRiZi00NmVlLTkxZGEtOGNlZThlYzA0ZDhiIiwidCI6IjgxMzdjMTE5LWI0NmMtNDE4YS04OTE0LTY4MzM0NjNlZWViMCJ9" frameborder="0" allowFullScreen="true"></iframe>
-          </div> -->
           <div class="reporte-container">
             <div id="reportContainer" class="reporte"></div> <!-- Contenedor para el reporte -->
           </div>
@@ -29,7 +28,23 @@ const sub = ref<number>(0);
 const tokenPayload = ref<any>(null);
 const urlEmbed = ref<any>(null);
 const tokenEmbed = ref<any>(null);
+const filterData = ref({});
 
+const filtroPais:any = ref();
+const filtroLocalidad1:any = ref();
+const filtroLocalidad2:any = ref();
+
+const handleFilter = (filterDataFromMenu) => {
+  filterData.value = filterDataFromMenu;
+  console.log('filterData',filterData)
+};
+
+watch(() => filterData, (newFilterData) => {
+    console.log('Nuevo filterData recibido:', newFilterData);
+    filtroPais.value = newFilterData?.pais
+    filtroLocalidad1.value = newFilterData?.localidad1
+    filtroLocalidad2.value = newFilterData?.localidad2
+  },{ immediate: true });
 
 onMounted(async () => {
   const route = useRoute();
@@ -64,10 +79,23 @@ onMounted(async () => {
         const reportContainer = document.getElementById("reportContainer");
 
         if (reportContainer) {
+          // Construir filtros dinámicos
+          let filters = `&filter=EMPRESAS/EMPID eq ${empresa.value}`;
+
+          if (filtroPais.value) {
+            filters += ` and EMPRESAS/PAIS eq ${filtroPais.value}`;
+          }
+          if (filtroLocalidad1.value) {
+            filters += ` and Filtro/LOCALIDAD1 eq ${filtroLocalidad1.value}`;
+          }
+          if (filtroLocalidad2.value) {
+            filters += ` and Filtro/LOCALIDAD2 eq ${filtroLocalidad2.value}`;
+          }
+
           // Configurar los detalles del reporte embebido
           const embedConfig = {
-            type: 'report', // Tipo de contenido embebido 
-            embedUrl: `${urlEmbed.value.data.embedUrl}&filter=EMPRESAS/EMPID eq ${empresa.value}`,
+            type: 'report', 
+            embedUrl: `${urlEmbed.value.data.embedUrl}${filters}`,
             accessToken: tokenEmbed.value.data.token,
             tokenType: powerbi.models.TokenType.Embed,
             settings: {

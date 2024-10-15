@@ -254,6 +254,9 @@
   let paisMap: { [key: string]: any[] } = {};
   let pregAbMap: { [key: string]: any[] } = {};
   
+  const filtroPais:any = ref();
+  const filtroLocalidad1:any = ref();
+  const filtroLocalidad2:any = ref();
   // Función para obtener los datos de la empresa por ID
   const empresafounded = async (id: number) => {
     if (id) {
@@ -262,6 +265,30 @@
     }
   };
   
+  watch(() => props.filterData, (newFilterData) => {
+    filtroPais.value = newFilterData?.pais
+    filtroLocalidad1.value = newFilterData?.localidad1
+    filtroLocalidad2.value = newFilterData?.localidad2
+
+    const { pais, localidad1, localidad2 } = newFilterData || {};
+
+    // Aplicamos los filtros sobre la data
+    if (pais) {
+      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdcont === pais);
+      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinfcont === pais);
+    } else if (localidad1) {
+      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocal === localidad1);
+      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocal === localidad1);
+    } else if (localidad2) {
+      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocalb === localidad2);
+      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocalb === localidad2);
+    } else {
+      // Si no hay filtros, restauramos los datos originales
+      bdbd010Data.value = bdbd010Data.value;
+      respuestasData.value = respuestasData.value;
+    }
+  },{ immediate: true });
+
   // Función para obtener las respuestas por ID de empresa y los demográficos
   const answersFounded = async (id: number) => {
     if (id) {
