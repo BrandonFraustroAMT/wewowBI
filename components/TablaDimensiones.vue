@@ -120,79 +120,48 @@ const initialFilters:any = ref([]);
 /* VARIABLRES PARA LOS DEMOGRÁFICOS */
 const generos:any = ref({});
 const generosCount:any = ref({});
-
 const medioTransporte:any = ref({});
 const medioTransporteCount:any = ref({});
-
 const tiempoLlegada:any = ref({});
 const tiempoLlegadaCount:any = ref({});
-
 const cantidadReuniones:any = ref({});
 const cantidadReunionesCount:any = ref({});
-
 const oportunidadesMejora:any = ref({});
 const oportunidadesMejoraCount:any = ref({});
-
 const seguirDesarrollandome:any = ref({});
 const seguirDesarrollandomeCount:any = ref({});
-
 const oportunidadesEmpleo:any = ref({});
 const oportunidadesEmpleoCount:any = ref({});
-
 const cantidadEmpleos:any = ref({});
 const cantidadEmpleosCount:any = ref({});
-
 const padecimientoSalud:any = ref({});
 const padecimientoSaludCount:any = ref({});
-
 const dependientesEconomicos:any = ref({});
 const dependientesEconomicosCount:any = ref({});
-
 const tiempoGenteACargo:any = ref({});
 const tiempoGenteACargoCount:any = ref({});
-
 const modalidadTrabajo:any = ref({});
 const modalidadTrabajoCount:any = ref({});
-
 const describirOrganizacion:any = ref({});
 const describirOrganizacionCount:any = ref({});
-
 const añosTrabajo:any = ref({});
-
 const area:any = ref({});
-
 const cargo:any = ref({});
-
 const cargoMologado:any = ref({});
-
 const educacion:any = ref({});
-
 const generacion:any = ref({});
-
 const localidad1:any = ref({});
-
 const localidad2:any = ref({});
-
 const nivelEstructural1:any = ref({});
-
 const nivelEstructural2:any = ref({});
-
 const nivelEstructural3:any = ref({});
-
 const nivelEstructural4:any = ref({});
-
 const nivelEstructural5:any = ref({});
-
 const nivelEstructural6:any = ref({});
-
 const nivelEstructural7:any = ref({});
-
 const nivelEstructural8:any = ref({});
-
 const nivelEstructural9:any = ref({});
-
 const nivelEstructural10:any = ref({});
-
 const pais:any = ref({});
 
 
@@ -311,6 +280,8 @@ let paisMap: { [key: string]: any[] } = {};
 const filtroPais:any = ref();
 const filtroLocalidad1:any = ref();
 const filtroLocalidad2:any = ref();
+const originalRespuestasData: any = ref([]);
+const originalBdbd010Data: any = ref([]);
 
 // Función para obtener los datos de la empresa por ID
 const empresafounded = async (id: number) => {
@@ -320,29 +291,36 @@ const empresafounded = async (id: number) => {
   }
 };
 
+const applyFilters = (pais?: string, localidad1?: string, localidad2?: string) => {
+  // Aplicamos los filtros sobre la data original
+  let filteredBdbd010Data = [...bdbd010Data.value];  // copia de la data original
+  let filteredRespuestasData = [...respuestasData.value];  // copia de la data original
+
+  if (pais) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdcont === pais);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinfcont === pais);
+  }
+  if (localidad1) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdlocal === localidad1);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinflocal === localidad1);
+  }
+  if (localidad2) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdlocalb === localidad2);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinflocalb === localidad2);
+  }
+
+  // Actualizamos las variables filtradas
+  bdbd010Data.value = filteredBdbd010Data;
+  respuestasData.value = filteredRespuestasData;
+};
+
 watch(() => props.filterData, (newFilterData) => {
-    filtroPais.value = newFilterData?.pais
-    filtroLocalidad1.value = newFilterData?.localidad1
-    filtroLocalidad2.value = newFilterData?.localidad2
-
-    const { pais, localidad1, localidad2 } = newFilterData || {};
-
-    // Aplicamos los filtros sobre la data
-    if (pais) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdcont === pais);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinfcont === pais);
-    } else if (localidad1) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocal === localidad1);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocal === localidad1);
-    } else if (localidad2) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocalb === localidad2);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocalb === localidad2);
-    } else {
-      // Si no hay filtros, restauramos los datos originales
-      bdbd010Data.value = bdbd010Data.value;
-      respuestasData.value = respuestasData.value;
-    }
-  },{ immediate: true });
+  filtroPais.value = newFilterData?.pais
+  filtroLocalidad1.value = newFilterData?.localidad1
+  filtroLocalidad2.value = newFilterData?.localidad2
+  
+  applyFilters(filtroPais.value, filtroLocalidad1.value, filtroLocalidad2.value);
+},{ immediate: true });
 
 // Función para obtener las respuestas por ID de empresa y los demográficos
 const answersFounded = async (id: number) => {
@@ -354,7 +332,9 @@ const answersFounded = async (id: number) => {
 
     bdbd010Data.value = bdbd010Demo;
     respuestasData.value = dataAnswers;
-    
+
+    applyFilters(filtroPais.value, filtroLocalidad1.value, filtroLocalidad2.value);
+
     /* DIMENSIONES */
     const contentTable = respuestasData.value.filter((rd:any) => rd.bid.bdinfdimid >= 2 && rd.bid.bdinfdimid <= 4);
     
@@ -2097,13 +2077,18 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       competencialocalidad2Map.set(`${lindidlin}-${indclasifi}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
     }
 
+    let resultado = '0%';
+    if (cantidadRespuestas.value > 3) {
+      const porcentaje = ((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0);
+      resultado = `${porcentaje}%`;
+    }
     // Handle Afirmaciones    
     const afirmacion = {
       name: indxldesc.trim(),
       level: 'afirmacion',
       id: `${lindidlin}-${indclasifi}-${indxlidln}`,
       parent: `${lindidlin}-${indclasifi}`,
-      resultado: `${((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      resultado,
       val1: `${((afirmVal1.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
       val2: `${((afirmVal2.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
       val3: `${((afirmVal3.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
@@ -5070,7 +5055,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   formatted.forEach(item => {
     if (item.level === 'competencia') {
       const competenciaData = competenciaMap.get(item.id);
-      if (competenciaData && competenciaData.count > 0) {
+      if (competenciaData && competenciaData.count > 0 && cantidadRespuestas.value > 3) {
         item.resultado = `${(((competenciaData.totalResult * 100 )/ competenciaData.count)/cantidadRespuestas.value).toFixed(0)}%`;
       }
       // Cálculo por demograficos en competencias
@@ -5266,7 +5251,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   formatted.forEach(item => {
     if (item.level === 'subdimension') {
       const subDimensionData = subDimensionMap.get(item.id);
-      if (subDimensionData && subDimensionData.count > 0) {
+      if (subDimensionData && subDimensionData.count > 0 && cantidadRespuestas.value > 3) {
         item.resultado = `${((subDimensionData.totalResult * 100 / subDimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
       }
 
@@ -5548,19 +5533,19 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   paisUnico.forEach(data => {
     overallPaisResult.value[data] = 0;
   });
-  localidad2Unico.forEach(data => {
+  localidad1Unico.forEach(data => {
     overallLocal1Result.value[data] = 0;
   });
   localidad2Unico.forEach(data => {
-    overallLocal1Result.value[data] = 0;
+    overallLocal2Result.value[data] = 0;
   });
 
   formatted.forEach(item => {
     if (item.level === 'dimension') {
       const dimensionData = dimensionMap.get(item.id);
-      if (dimensionData && dimensionData.count > 0) {
+      if (dimensionData && dimensionData.count > 0 && cantidadRespuestas.value > 3) {
         item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
-        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value+1;
+        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
       }
       generosUnicos.forEach(genero => {
         const generoData = dimensionGeneroMap.get(item.id)[genero];
@@ -5865,6 +5850,7 @@ const exportToExcel = () => {
   const dataToExport = formattedData.value.map(item => {
     // Crea un objeto para cada fila de la tabla
     const row = {
+      Modelo: item.level.toUpperCase(),
       Name: item.name,
       Resultado: item.resultado,
     };
@@ -6049,8 +6035,6 @@ const exportToExcel = () => {
 
 defineExpose({ exportToExcel });
 
-
-// Lifecycle hook para cargar datos al montar el componente
 onMounted(async () => {
   const route = useRoute();
   // Decodificar el token en Base64

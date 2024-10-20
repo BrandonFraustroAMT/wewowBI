@@ -5,7 +5,7 @@
         <Menu :filterData="filterData" @applyFilter="handleFilter" @exportExcel="handleExport" :empresa="empresa" :mod="mod" :sub="sub"/>
         <div>
           <div>
-              <TablaDimensiones :filterData="filterData" ref="tablaDimensiones"/>
+              <TablaDimensiones :key="tablaKey" :filterData="filterData" ref="tablaDimensiones"/>
           </div>
         </div>
       </div>
@@ -25,8 +25,31 @@ const tokenPayload = ref<any>(null);
 
 const filterData = ref({});
 const tablaDimensiones = ref(null);
+const tablaKey = ref(0);
+
+const lastFilterData = ref({
+  pais: null,
+  localidad1: null,
+  localidad2: null
+});
 
 const handleFilter = (filterDataFromMenu) => {
+  const { pais, localidad1, localidad2 } = filterDataFromMenu;
+
+  // Verificar si los valores de `pais`, `localidad1` o `localidad2` han cambiado
+  if (
+    pais !== lastFilterData.value.pais ||
+    localidad1 !== lastFilterData.value.localidad1 ||
+    localidad2 !== lastFilterData.value.localidad2
+  ) {
+    // Actualizar la clave del componente solo si cambian estos filtros
+    tablaKey.value++;
+
+    // Guardar los nuevos valores
+    lastFilterData.value = { pais, localidad1, localidad2 };
+  }
+
+  // Actualizar el objeto `filterData` para pasar los filtros al componente hijo
   filterData.value = filterDataFromMenu;
 };
 

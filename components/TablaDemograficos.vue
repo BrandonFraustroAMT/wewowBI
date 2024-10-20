@@ -308,6 +308,8 @@
   const filtroPais:any = ref();
   const filtroLocalidad1:any = ref();
   const filtroLocalidad2:any = ref();
+  const originalRespuestasData: any = ref([]);
+  const originalBdbd010Data: any = ref([]);
   
   // Función para obtener los datos de la empresa por ID
   const empresafounded = async (id: number) => {
@@ -318,30 +320,36 @@
   };
   
 
-  // Observa los cambios en filterData y actualiza la tabla
-  watch(() => props.filterData, (newFilterData) => {
-    filtroPais.value = newFilterData?.pais
-    filtroLocalidad1.value = newFilterData?.localidad1
-    filtroLocalidad2.value = newFilterData?.localidad2
+  const applyFilters = (pais?: string, localidad1?: string, localidad2?: string) => {
+  // Aplicamos los filtros sobre la data original
+  let filteredBdbd010Data = [...bdbd010Data.value];  // copia de la data original
+  let filteredRespuestasData = [...respuestasData.value];  // copia de la data original
 
-    const { pais, localidad1, localidad2 } = newFilterData || {};
+  if (pais) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdcont === pais);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinfcont === pais);
+  }
+  if (localidad1) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdlocal === localidad1);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinflocal === localidad1);
+  }
+  if (localidad2) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdlocalb === localidad2);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinflocalb === localidad2);
+  }
 
-    // Aplicamos los filtros sobre la data
-    if (pais) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdcont === pais);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinfcont === pais);
-    } else if (localidad1) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocal === localidad1);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocal === localidad1);
-    } else if (localidad2) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocalb === localidad2);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocalb === localidad2);
-    } else {
-      // Si no hay filtros, restauramos los datos originales
-      bdbd010Data.value = bdbd010Data.value;
-      respuestasData.value = respuestasData.value;
-    }
-  },{ immediate: true });
+  // Actualizamos las variables filtradas
+  bdbd010Data.value = filteredBdbd010Data;
+  respuestasData.value = filteredRespuestasData;
+};
+
+watch(() => props.filterData, (newFilterData) => {
+  filtroPais.value = newFilterData?.pais
+  filtroLocalidad1.value = newFilterData?.localidad1
+  filtroLocalidad2.value = newFilterData?.localidad2
+  
+  applyFilters(filtroPais.value, filtroLocalidad1.value, filtroLocalidad2.value);
+},{ immediate: true });
   
   // Función para obtener las respuestas por ID de empresa y los demográficos
   const answersFounded = async (id: number) => {
@@ -353,6 +361,8 @@
       
       bdbd010Data.value = bdbd010Demo;
       respuestasData.value = dataAnswers;
+
+      applyFilters(filtroPais.value, filtroLocalidad1.value, filtroLocalidad2.value);
 
       /* DIMENSIONES */
       const contentTable = respuestasData.value.filter((rd:any) => rd.bid.bdinfdimid >= 2 && rd.bid.bdinfdimid <= 4);
@@ -1542,6 +1552,7 @@
           colspan: localidad2Unico.length,
       });
       
+      console.log('overallLocal2Result',overallLocal2Result)
       localidad2Unico.forEach((cru, index) => {
         const dataOverall = overallLocal2Result.value[cru]
           ? `${((overallLocal2Result.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
@@ -2097,13 +2108,18 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       competencialocalidad2Map.set(`${lindidlin}-${indclasifi}`, localidad2Unico.reduce((acc, dat) => ({ ...acc, [dat]: { total: 0, count: 0 } }), {}));
     }
 
+    let resultado = '0%';
+    if (cantidadRespuestas.value > 3) {
+      const porcentaje = ((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0);
+      resultado = `${porcentaje}%`;
+    }
     // Handle Afirmaciones    
     const afirmacion = {
       name: indxldesc.trim(),
       level: 'afirmacion',
       id: `${lindidlin}-${indclasifi}-${indxlidln}`,
       parent: `${lindidlin}-${indclasifi}`,
-      resultado: `${((afirmaciones.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
+      resultado,
       val1: `${((afirmVal1.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
       val2: `${((afirmVal2.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
       val3: `${((afirmVal3.length * 100) / cantidadRespuestas.value).toFixed(0)}%`,
@@ -2143,8 +2159,6 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       expandable: false,
     };
 
-    // Mapear los géneros únicos a un objeto que contenga los datos agrupados por género
-    // Añadir columnas dinámicas de género
     generosUnicos.forEach(genero => {
       const genData = generoMap[genero] || [];
       const idsValores = genData.map(item => item.bid.bdinfid);
@@ -5070,7 +5084,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   formatted.forEach(item => {
     if (item.level === 'competencia') {
       const competenciaData = competenciaMap.get(item.id);
-      if (competenciaData && competenciaData.count > 0) {
+      if (competenciaData && competenciaData.count > 0 && cantidadRespuestas.value > 3) {
         item.resultado = `${(((competenciaData.totalResult * 100 )/ competenciaData.count)/cantidadRespuestas.value).toFixed(0)}%`;
       }
       // Cálculo por demograficos en competencias
@@ -5266,7 +5280,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   formatted.forEach(item => {
     if (item.level === 'subdimension') {
       const subDimensionData = subDimensionMap.get(item.id);
-      if (subDimensionData && subDimensionData.count > 0) {
+      if (subDimensionData && subDimensionData.count > 0 && cantidadRespuestas.value > 3) {
         item.resultado = `${((subDimensionData.totalResult * 100 / subDimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
       }
 
@@ -5548,19 +5562,19 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
   paisUnico.forEach(data => {
     overallPaisResult.value[data] = 0;
   });
-  localidad2Unico.forEach(data => {
+  localidad1Unico.forEach(data => {
     overallLocal1Result.value[data] = 0;
   });
   localidad2Unico.forEach(data => {
-    overallLocal1Result.value[data] = 0;
+    overallLocal2Result.value[data] = 0;
   });
 
   formatted.forEach(item => {
     if (item.level === 'dimension') {
       const dimensionData = dimensionMap.get(item.id);
-      if (dimensionData && dimensionData.count > 0) {
+      if (dimensionData && dimensionData.count > 0 && cantidadRespuestas.value > 3) {
         item.resultado = `${((dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value).toFixed(0)}%`;
-        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value+1;
+        overallResult.value += (dimensionData.totalResult * 100 / dimensionData.count)/cantidadRespuestas.value;
       }
       generosUnicos.forEach(genero => {
         const generoData = dimensionGeneroMap.get(item.id)[genero];
@@ -5812,6 +5826,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       }
     });
     formattedData.value = updatedData;
+    console.log('formattedData',formattedData.value)
   };
   
   // Función para verificar si una fila está expandida
@@ -5865,6 +5880,7 @@ const exportToExcel = () => {
   const dataToExport = formattedData.value.map(item => {
     // Crea un objeto para cada fila de la tabla
     const row = {
+      Modelo: item.level.toUpperCase(),
       Name: item.name,
       Resultado: item.resultado,
     };

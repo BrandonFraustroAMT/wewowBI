@@ -257,6 +257,9 @@
   const filtroPais:any = ref();
   const filtroLocalidad1:any = ref();
   const filtroLocalidad2:any = ref();
+  const originalRespuestasData: any = ref([]);
+  const originalBdbd010Data: any = ref([]);
+
   // Función para obtener los datos de la empresa por ID
   const empresafounded = async (id: number) => {
     if (id) {
@@ -265,29 +268,36 @@
     }
   };
   
-  watch(() => props.filterData, (newFilterData) => {
-    filtroPais.value = newFilterData?.pais
-    filtroLocalidad1.value = newFilterData?.localidad1
-    filtroLocalidad2.value = newFilterData?.localidad2
+const applyFilters = (pais?: string, localidad1?: string, localidad2?: string) => {
+  // Aplicamos los filtros sobre la data original
+  let filteredBdbd010Data = [...bdbd010Data.value];  // copia de la data original
+  let filteredRespuestasData = [...respuestasData.value];  // copia de la data original
 
-    const { pais, localidad1, localidad2 } = newFilterData || {};
+  if (pais) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdcont === pais);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinfcont === pais);
+  }
+  if (localidad1) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdlocal === localidad1);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinflocal === localidad1);
+  }
+  if (localidad2) {
+    filteredBdbd010Data = filteredBdbd010Data.filter((bd: any) => bd.bdlocalb === localidad2);
+    filteredRespuestasData = filteredRespuestasData.filter((bd: any) => bd.bdinflocalb === localidad2);
+  }
 
-    // Aplicamos los filtros sobre la data
-    if (pais) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdcont === pais);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinfcont === pais);
-    } else if (localidad1) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocal === localidad1);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocal === localidad1);
-    } else if (localidad2) {
-      bdbd010Data.value = bdbd010Data.value.filter((bd: any) => bd.bdlocalb === localidad2);
-      respuestasData.value = respuestasData.value.filter((bd: any) => bd.bdinflocalb === localidad2);
-    } else {
-      // Si no hay filtros, restauramos los datos originales
-      bdbd010Data.value = bdbd010Data.value;
-      respuestasData.value = respuestasData.value;
-    }
-  },{ immediate: true });
+  // Actualizamos las variables filtradas
+  bdbd010Data.value = filteredBdbd010Data;
+  respuestasData.value = filteredRespuestasData;
+};
+
+watch(() => props.filterData, (newFilterData) => {
+  filtroPais.value = newFilterData?.pais
+  filtroLocalidad1.value = newFilterData?.localidad1
+  filtroLocalidad2.value = newFilterData?.localidad2
+  
+  applyFilters(filtroPais.value, filtroLocalidad1.value, filtroLocalidad2.value);
+},{ immediate: true });
 
   // Función para obtener las respuestas por ID de empresa y los demográficos
   const answersFounded = async (id: number) => {
@@ -299,6 +309,7 @@
   
       bdbd010Data.value = bdbd010Demo;
       respuestasData.value = dataAnswers;
+      applyFilters(filtroPais.value, filtroLocalidad1.value, filtroLocalidad2.value);
       
       /* DIMENSIONES */
       const contentTable = respuestasData.value.filter((rd:any) => rd.bid.bdinfdimid >= 2 && rd.bid.bdinfdimid <= 4);
@@ -1488,6 +1499,18 @@ const applyFilter = () => {
       const row = {};
   
       // Verificar si "Género" está en los headers de la tabla
+      if (props.filterData.columns.map(nc => nc.name).includes('¿Qué es lo más WOW de trabajar en tu organización?')) {
+        row['Qué es lo más WOW de trabajar en tu organización?'] = item[`preguntasab_Qué es lo más WOW de trabajar en tu organización?`] || '';
+      }
+      if (props.filterData.columns.map(nc => nc.name).includes('¿Qué es lo menos WOW de trabajar en tu organización?')) {
+        row['Qué es lo menos WOW de trabajar en tu organización?'] = item[`preguntasab_Qué es lo menos WOW de trabajar en tu organización?`] || '';
+      }
+      if (props.filterData.columns.map(nc => nc.name).includes('Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?')) {
+        row['¿Si tu empresa fuera un vehículo que vehículo sería?'] = item[`preguntasab_¿Si tu empresa fuera un vehículo que vehículo sería?`] || '';
+      }
+      if (props.filterData.columns.map(nc => nc.name).includes('Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.')) {
+        row['Menciona 3 características que explican porque tu organización sería ese vehículo.'] = item[`preguntasab_Menciona 3 características que explican porque tu organización sería ese vehículo.`] || '';
+      }
       if (props.filterData.columns.map(nc => nc.name).includes('Genero')) {
         generosUnicos.forEach(genero => {
           row[genero] = item[`genero_${genero}`] || '';
@@ -1643,18 +1666,6 @@ const applyFilter = () => {
         localidad2Unico.forEach(mt => {
           row[mt] = item[`local2_${mt}`] || '';
         });
-      }
-      if (props.filterData.columns.map(nc => nc.name).includes('¿Qué es lo más WOW de trabajar en tu organización?')) {
-        row['Qué es lo más WOW de trabajar en tu organización?'] = item[`preguntasab_Qué es lo más WOW de trabajar en tu organización?`] || '';
-      }
-      if (props.filterData.columns.map(nc => nc.name).includes('¿Qué es lo menos WOW de trabajar en tu organización?')) {
-        row['Qué es lo menos WOW de trabajar en tu organización?'] = item[`preguntasab_Qué es lo menos WOW de trabajar en tu organización?`] || '';
-      }
-      if (props.filterData.columns.map(nc => nc.name).includes('Si tu empresa fuera un vehiculo ¿Qué vehiculo seria?')) {
-        row['¿Si tu empresa fuera un vehículo que vehículo sería?'] = item[`preguntasab_¿Si tu empresa fuera un vehículo que vehículo sería?`] || '';
-      }
-      if (props.filterData.columns.map(nc => nc.name).includes('Menciona 3 caracteristicas que explican porque tu organización sería ese vehiculo.')) {
-        row['Menciona 3 características que explican porque tu organización sería ese vehículo.'] = item[`preguntasab_Menciona 3 características que explican porque tu organización sería ese vehículo.`] || '';
       }
       if (props.filterData.valores && Array.isArray(props.filterData.valores)) {
         props.filterData.valores.map((val, index) => {
