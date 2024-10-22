@@ -7,7 +7,7 @@
           :empresa="empresa" :mod="mod" :sub="sub" />
         <div>
           <div class="reporte-container">
-            <div id="reportContainer" class="reporte"></div> <!-- Contenedor para el reporte -->
+            <div id="reportContainer" class="reporte"></div>
           </div>
         </div>
       </div>
@@ -72,6 +72,9 @@ onMounted(async () => {
       // Obtener la URL y el token para el reporte embebido
       urlEmbed.value = await getUrlEmbed();
       tokenEmbed.value = await getEmbedToken();
+
+      console.log('urlEmbed',urlEmbed)
+      console.log('tokenEmbed',tokenEmbed)
 
       // Llamadas exitosas, ahora configurar el reporte con Power BI SDK
       if (urlEmbed.value.data.embedUrl && tokenEmbed.value.data.token) {
