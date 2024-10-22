@@ -33,18 +33,18 @@ const filterData = ref({});
 const filtroPais:any = ref();
 const filtroLocalidad1:any = ref();
 const filtroLocalidad2:any = ref();
+let powerbiService: any = null;
 
 const handleFilter = (filterDataFromMenu) => {
   filterData.value = filterDataFromMenu;
-  console.log('filterData',filterData)
 };
 
-watch(() => filterData, (newFilterData) => {
-    console.log('Nuevo filterData recibido:', newFilterData);
-    filtroPais.value = newFilterData?.pais
-    filtroLocalidad1.value = newFilterData?.localidad1
-    filtroLocalidad2.value = newFilterData?.localidad2
-  },{ immediate: true });
+watch(() => filterData, async (newFilterData) => {
+  filtroPais.value = newFilterData?.pais
+  filtroLocalidad1.value = newFilterData?.localidad1
+  filtroLocalidad2.value = newFilterData?.localidad2
+  await renderReport()
+},{ immediate: true });
 
 onMounted(async () => {
   const route = useRoute();
@@ -67,67 +67,72 @@ onMounted(async () => {
     }
   }
 
-  if (typeof window !== 'undefined') {
-    try {
-      // Obtener la URL y el token para el reporte embebido
-      urlEmbed.value = await getUrlEmbed();
-      tokenEmbed.value = await getEmbedToken();
-
-      console.log('urlEmbed',urlEmbed)
-      console.log('tokenEmbed',tokenEmbed)
-
-      // Llamadas exitosas, ahora configurar el reporte con Power BI SDK
-      if (urlEmbed.value.data.embedUrl && tokenEmbed.value.data.token) {
-        // Inicializar el contenedor del reporte
-        const reportContainer = document.getElementById("reportContainer");
-
-        if (reportContainer) {
-          // Construir filtros dinámicos
-          let filters = `&filter=EMPRESAS/EMPID eq ${empresa.value}`;
-
-          if (filtroPais.value) {
-            filters += ` and EMPRESAS/PAIS eq ${filtroPais.value}`;
-          }
-          if (filtroLocalidad1.value) {
-            filters += ` and Filtro/LOCALIDAD1 eq ${filtroLocalidad1.value}`;
-          }
-          if (filtroLocalidad2.value) {
-            filters += ` and Filtro/LOCALIDAD2 eq ${filtroLocalidad2.value}`;
-          }
-
-          // Configurar los detalles del reporte embebido
-          const embedConfig = {
-            type: 'report', 
-            embedUrl: `${urlEmbed.value.data.embedUrl}${filters}`,
-            accessToken: tokenEmbed.value.data.token,
-            tokenType: powerbi.models.TokenType.Embed,
-            settings: {
-              filterPaneEnabled: false,
-              navContentPaneEnabled: true,
-              panes: {
-                pageNavigation: {
-                  visible: true,
-                }
-              }
-            }
-          };
-
-          // Inicializar Power BI
-          const powerbiService = new powerbi.service.Service(
-            powerbi.factories.hpmFactory,
-            powerbi.factories.wpmpFactory,
-            powerbi.factories.routerFactory
-          );
-
-          // Embeber el reporte dentro del contenedor
-          powerbiService.embed(reportContainer, embedConfig);
-        }
-      }
-    } catch (error) {
-      console.error("Error al obtener el embedUrl o embedToken:", error);
-    }
-  }
+  await renderReport();
 });
+
+async function renderReport() {
+  const reportContainer = document.getElementById('reportContainer');
+
+  if (!reportContainer) return;
+
+  // Destruir el reporte anterior si existe
+  const existingReport = powerbiService?.get(reportContainer);
+  if (existingReport) {
+    existingReport.reset();
+  }
+
+  try {
+    // Obtener la URL y el token para el reporte embebido
+    urlEmbed.value = await getUrlEmbed();
+    tokenEmbed.value = await getEmbedToken();
+
+    if (urlEmbed.value.data.embedUrl && tokenEmbed.value.data.token) {
+      // Construir filtros dinámicos
+      let filters = `&filter=EMPRESAS/EMPID eq ${empresa.value}`;
+
+      if (filtroPais.value) {
+        filters += ` and EMPRESAS/PAIS eq ${filtroPais.value}`;
+      }
+      if (filtroLocalidad1.value) {
+        filters += ` and Filtro/LOCALIDAD1 eq ${filtroLocalidad1.value}`;
+      }
+      if (filtroLocalidad2.value) {
+        filters += ` and Filtro/LOCALIDAD2 eq ${filtroLocalidad2.value}`;
+      }
+
+      // Configurar los detalles del reporte embebido
+      const embedConfig = {
+        type: 'report',
+        embedUrl: `${urlEmbed.value.data.embedUrl}${filters}`,
+        accessToken: tokenEmbed.value.data.token,
+        tokenType: powerbi.models.TokenType.Embed,
+        settings: {
+          filterPaneEnabled: false,
+          navContentPaneEnabled: true,
+          panes: {
+            pageNavigation: {
+              visible: true,
+            },
+          },
+        },
+      };
+
+      // Inicializar Power BI Service si aún no lo has hecho
+      if (!powerbiService) {
+        powerbiService = new powerbi.service.Service(
+          powerbi.factories.hpmFactory,
+          powerbi.factories.wpmpFactory,
+          powerbi.factories.routerFactory
+        );
+      }
+
+      // Embeber el nuevo reporte
+      powerbiService.embed(reportContainer, embedConfig);
+    }
+  } catch (error) {
+    console.error('Error al obtener el embedUrl o embedToken:', error);
+  }
+}
 
 // Función para decodificar Base64 URL-Safe
 function decodeBase64UrlSafe(base64String: string) {
