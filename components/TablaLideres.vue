@@ -611,9 +611,9 @@ const answersFounded = async (id: number) => {
       localidad2Map[psu] = dataRespuestas.filter((ps: any) => ps.bdinflocalb === psu);
     });
 
-    lideresUnico = [...new Set(bdbd010Data.value.filter((mt: any) => mt.bdnamejd !== 'VACANTE').map((mt:any) => mt.bdnamejd))]
+    lideresUnico = [...new Set(bdbd010Data.value.filter((mt: any) => mt.bdnamejd !== 'VACANTE' && mt.bdavan === 100).map((mt:any) => mt.bdnamejd))]
     lideresUnico.forEach(psu => {
-      lideresMap[psu] = bdbd010Data.value.filter((ps: any) => ps.bdnamejd === psu);
+      lideresMap[psu] = bdbd010Data.value.filter((ps: any) => ps.bdnamejd === psu && ps.bdavan === 100);
     });
 
     tableData.value = transformData(
@@ -1591,7 +1591,7 @@ watch(() => props.filterData.columns, (newColumns) => {
       
       lideresUnico.forEach((cru, index) => {
         const dataOverall = overallLideresResult.value[cru]
-          ? `${((overallLideresResult.value[cru])/3).toFixed(0)}%`  // Calcula el promedio del overall
+          ? `${(((overallLideresResult.value[cru])/3)+1).toFixed(0)}%`  // Calcula el promedio del overall
           : '0%';  // Valor por defecto si no hay resultados
 
           dynamicHeaders.push({
@@ -2178,7 +2178,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
         ).length;
   
         if (generoCountValue.length != 0) {
-          afirmacion[`lideres_${dat}`] = `${((generoCountValue.length * 100)/ generoFilteredCount.length).toFixed(0) || 0}%`;
+          afirmacion[`lideres_${dat}`] = `${(((generoCountValue.length * 100)/ generoFilteredCount.length)).toFixed(0) || 0}%`;
         } else {
           afirmacion[`lideres_${dat}`] = `0%`;
         }
