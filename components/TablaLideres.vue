@@ -239,6 +239,7 @@ const overallNivel9Result = ref<{ [key: string]: number }>({});
 const overallNivel10Result = ref<{ [key: string]: number }>({});
 const overallPaisResult = ref<{ [key: string]: number }>({});
 const overallLideresResult = ref<{ [key: string]: number }>({});
+let overallLideres = ref<{ [key: string]: number }>({});
 
 let generosUnicos: string[] = [];
 let medioTransporteUnico: string[] = [];
@@ -1591,7 +1592,7 @@ watch(() => props.filterData.columns, (newColumns) => {
       
       lideresUnico.forEach((cru, index) => {
         const dataOverall = overallLideresResult.value[cru]
-          ? `${(((overallLideresResult.value[cru])/3)+1).toFixed(0)}%`  // Calcula el promedio del overall
+          ? `${(overallLideres.value[cru]).toFixed(0)}%`  // Calcula el promedio del overall
           : '0%';  // Valor por defecto si no hay resultados
 
           dynamicHeaders.push({
@@ -2156,9 +2157,15 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       expandable: false,
     };
 
+    lideresUnico.forEach(data => {
+      if (!overallLideres.value[data]) {
+        overallLideres.value[data] = 0;
+      }
+    });
     // Mapear los géneros únicos a un objeto que contenga los datos agrupados por lider
     lideresUnico.forEach(dat => {
       const lidData = lideresMap[dat] || [];
+      let sumGeneroCount = 0;
       if(lidData.length >= 3) {
         // Extraemos los `bdinfid` de las personas que respondieron el género actual
         const idsPorLid = lidData.map(item => item.bdbdo10id.bdid);
@@ -2178,6 +2185,10 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
         ).length;
   
         if (generoCountValue.length != 0) {
+          const porcentaje = (generoCountValue.length * 100) / generoFilteredCount.length;
+      
+          // Acumular el porcentaje en la suma
+          sumGeneroCount += porcentaje;
           afirmacion[`lideres_${dat}`] = `${(((generoCountValue.length * 100)/ generoFilteredCount.length)).toFixed(0) || 0}%`;
         } else {
           afirmacion[`lideres_${dat}`] = `0%`;
@@ -2207,6 +2218,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
           generoData.count += 1;
         }
       }
+      overallLideres.value[dat] += sumGeneroCount/55;
     });
     generosUnicos.forEach(genero => {
       const genData = generoMap[genero] || [];
@@ -5128,7 +5140,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       dimensionMap.set(dimid, dimensionData);
     }
   });
-
+  console.log('overallLideres',overallLideres.value)
   // Calculate and set average results for Competencias
   formatted.forEach(item => {
     if (item.level === 'competencia') {
@@ -5652,7 +5664,7 @@ const transformData = (dataDimensions: any[], contentTable: any[], cantidadRespu
       lideresUnico.forEach(data => {
         const lidData = dimensionlideresMap.get(item.id)[data];
         if (lidData.count > 0) {
-          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0) >= 0 ? (
+          item[`lideres_${data}`] = `${(((lidData.total * 100) / lidData.count)/lideresMap[data].length) >= 0 ? (
             (((lidData.total * 100) / lidData.count)/lideresMap[data].length).toFixed(0)
           ):(
             0
