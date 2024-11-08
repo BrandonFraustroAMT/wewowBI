@@ -37,6 +37,7 @@ onMounted(() => {
 
       // Tratar de decodificar como UTF-16 y luego convertir a JSON
       tokenPayload.value = parseTokenAsUtf16(decodedToken);
+      console.log('token',tokenPayload)
 
       empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
       mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;

@@ -102,10 +102,10 @@
           <nav class="menu-nav">
             <ul class="menu-slice__link">
               <li><NuxtLink :to="buildLink('/tablapivote/dimensiones')">Dimensiones</NuxtLink></li>
-              <li><NuxtLink :to="buildLink('/tablapivote/demograficos')">Demográficos</NuxtLink></li>
+              <!-- <li><NuxtLink :to="buildLink('/tablapivote/demograficos')">Demográficos</NuxtLink></li>
               <li><NuxtLink :to="buildLink('/tablapivote/lideres')">Lideres</NuxtLink></li>
               <li><NuxtLink :to="buildLink('/tablapivote/preguntas')">Preguntas abiertas</NuxtLink></li>
-              <li><NuxtLink :to="buildLink('/tablapivote/vacio')">Vacio</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote/vacio')">Vacio</NuxtLink></li> -->
             </ul>
           </nav>
         </div>
