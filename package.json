@@ -9,7 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "slicemachine": "start-slicemachine",
-    "start": "nuxt start"
+    "start": "nuxt start --port=8443"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.3.0",
