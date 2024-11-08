@@ -88,7 +88,7 @@ async function renderReport() {
 
     if (urlEmbed.value.data.embedUrl && tokenEmbed.value.data.token) {
       // Construir filtros dinámicos
-      let filters = `&filter=EMPRESAS/EMPID eq ${empresa.value}`;
+      let filters = `&filter=DIM_EMPRESAS/ID eq '${empresa.value}'`;
 
       if (filtroPais.value) {
         filters += ` and EMPRESAS/PAIS eq ${filtroPais.value}`;

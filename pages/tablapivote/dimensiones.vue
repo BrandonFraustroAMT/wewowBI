@@ -90,7 +90,7 @@ try {
 
   if (urlEmbed.value.data.embedUrl && tokenEmbed.value.data.token) {
     // Construir filtros dinámicos
-    let filters = `&filter=InfoEmpresas/EMPID eq ${empresa.value}`;
+    let filters = `&filter=InfoEmpresas/EMPID eq '${empresa.value}'`;
 
     if (filtroPais.value) {
       filters += ` and EMPRESAS/PAIS eq ${filtroPais.value}`;
