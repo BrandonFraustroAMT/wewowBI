@@ -24,6 +24,7 @@ const route = useRoute();
 const empresa = ref<number>(0);
 const mod = ref<number>(0);
 const sub = ref<number>(0);
+const encuesta = ref<number>(0);
 const tokenPayload = ref<any>(null);
 const urlEmbed = ref<any>(null);
 const tokenEmbed = ref<any>(null);
@@ -62,6 +63,7 @@ onMounted(async () => {
         empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
         mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;
         sub.value = tokenPayload.value.subid ? Number(tokenPayload.value.subid) : null;
+        encuesta.value = tokenPayload.value.subid ? Number(tokenPayload.value.Encuid) : null;
       } catch (error) {
         console.error("Error al decodificar el token:", error);
       }
@@ -90,7 +92,7 @@ try {
 
   if (urlEmbed.value.data.embedUrl && tokenEmbed.value.data.token) {
     // Construir filtros dinámicos
-    let filters = `&filter=InfoEmpresas/EMPID eq '${empresa.value}'`;
+    let filters = `&filter=InfoEmpresas/EMPID eq ${empresa.value} and InfoEncuestas/ENCUID eq 1`;
 
     if (filtroPais.value) {
       filters += ` and EMPRESAS/PAIS eq ${filtroPais.value}`;
