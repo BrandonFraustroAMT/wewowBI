@@ -16,7 +16,7 @@
             <ul class="menu-slice__link">
               <li><NuxtLink :to="buildLink('/portada')">Portada</NuxtLink></li>
               <li><NuxtLink :to="buildLink('/reporteejecutivo')">Reporte Ejecutivo</NuxtLink></li>
-              <li><NuxtLink :to="buildLink('/tablapivote/dimensiones')">Tabla Pivote</NuxtLink></li>
+              <li><NuxtLink :to="buildLink('/tablapivote')">Tabla Pivote</NuxtLink></li>
             </ul>
           </nav>
         </div>
@@ -98,28 +98,6 @@
             </div>
           </div>
         </div>
-        <div v-if="isTablePivotePage" class="tablas-pivote">
-          <nav class="menu-nav">
-            <ul class="menu-slice__link">
-              <li><NuxtLink :to="buildLink('/tablapivote/dimensiones')">Dimensiones</NuxtLink></li>
-              <!-- <li><NuxtLink :to="buildLink('/tablapivote/demograficos')">Demográficos</NuxtLink></li>
-              <li><NuxtLink :to="buildLink('/tablapivote/lideres')">Lideres</NuxtLink></li>
-              <li><NuxtLink :to="buildLink('/tablapivote/preguntas')">Preguntas abiertas</NuxtLink></li>
-              <li><NuxtLink :to="buildLink('/tablapivote/vacio')">Vacio</NuxtLink></li> -->
-            </ul>
-          </nav>
-        </div>
-        <div v-if="isTablePivotePage" class="paises-container__buttons">
-          <div class="btn_campos">
-              <UButton label="Campos" @click="openModal" />
-              <UModal v-model="isOpen">
-                <FiltroCampos :initialFilterData="filterData" @applyFilter="applyFilter" @cancel="closeModal"/>
-              </UModal>
-          </div>
-          <div class="paises-container__img">
-            <button class="btn_menu" @click="emitExport">Exportar</button>
-          </div>
-        </div>
       </div>
     </section>
   </section>
@@ -199,13 +177,6 @@ const buildLink = (path) => {
   return { path, query }; // Devuelve la ruta con los parámetros de consulta
 };
 
-const openModal = () => {
-  isOpen.value = true;
-};
-const closeModal = () => {
-  isOpen.value = false;
-};
-
 // Computed para verificar si la ruta es /tablapivote/dimensiones
 const isTablePivotePage = computed(() => {
   return route.path.startsWith('/tablapivote/');
@@ -215,10 +186,6 @@ const isTablePivotePage = computed(() => {
 // Define el método `applyFilter` que manejará el filtro
 const applyFilter = (filterData) => {
   emit('applyFilter', filterData);
-};
-
-const emitExport = () => {
-  emit('exportExcel');
 };
 
 // Llama a la función empresafounded cuando se monte el componente

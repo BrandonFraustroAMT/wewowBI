@@ -16,7 +16,6 @@
 <script setup lang="ts">
 
 import { useRoute } from '#app';
-import * as powerbi from 'powerbi-client';
 
 import { getUrlEmbed } from '~/services/PowerbiService';
 import { getEmbedToken } from '~/services/PowerbiService';
@@ -34,6 +33,7 @@ const filtroPais:any = ref();
 const filtroLocalidad1:any = ref();
 const filtroLocalidad2:any = ref();
 let powerbiService: any = null;
+let powerbi: any = null;
 
 const handleFilter = (filterDataFromMenu) => {
   filterData.value = filterDataFromMenu;
@@ -47,32 +47,38 @@ watch(() => filterData, async (newFilterData) => {
 },{ immediate: true });
 
 onMounted(async () => {
-  const route = useRoute();
-
-  // Decodificar el token en Base64
-  const token = route.query.token as string;
-  if (token) {
-    try {
-      // Verificar si el token necesita padding
-      const decodedToken = decodeBase64UrlSafe(token);
-
-      // Tratar de decodificar como UTF-16 y luego convertir a JSON
-      tokenPayload.value = parseTokenAsUtf16(decodedToken);
-
-      empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
-      mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;
-      sub.value = tokenPayload.value.subid ? Number(tokenPayload.value.subid) : null;
-    } catch (error) {
-      console.error("Error al decodificar el token:", error);
+  if(typeof window !== 'undefined') {
+    const powerbiClient = await import('powerbi-client');
+    powerbi = powerbiClient;
+      
+    const route = useRoute();
+  
+    // Decodificar el token en Base64
+    const token = route.query.token as string;
+    if (token) {
+      try {
+        // Verificar si el token necesita padding
+        const decodedToken = decodeBase64UrlSafe(token);
+  
+        // Tratar de decodificar como UTF-16 y luego convertir a JSON
+        tokenPayload.value = parseTokenAsUtf16(decodedToken);
+  
+        empresa.value = tokenPayload.value.empresa ? Number(tokenPayload.value.empresa) : null;
+        mod.value = tokenPayload.value.modid ? Number(tokenPayload.value.modid) : null;
+        sub.value = tokenPayload.value.subid ? Number(tokenPayload.value.subid) : null;
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+      }
     }
+  
+    await renderReport();
   }
-
-  await renderReport();
 });
 
 async function renderReport() {
-  const reportContainer = document.getElementById('reportContainer');
+  if (typeof window === 'undefined') return;
 
+  const reportContainer = document.getElementById('reportContainer');
   if (!reportContainer) return;
 
   // Destruir el reporte anterior si existe
